@@ -4,8 +4,8 @@
  * authors: Kris Semelka, Richard Prasad
  */
 
-#ifndef _NAVIGATION_H_
-#define _NAVIGATION_H_
+#ifndef _SPARKFUN_NAVIGATION_H_
+#define _SPARKFUN_NAVIGATION_H_
 
 void navigationInit();
 void navigationUpdate();

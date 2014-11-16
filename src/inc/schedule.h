@@ -5,8 +5,8 @@
  *      Author: james
  */
 
-#ifndef _SCHEDULE_H_
-#define _SCHEDULE_H_
+#ifndef _SPARKFUN_SCHEDULE_H_
+#define _SPARKFUN_SCHEDULE_H_
 
 #define SCH_MAX_TASKS (3)
 

@@ -4,3 +4,7 @@
  * authors: James Smith
  */
 
+#ifndef _SPARKFUN_COMMON_H_
+#define _SPARKFUN_COMMON_H_
+
+#endif

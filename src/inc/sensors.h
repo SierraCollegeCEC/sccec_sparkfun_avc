@@ -4,8 +4,8 @@
  * authors: Alex Norell, Kosuke Fujimoto, Austin Taylor
  */
 
-#ifndef _SENSORS_H_
-#define _SENSORS_H_
+#ifndef _SPARKFUN_SENSORS_H_
+#define _SPARKFUN_SENSORS_H_
 
 void sensorsInit();
 void sensorsUpdate();
