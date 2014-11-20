@@ -3,6 +3,7 @@
  * Motion Subsystem
  * Authors: 
  */
+#include "common.h"
 #include "motion.h"
 
 void initMotion()

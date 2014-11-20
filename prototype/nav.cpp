@@ -3,6 +3,7 @@
  * Navigation Subsystem
  * Authors: 
  */
+#include "common.h"
 #include "nav.h"
 
 void initNav()
