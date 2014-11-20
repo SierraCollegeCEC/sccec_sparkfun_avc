@@ -13,4 +13,3 @@ void updateSensors()
 {
 }
 
-sData raw;
