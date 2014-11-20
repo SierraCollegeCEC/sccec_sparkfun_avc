@@ -3,6 +3,7 @@
  * Sensors Subsystem
  * Authors: 
  */
+#include "common.h"
 #include "sensors.h"
 
 void initSensors()
