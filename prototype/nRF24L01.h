@@ -4,6 +4,10 @@
  * Authors: James Smith
  */
 
+#ifndef _NRF24L01_H_
+#define _NRF24L01_H_
+#include <stdint.h>
+
 /* Register map */
 #define CONFIG      0x00
 #define EN_AA       0x01
@@ -32,3 +36,12 @@
 #define DYNPD       0x1C
 #define FEATURE     0x1D
 
+typedef struct s_nRF24L01
+{
+  uint8_t pinCE;
+  uint8_t pinCSN;
+} nRF24L01;
+
+void rf24Setup( nRF24L01* radio, uint8_t pinCE, uint8_t pinCSN );
+
+#endif
