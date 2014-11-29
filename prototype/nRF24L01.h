@@ -1,6 +1,9 @@
 /*
  * Sierra College Computer Engineering Club: Sparkfun AVC
- * nRF24L01 - Radio module used for telemetry information
+ * nRF42L01+ API
+ * Radio module used for telemetry information. This API uses SPI to communicate with 
+ * the nRF42L01+ radio module
+ * 
  * Authors: James Smith
  */
 
