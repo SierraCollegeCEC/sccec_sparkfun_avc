@@ -36,12 +36,19 @@
 #define DYNPD       0x1C
 #define FEATURE     0x1D
 
+enum TransferMode
+{
+  RXMODE,
+  TXMODE
+};
+
 typedef struct s_nRF24L01
 {
   uint8_t pinCE;
-  uint8_t pinCSN;
+  uint8_t pinSS;
+  TransferMode mode;
 } nRF24L01;
 
-void rf24Setup( nRF24L01* radio, uint8_t pinCE, uint8_t pinCSN );
+void rf24Setup( nRF24L01* radio, uint8_t pinCE, uint8_t pinSS );
 
 #endif

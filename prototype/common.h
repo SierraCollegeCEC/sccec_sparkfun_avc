@@ -11,5 +11,15 @@
 // Run the code at 10Hz for now
 const float dt = 100.0f;
 
+/*
+ * I/O Pin Definitions
+ * These arent needed in all files but it's nice to have them in one place so we can avoid pin collisions
+ */
+const int spiSCK = 13;
+const int spiMISO = 12;
+const int spiMOSI = 11;
+const int spiRF24 = 6;
+const int spiRF24_mode = 7;
+
 #endif
 

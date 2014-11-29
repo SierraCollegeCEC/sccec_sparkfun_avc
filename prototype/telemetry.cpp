@@ -12,8 +12,7 @@ nRF24L01 radio;
 
 void initTelemetry()
 {
-  SPI.begin();
-  rf24Setup( &radio, 9, 10 );
+  rf24Setup( &radio, spiRF24_mode, spiRF24 );  
 }
 
 void updateTelemetry()
