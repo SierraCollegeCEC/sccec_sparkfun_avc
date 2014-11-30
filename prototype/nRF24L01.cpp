@@ -1,8 +1,8 @@
 /*
  * Sierra College Computer Engineering Club: Sparkfun AVC
- * nRF42L01+ API
+ * nRF24L01+ API
  * Radio module used for telemetry information. This API uses SPI to communicate with 
- * the nRF42L01+ radio module
+ * the nRF24L01+ radio module
  * 
  * TODO: Remove Arduino dependent implementations
  * Authors: James Smith
