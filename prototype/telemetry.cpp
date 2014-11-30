@@ -12,7 +12,8 @@ nRF24L01 radio;
 
 void initTelemetry()
 {
-  rf24Setup( &radio, spiRF24_mode, spiRF24 );  
+  rf24Setup( &radio, spiRF24_mode, spiRF24 );
+  Serial.println( rf24ReadRegister( &radio, STATUS ), BIN );
 }
 
 void updateTelemetry()

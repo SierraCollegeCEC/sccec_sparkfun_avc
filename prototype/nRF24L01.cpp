@@ -36,12 +36,31 @@ void rf24Setup( nRF24L01* radio, uint8_t pinCE, uint8_t pinSS )
     digitalWrite( radio->pinSS, HIGH );
     
     SPI.begin();
-    
-    digitalWrite( radio->pinSS, LOW );
-    data[0] = SPI.transfer( CONFIG );
-    data[1] = SPI.transfer( 0x00 );
-    digitalWrite( radio->pinSS, HIGH );
-    
-    Serial.println( data[1], BIN );
   }
 }
+
+uint8_t rf24ReadRegister( nRF24L01* radio, uint8_t reg )
+{
+  int value = 0;
+  if( radio )
+  {
+    digitalWrite( radio->pinSS, LOW );
+    /* TODO: Does this return an error code? */
+    SPI.transfer( R_REGISTER | (REGISTER_MASK & reg) );
+    value = SPI.transfer( 0xFF );
+    digitalWrite( radio->pinSS, HIGH );
+  }
+  return value;
+}
+
+void rf24WriteRegister( nRF24L01* radio, uint8_t reg, uint8_t value )
+{
+  if( radio )
+  {
+    digitalWrite( radio->pinSS, LOW );
+    SPI.transfer( W_REGISTER | (REGISTER_MASK * reg) );
+    SPI.transfer( value );
+    digitalWrite( radio->pinSS, HIGH );
+  }
+}
+

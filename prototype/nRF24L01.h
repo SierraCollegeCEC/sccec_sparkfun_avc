@@ -115,6 +115,7 @@ typedef struct s_nRF24L01
 } nRF24L01;
 
 void rf24Setup( nRF24L01* radio, uint8_t pinCE, uint8_t pinSS );
-void rf24
+uint8_t rf24ReadRegister( nRF24L01* radio, uint8_t reg );
+void rf24WriteRegister( nRF24L01* radio, uint8_t reg, uint8_t value );
 
 #endif
