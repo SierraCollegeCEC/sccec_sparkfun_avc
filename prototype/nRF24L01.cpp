@@ -64,3 +64,16 @@ void rf24WriteRegister( nRF24L01* radio, uint8_t reg, uint8_t value )
   }
 }
 
+void rf24Send( nRF24L01* radio, uint8_t* buffer, uint8_t length )
+{
+  if( radio )
+  {
+  }
+}
+
+void rf24Recieve( nRF24L01* radio, uint8_t* buffer, uint8_t length )
+{
+  if( radio )
+  {
+  }
+}
