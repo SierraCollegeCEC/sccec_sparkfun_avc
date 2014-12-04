@@ -22,14 +22,19 @@ const char* telemetryNames[TELEMETRY_TYPES] =
 };
 */
 
+uint8_t temp[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31 };
+
 void initTelemetry()
 {
   rf24Setup( &radio, spiRF24_mode, spiRF24 );
-  Serial.println( rf24ReadRegister( &radio, STATUS ), BIN );
+  rf24WritePayload( &radio, temp, 32 );
+  Serial.println( rf24ReadRegister( &radio, FIFO_STATUS ), BIN );
+  Serial.println( rf24ReadRegister( &radio, CONFIG ), BIN );
 }
 
 void updateTelemetry()
 {
+  //Serial.println( rf24ReadRegister( &radio, FIFO_STATUS ), BIN );
   for( uint8_t idx = 0; idx < TELEMETRY_TYPES; ++idx )
   {
     uint8_t toSend = 0;

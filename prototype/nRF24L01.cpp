@@ -36,6 +36,11 @@ void rf24Setup( nRF24L01* radio, uint8_t pinCE, uint8_t pinSS )
     digitalWrite( radio->pinSS, HIGH );
     
     SPI.begin();
+    
+    delay( 5 );
+    
+    /* Automatically re-transmit packets */
+    rf24WriteRegister( radio, SETUP_RETR, (B0100 << ARD) | (B1111 << ARC) );
   }
 }
 
@@ -62,6 +67,34 @@ void rf24WriteRegister( nRF24L01* radio, uint8_t reg, uint8_t value )
     SPI.transfer( value );
     digitalWrite( radio->pinSS, HIGH );
   }
+}
+
+void rf24WritePayload( nRF24L01* radio, uint8_t* buffer, uint8_t length )
+{
+  if( radio )
+  {
+    uint8_t padding = PAYLOAD_SIZE - length;
+    digitalWrite( radio->pinSS, LOW );
+    SPI.transfer( W_TX_PAYLOAD );
+    while( length > 0 )
+    {
+      SPI.transfer( *buffer );
+      buffer++;
+      length--;
+    }
+    while( padding > 0 )
+    {
+      SPI.transfer( 0x00 );
+      padding--;
+    }
+    digitalWrite( radio->pinSS, HIGH );
+    rf24WriteRegister( radio, CONFIG, (rf24ReadRegister( radio, CONFIG ) | (1 << PWR_UP)) & ~(1 << PRIM_RX) );
+    Serial.println( rf24ReadRegister( radio, CONFIG ), BIN );
+  }
+}
+
+void rf24ReadPayload( nRF24L01* radio, uint8_t* buffer, uint8_t length )
+{
 }
 
 void rf24Send( nRF24L01* radio, uint8_t* buffer, uint8_t length )

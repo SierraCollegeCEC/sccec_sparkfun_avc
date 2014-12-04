@@ -15,11 +15,18 @@ const float dt = 100.0f;
  * I/O Pin Definitions
  * These arent needed in all files but it's nice to have them in one place so we can avoid pin collisions
  */
+/*
 const int spiSCK = 13;
 const int spiMISO = 12;
 const int spiMOSI = 11;
-const int spiRF24 = 6;
-const int spiRF24_mode = 7;
+const int spiRF24 = 6; // SS
+const int spiRF24_mode = 7; // CE
+*/
+const int spiSCK = 52;
+const int spiMISO = 50;
+const int spiMOSI = 51;
+const int spiRF24 = 45; // SS
+const int spiRF24_mode = 44; // CE
 
 #endif
 
