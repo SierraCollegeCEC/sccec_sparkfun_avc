@@ -5,6 +5,7 @@
  */
 #include "common.h"
 #include "motion.h"
+#include "nav.h"
 
 void initMotion()
 {
