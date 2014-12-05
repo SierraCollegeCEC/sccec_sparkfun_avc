@@ -50,7 +50,7 @@ int hm55b_shift_in( int bits )
 	{
 		Serial.print( "Shifting in ");
 		Serial.print( bits );
-		Serial.print( "Recieved: " );
+		Serial.print( " bits. Recieved: " );
 	}
 	
 	for( int i = bits; i >= 0; i-- )
@@ -143,7 +143,7 @@ int hm55b_read()
 {
 	pinMode( DATA, OUTPUT );
 	digitalWrite( EN, LOW );
-	hm55b_shift_out( B0000, 3 );
+	hm55b_shift_out( B1000, 3 );
 	digitalWrite( EN, HIGH );
 	delay(40);
 	
@@ -170,11 +170,18 @@ int hm55b_read()
 
 void initSensors()
 {
-	
+	pinMode( EN, OUTPUT );
+	pinMode( CLK, OUTPUT );
+	pinMode( DATA, INPUT );
+
+	hm55b_reset();
+	int filter_array[10];
 }
 
 void updateSensors()
 {
+
+
 }
 
 navData* getNavData()
