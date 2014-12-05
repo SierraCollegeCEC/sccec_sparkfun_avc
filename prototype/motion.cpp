@@ -47,7 +47,7 @@ void updateMotion()
 	float a=-.75;
 	int maxSpeed=0;
 	motionData *MotionData = getMotionData();
-	float angle= MotionData->speed;
+	float angle= MotionData->heading;
 	
 	int v;
 	v=speedCalc(a);
