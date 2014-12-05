@@ -57,6 +57,26 @@ float findCorrection(float current, float desired)
   return correction;
 }
 
+float pidAdjust(float headingDiff)
+{
+  /*
+    Takes a value and applies the PID controller to it.
+    Currently only does a proportional correction.
+  */
+  float newHeading;
+  float kp;
+
+  kp = .7f;
+
+  /*
+    Maybe this is a good value. Maybe it's not! Who knows!
+  */
+
+  newHeading = headingDiff * kp;
+
+  return newHeading;
+}
+
 void updateNav()
 {
   /*
@@ -72,13 +92,16 @@ void updateNav()
   navData* NavData;
   float desiredHeading;
   float headingDiff;
+  float adjustedCorrection;
   
   NavData = getNavData();
   desiredHeading = M1HEADING;
 
   headingDiff = findCorrection(NavData->heading, M1HEADING);
 
-  MotionData.heading = headingDiff;
+  adjustedCorrection = pidAdjust(headingDiff);
+  
+  MotionData.heading = adjustedCorrection;
   
 }
 
