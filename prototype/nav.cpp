@@ -6,6 +6,14 @@
 #include "common.h"
 #include "nav.h"
 #include "sensors.h"
+#include <stdlib.h>
+#include <math.h>
+
+/*
+  We'll need math and stdlib... someday.
+  TODO: What standard libraries are available
+  on the TI?
+*/
 
 motionData MotionData;
 
@@ -17,9 +25,42 @@ void initNav()
   */
 }
 
+float findCorrection(float current, float desired)
+{
+  /*
+    Takes the current heading and desired heading, and
+    finds the (shortest) difference between the two.
+  */
+  float tempAngle, correction;
+  
+  tempAngle = desired - current;
+
+  if ( abs(tempAngle) > 180)
+    {
+      /*
+       Use the other angle, in the other direction
+     */
+
+      if ( tempAngle > 0)
+        {
+          correction = (360.0f - tempAngle) * -1;
+        }
+      else
+        {
+          correction = (-360.0f - tempAngle) * -1;
+        }
+    }
+
+  else
+    { correction = tempAngle; }
+  
+  return correction;
+}
+
 void updateNav()
 {
-  /* This function:
+  /*
+    This function:
      - gets the navigation data from sensors;
      - "gets" (constant for now) desired heading;
      - finds difference;
@@ -35,7 +76,7 @@ void updateNav()
   NavData = getNavData();
   desiredHeading = M1HEADING;
 
-  headingDiff = findDifference(NavData->heading, M1HEADING);
+  headingDiff = findCorrection(NavData->heading, M1HEADING);
 
   MotionData.heading = headingDiff;
   
