@@ -101,7 +101,11 @@ void updateNav()
 
   adjustedCorrection = pidAdjust(headingDiff);
   
-  MotionData.heading = adjustedCorrection;
+  MotionData.heading = adjustedCorrection * -1;
+  /* Correction factor to account for interface difference.
+     Motion considers negative to be right; navigation
+     considers negative to be left (compass directions)
+  */
   
 }
 
