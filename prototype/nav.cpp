@@ -97,7 +97,7 @@ void updateNav()
   NavData = getNavData();
   desiredHeading = M1HEADING;
 
-  headingDiff = findCorrection(NavData->heading, M1HEADING);
+  headingDiff = findCorrection(NavData->heading, desiredHeading);
 
   adjustedCorrection = pidAdjust(headingDiff);
   
