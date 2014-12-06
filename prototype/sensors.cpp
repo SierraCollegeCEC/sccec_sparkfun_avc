@@ -180,8 +180,7 @@ void initSensors()
 
 void updateSensors()
 {
-
-
+	NavData.heading = (float) hm55b_read();
 }
 
 navData* getNavData()
