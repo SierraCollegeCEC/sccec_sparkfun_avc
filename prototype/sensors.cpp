@@ -29,16 +29,12 @@
 #include "common.h"
 #include "sensors.h"
 #include <math.h>
+#include <Arduino.h>
 
 /* Debugging Flag */
-const int DEBUGGING = 1;
+const int DEBUGGING = 0;
 
 navData NavData;
-
-/* Pins */
-const byte CLK = 10;
-const byte EN = 11;
-const byte DATA = 12;
 
 /* HM55B Commands */
 int hm55b_shift_in( int bits )
@@ -160,6 +156,7 @@ int hm55b_read()
 	int angle = 180 * ( atan2( ( -1 * y_value ) , x_value ) / M_PI );
 	if ( DEBUGGING )
 	{
+  
 		Serial.print( "Angle: " );
 		Serial.print( angle );
 		Serial.print( "\n" );
@@ -180,7 +177,17 @@ void initSensors()
 
 void updateSensors()
 {
-	NavData.heading = (float) hm55b_read();
+  float heading = (float)hm55b_read();
+  if( heading < 0 )
+  {
+    heading = abs(heading);
+  }
+  else
+  {
+    heading = 360.0f - heading;
+  }
+  Serial.println( heading );
+  NavData.heading = heading;
 }
 
 navData* getNavData()

@@ -6,6 +6,7 @@
 #include "sensors.h"
 #include "nav.h"
 #include "motion.h"
+#include <Servo.h>
 
 void setup()
 {

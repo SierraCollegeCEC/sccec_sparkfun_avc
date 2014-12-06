@@ -1,7 +1,7 @@
 /*
  * Sierra College Computer Engineering Club: Sparkfun AVC
  * Motion Subsystem
- * Authors: 
+ * Authors:
  */
 
 #ifndef _MOTION_H_

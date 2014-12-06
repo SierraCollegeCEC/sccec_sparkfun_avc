@@ -16,7 +16,7 @@
 */
 
 motionData MotionData;
-float lastHeadingDiff, headingDiff;
+float lastHeadingDiff, headingDiff, totalErr;
 
 void initNav()
 {
@@ -67,9 +67,11 @@ float pidAdjust(float headingDiff)
   float newHeading;
   float kp;
   float kd;
+  float ki;
 
-  kp = .4f;
-  kd = .7f;
+  kp = 3.f;
+  kd = 2.f;
+  ki = 0.1f;
 
   /*
     Maybe this is a good value. Maybe it's not! Who knows!
@@ -77,8 +79,10 @@ float pidAdjust(float headingDiff)
 
   newHeading = headingDiff * kp
   /* Proportional Correction */
-               + (headingDiff - lastHeadingDiff) * kd / dt;
+               + (headingDiff - lastHeadingDiff) * kd / dt
   /* Derivative Correction */
+               + (totalErr * ki);
+  /* Integral Correction */
 
   return newHeading;
 }
@@ -104,10 +108,10 @@ void updateNav()
   desiredHeading = M1HEADING;
 
   headingDiff = findCorrection(NavData->heading, desiredHeading);
-
+  totalErr += headingDiff;
   adjustedCorrection = pidAdjust(headingDiff);
   
-  MotionData.heading = adjustedCorrection * -1;
+  MotionData.heading = adjustedCorrection;
   /* Correction factor to account for interface difference.
      Motion considers negative to be right; navigation
      considers negative to be left (compass directions)
