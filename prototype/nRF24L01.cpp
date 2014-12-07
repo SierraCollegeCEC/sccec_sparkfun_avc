@@ -108,6 +108,7 @@
 #define BIT(offset) (1<<offset)
 const uint16_t FREQ_MIN = 2400;
 const uint16_t FREQ_MAX = 2525;
+const uint16_t FREQ = 2475;
 /*
  * Address width values:
  * 0x01 - 3 bytes
@@ -123,6 +124,17 @@ void writeRegister( Radio* radio, uint8_t reg, const uint8_t* value, uint8_t len
 uint8_t readRegister( Radio* radio, uint8_t reg );
 void setFrequency( Radio* radio, uint16_t freq );
 
+/* 
+ * Setup the nRF24L01+
+ * The radio operates internally on a state machine. There are a couple of ways that we could
+ * run the radio, but for now what we will do is power it up, put it into PRX mode (Primary Recieve)
+ * and wait for any communication from the other radio. When it is time to send data to the other
+ * radio, we will enter PTX mode (Primary Transmit), transmit the packet, and then return to PRX mode.
+ * 
+ * For now, we will run the radio in a configuration that only allows for bi directional communication
+ * with one other radio module. It is possible to communicate with up to 6 modules with the nRF24L01+
+ * but we will not need this feature for our project. In the future it would be nice to support this
+ */
 void radioSetup( Radio* radio, uint8_t pinCE, uint8_t pinSS )
 {
 	if( radio )
@@ -130,6 +142,7 @@ void radioSetup( Radio* radio, uint8_t pinCE, uint8_t pinSS )
 		radio->pinCE = pinCE;
 		radio->pinSS = pinSS;
 
+		/* Pin Setup */
 		pinMode( spiSCK, OUTPUT );
 		pinMode( spiMISO, INPUT );
 		pinMode( spiMOSI, OUTPUT );
@@ -140,7 +153,6 @@ void radioSetup( Radio* radio, uint8_t pinCE, uint8_t pinSS )
 		SPI.setDataMode( SPI_MODE0 );
 		SPI.setClockDivider( SPI_CLOCK_DIV2 );
 
-		/* 1 = TX, 2 = RX */
 		digitalWrite( radio->pinCE, HIGH );
 		digitalWrite( radio->pinSS, HIGH );
 
@@ -149,7 +161,7 @@ void radioSetup( Radio* radio, uint8_t pinCE, uint8_t pinSS )
 		/*
 		 * Automatically re-transmit packets
 		 * ARD: Auto-Retransmit Delay: How long between retransmits (see datasheet for values)
-		 * ARC: Auto-Retransmit Count: How many times to retransmit
+		 * ARC: Auto-Retransmit Count: How many times to retransmit. 0-15
 		 * TODO: Clean up these magic numbers
 		 */
 		writeRegister( radio, SETUP_RETR, (B0100 << ARD) | (15 << ARC) );
@@ -158,7 +170,7 @@ void radioSetup( Radio* radio, uint8_t pinCE, uint8_t pinSS )
 		writeRegister( radio, TX_ADDR, ADDR, 2 + ADDR_WIDTH );
 		writeRegister( radio, RX_ADDR_P0, ADDR, 2 + ADDR_WIDTH );
 
-		setFrequency( radio, 2475 );
+		setFrequency( radio, FREQ );
 
 		/* Power up and go into PRX mode */
 		writeRegister( radio, CONFIG, readRegister( radio, CONFIG ) | BIT(PWR_UP) & BIT(PRIM_RX) );
@@ -173,11 +185,20 @@ void radioSetup( Radio* radio, uint8_t pinCE, uint8_t pinSS )
 	}
 }
 
+/* 
+ * Sending out data on the nRF24L01+ is fairly strait forward. First we write the payload, which is the
+ * packet that will be sent over the radio. Then we turn off the PRX bit, which will tell the chip to 
+ * check if there is a payload waiting to be sent. Since there is (we just wrote one), it will transmit 
+ * the packet, and then wait for a response from the reciever. After that we return to PRX mode
+ */
 void radioSend( Radio* radio, uint8_t* buffer, uint8_t length )
 {
 	if( radio )
 	{
-		/* Write the payload */
+		/* 
+		 * Write the payload. They must be a specific size, specified by PAYLOAD_SIZE, so if we arent
+		 * going to fill up a packet, just fill the rest of the payload with 0x00
+		 */
 		uint8_t padding = PAYLOAD_SIZE - length;
 		digitalWrite( radio->pinSS, LOW );
 		SPI.transfer( W_TX_PAYLOAD );
@@ -209,6 +230,9 @@ void radioSend( Radio* radio, uint8_t* buffer, uint8_t length )
 	}
 }
 
+/* 
+ * Just checks the status register to see if we have data ready to be read
+ */
 bool radioHasData( Radio* radio )
 {
 	if( radio )
@@ -218,6 +242,10 @@ bool radioHasData( Radio* radio )
 	return false;
 }
 
+/* 
+ * This should only be called after a call to radioHasData has returned true
+ * Read the specified amount from the RX payload, put it into the desired buffer
+ */
 void radioRecieve( Radio* radio, uint8_t* buffer, uint8_t length )
 {
 	if( radio )
@@ -247,11 +275,11 @@ void radioRecieve( Radio* radio, uint8_t* buffer, uint8_t length )
  * and I am already null checking them in the public interface, there should be no problems
  */
 
-void writeRegister( Radio* radio, uint8_t reg, uint8_t value )
-{
-	writeRegister( radio, reg, &value, 1 );
-}
-
+/* 
+ * Writes to a register on the nRF24L01+
+ * This can write to multi byte registers, just pass in the address to the bytes you want
+ * to write and how many of them there are
+ */
 void writeRegister( Radio* radio, uint8_t reg, const uint8_t* value, uint8_t length )
 {
 	digitalWrite( radio->pinSS, LOW );
@@ -265,6 +293,21 @@ void writeRegister( Radio* radio, uint8_t reg, const uint8_t* value, uint8_t len
 	digitalWrite( radio->pinSS, HIGH );
 }
 
+/* 
+ * Specialized version of writeRegister that writes to 1 byte registers
+ * Since most registers on the nRF24L01+ are 1 byte registers, this is more convenient
+ * because we can just pass new register values by value
+ */
+void writeRegister( Radio* radio, uint8_t reg, uint8_t value )
+{
+	writeRegister( radio, reg, &value, 1 );
+}
+
+/*
+ * Read from a register on the nRF24L01+
+ * Returns the value as a byte
+ * TODO: Support for reading from registers that are longer than 1 byte!
+ */
 uint8_t readRegister( Radio* radio, uint8_t reg )
 {
 	int value = 0;
@@ -284,7 +327,8 @@ uint8_t readRegister( Radio* radio, uint8_t reg )
 void setFrequency( Radio* radio, uint16_t freq )
 {
 	/* First clamps freq between FREQ_MIN and FREQ_MAX, then takes the remainder after a division with FREQ_MIN, 
-	   since this is what is needed in the register */
+	   since this is what is needed in the register. We can use 1 byte for this because the range is 0-127 for the
+	   register, but based on our clamping it will only range from 0-125 */
 	freq = min( FREQ_MAX, max( freq, FREQ_MIN ) );
 	uint8_t value = freq % FREQ_MIN;
 	writeRegister( radio, RF_CH, value );
