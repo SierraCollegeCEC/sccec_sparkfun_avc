@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "pid.h"
+#include "bezier.h"
 
 motionData MotionData;
 
@@ -56,30 +57,32 @@ void updateNav()
 {
   /*
     This function:
-     - gets the navigation data from sensors;
-     - "gets" (constant for now) desired heading;
-     - finds difference;
-     - applies PID (just P for now);
+     - gets the navigation data from sensors (heading, position);
+     - gets desired values from Bezier Curves (position);
+     - finds difference between desired position and real position
+       to obtain desired heading;
+     - find difference between desired heading and real heading
+     - applies PID to heading differences;
      - creates instructions for motion module;
      - and pushes instructions to MotionData
-     on every update.
+       on every update.
   */
   navData* NavData;
   float desiredHeading;
   float headingDiff;
-  float adjustedCorrection;
-  
+  float adjustedHeading;
+
   NavData = getNavData();
-  desiredHeading = M1HEADING;
+  desiredHeading = getDesiredHeading();
+  /* This NEEDS to accept NavData->pos as an argument, but I can't till
+     it's defined in sensors.h. Returning stub value in the meantime for
+     purposes of this commit.
+  */
 
   headingDiff = findCorrection(NavData->heading, desiredHeading);
-  adjustedCorrection = pidAdjust(headingDiff);
+  adjustedHeading = pidAdjust(headingDiff);
   
-  MotionData.heading = adjustedCorrection;
-  /* Correction factor to account for interface difference.
-     Motion considers negative to be right; navigation
-     considers negative to be left (compass directions)
-  */
+  MotionData.heading = adjustedHeading;
   
 }
 
