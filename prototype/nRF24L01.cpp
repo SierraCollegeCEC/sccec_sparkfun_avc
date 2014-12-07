@@ -11,6 +11,8 @@
 #include "common.h"
 #include "nRF24L01.h"
 
+ #define BIT(offset) (1<<offset)
+
 uint8_t data[2];
 
 void rf24Setup( nRF24L01* radio, uint8_t pinCE, uint8_t pinSS )
@@ -37,6 +39,7 @@ void rf24Setup( nRF24L01* radio, uint8_t pinCE, uint8_t pinSS )
 
 		SPI.begin();
 
+		/* The datasheet mentions needed a 1.5ms startup time for the crystal, give it a little extra time */
 		delay( 5 );
 
 		/* Automatically re-transmit packets */
@@ -73,6 +76,8 @@ void rf24WritePayload( nRF24L01* radio, uint8_t* buffer, uint8_t length )
 {
 	if( radio )
 	{
+		rf24WriteRegister( radio, CONFIG, rf24ReadRegister( radio, CONFIG ) | BIT(PWR_UP) & ~(BIT(PRIM_RX)) );
+		
 		uint8_t padding = PAYLOAD_SIZE - length;
 		digitalWrite( radio->pinSS, LOW );
 		SPI.transfer( W_TX_PAYLOAD );
@@ -88,13 +93,31 @@ void rf24WritePayload( nRF24L01* radio, uint8_t* buffer, uint8_t length )
 			padding--;
 		}
 		digitalWrite( radio->pinSS, HIGH );
-		rf24WriteRegister( radio, CONFIG, (rf24ReadRegister( radio, CONFIG ) | (1 << PWR_UP)) & ~(1 << PRIM_RX) );
+
 		Serial.println( rf24ReadRegister( radio, CONFIG ), BIN );
 	}
 }
 
 void rf24ReadPayload( nRF24L01* radio, uint8_t* buffer, uint8_t length )
 {
+	if( radio )
+	{
+		uint8_t padding = PAYLOAD_SIZE - length;
+		digitalWrite( radio->pinSS, LOW );
+		SPI.transfer( R_RX_PAYLOAD );
+		while( length > 0 )
+		{
+			*buffer = SPI.transfer( 0xFF );
+			buffer++;
+			length--;
+		}
+		while( padding > 0 )
+		{
+			SPI.transfer( 0x00 );
+			padding--;
+		}
+		digitalWrite( radio->pinSS, HIGH );
+	}
 }
 
 void rf24Send( nRF24L01* radio, uint8_t* buffer, uint8_t length )
