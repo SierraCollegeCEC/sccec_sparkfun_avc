@@ -11,20 +11,20 @@
 
 void setup()
 {
-  Serial.begin( 9600 );
-  initSensors();
-  initNav();
-  initMotion();
-  initTelemetry();
+	Serial.begin( 9600 );
+	initSensors();
+	initNav();
+	initMotion();
+	initTelemetry();
 }
 
 void loop()
 {
-  updateSensors();
-  updateNav();
-  updateMotion();
-  updateTelemetry();
-  
-  delay( dt );
+	  updateSensors();
+	  updateNav();
+	  updateMotion();
+	  updateTelemetry();
+	  
+	  delay( dt );
 }
 
