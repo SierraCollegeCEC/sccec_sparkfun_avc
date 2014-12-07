@@ -10,18 +10,18 @@
 
 void setup()
 {
-  Serial.begin( 9600 );
-  initSensors();
-  initNav();
-  initMotion();
+	Serial.begin( 9600 );
+	initSensors();
+	initNav();
+	initMotion();
 }
 
 void loop()
 {
-  updateSensors();
-  updateNav();
-  updateMotion();
-  
-  delay( dt );
+	updateSensors();
+ 	updateNav();
+	updateMotion();
+
+	delay( dt );
 }
 
