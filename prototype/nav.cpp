@@ -8,15 +8,9 @@
 #include "sensors.h"
 #include <stdlib.h>
 #include <math.h>
-
-/*
-  We'll need math and stdlib... someday.
-  TODO: What standard libraries are available
-  on the TI?
-*/
+#include "pid.h"
 
 motionData MotionData;
-float lastHeadingDiff, headingDiff, totalErr;
 
 void initNav()
 {
@@ -58,35 +52,6 @@ float findCorrection(float current, float desired)
   return correction;
 }
 
-float pidAdjust(float headingDiff)
-{
-  /*
-    Takes a value and applies the PID controller to it.
-    Currently only does a proportional correction.
-  */
-  float newHeading;
-  float kp;
-  float kd;
-  float ki;
-
-  kp = 3.f;
-  kd = 2.f;
-  ki = 0.1f;
-
-  /*
-    Maybe this is a good value. Maybe it's not! Who knows!
-  */
-
-  newHeading = headingDiff * kp
-  /* Proportional Correction */
-               + (headingDiff - lastHeadingDiff) * kd / dt
-  /* Derivative Correction */
-               + (totalErr * ki);
-  /* Integral Correction */
-
-  return newHeading;
-}
-
 void updateNav()
 {
   /*
@@ -108,7 +73,6 @@ void updateNav()
   desiredHeading = M1HEADING;
 
   headingDiff = findCorrection(NavData->heading, desiredHeading);
-  totalErr += headingDiff;
   adjustedCorrection = pidAdjust(headingDiff);
   
   MotionData.heading = adjustedCorrection;
@@ -116,8 +80,6 @@ void updateNav()
      Motion considers negative to be right; navigation
      considers negative to be left (compass directions)
   */
-  
-  lastHeadingDiff = headingDiff;
   
 }
 
