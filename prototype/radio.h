@@ -20,6 +20,7 @@ typedef struct s_Radio
 
 void radioSetup( Radio* radio, uint8_t pinCE, uint8_t pinSS );
 void radioSend( Radio* radio, uint8_t* buffer, uint8_t length );
+bool radioHasData( Radio* radio );
 void radioRecieve( Radio* radio, uint8_t* buffer, uint8_t length );
 
 #endif

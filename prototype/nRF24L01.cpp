@@ -5,6 +5,8 @@
  * the nRF24L01+ radio module
  * 
  * TODO: Remove Arduino dependent implementations
+ * TODO: After transmitting a packet, listen on an interrupt for ack and then return to RX mode
+ * TODO: Iron out the bandwidth/retry stuff
  * Authors: James Smith
  */
 #include <SPI.h>
@@ -119,11 +121,7 @@ const uint8_t ADDR[] = { 0xDE, 0xAD, 0xFF };
 void writeRegister( Radio* radio, uint8_t reg, uint8_t value );
 void writeRegister( Radio* radio, uint8_t reg, const uint8_t* value, uint8_t length );
 uint8_t readRegister( Radio* radio, uint8_t reg );
-void writePayload( Radio* radio, uint8_t* buffer, uint8_t length );
-void readPayload( Radio* radio, uint8_t* buffer, uint8_t length );
 void setFrequency( Radio* radio, uint16_t freq );
-
-uint8_t data[2];
 
 void radioSetup( Radio* radio, uint8_t pinCE, uint8_t pinSS )
 {
@@ -162,6 +160,9 @@ void radioSetup( Radio* radio, uint8_t pinCE, uint8_t pinSS )
 
 		setFrequency( radio, 2475 );
 
+		/* Power up and go into PRX mode */
+		writeRegister( radio, CONFIG, readRegister( radio, CONFIG ) | BIT(PWR_UP) & BIT(PRIM_RX) );
+
 		/* 
 		 * Startup times (from datasheet)
 		 *   Power Down -> Standby: 4.5ms (max)
@@ -176,16 +177,66 @@ void radioSend( Radio* radio, uint8_t* buffer, uint8_t length )
 {
 	if( radio )
 	{
-		writePayload( radio, buffer, length );
+		/* Write the payload */
+		uint8_t padding = PAYLOAD_SIZE - length;
+		digitalWrite( radio->pinSS, LOW );
+		SPI.transfer( W_TX_PAYLOAD );
+		while( length > 0 )
+		{
+			SPI.transfer( *buffer );
+			buffer++;
+			length--;
+		}
+		while( padding > 0 )
+		{
+			SPI.transfer( 0x00 );
+			padding--;
+		}
+		digitalWrite( radio->pinSS, HIGH );
+
 		Serial.println( readRegister( radio, CONFIG ), BIN );
-		writeRegister( radio, CONFIG, readRegister( radio, CONFIG ) | BIT(PWR_UP) & ~(BIT(PRIM_RX)) );
+		writeRegister( radio, CONFIG, readRegister( radio, CONFIG ) & ~(BIT(PRIM_RX)) );
+
+		/* This is a bad way to do this but for now it will work. This should be in an interrupt */
+		bool waitingForAck = true;
+		while( waitingForAck )
+		{
+			waitingForAck = (readRegister( radio, STATUS ) & (BIT(TX_DS) | BIT(MAX_RT)));
+		}
+
+		/* Send is finished, go back to listening mode */
+		writeRegister( radio, CONFIG, readRegister( radio, CONFIG ) | BIT(PRIM_RX) );
 	}
+}
+
+bool radioHasData( Radio* radio )
+{
+	if( radio )
+	{
+		return (readRegister( radio, STATUS ) & BIT(RX_DR));
+	}
+	return false;
 }
 
 void radioRecieve( Radio* radio, uint8_t* buffer, uint8_t length )
 {
 	if( radio )
 	{
+		uint8_t padding = PAYLOAD_SIZE - length;
+		digitalWrite( radio->pinSS, LOW );
+		SPI.transfer( R_RX_PAYLOAD );
+		while( length > 0 )
+		{
+			*buffer = SPI.transfer( 0xFF );
+			buffer++;
+			length--;
+		}
+		while( padding > 0 )
+		{
+			SPI.transfer( 0x00 );
+			padding--;
+		}
+		digitalWrite( radio->pinSS, HIGH );
 	}
 }
 
@@ -223,44 +274,6 @@ uint8_t readRegister( Radio* radio, uint8_t reg )
 	value = SPI.transfer( 0xFF );
 	digitalWrite( radio->pinSS, HIGH );
 	return value;
-}
-
-void writePayload( Radio* radio, uint8_t* buffer, uint8_t length )
-{
-	uint8_t padding = PAYLOAD_SIZE - length;
-	digitalWrite( radio->pinSS, LOW );
-	SPI.transfer( W_TX_PAYLOAD );
-	while( length > 0 )
-	{
-		SPI.transfer( *buffer );
-		buffer++;
-		length--;
-	}
-	while( padding > 0 )
-	{
-		SPI.transfer( 0x00 );
-		padding--;
-	}
-	digitalWrite( radio->pinSS, HIGH );
-}
-
-void readPayload( Radio* radio, uint8_t* buffer, uint8_t length )
-{
-	uint8_t padding = PAYLOAD_SIZE - length;
-	digitalWrite( radio->pinSS, LOW );
-	SPI.transfer( R_RX_PAYLOAD );
-	while( length > 0 )
-	{
-		*buffer = SPI.transfer( 0xFF );
-		buffer++;
-		length--;
-	}
-	while( padding > 0 )
-	{
-		SPI.transfer( 0x00 );
-		padding--;
-	}
-	digitalWrite( radio->pinSS, HIGH );
 }
 
 /*

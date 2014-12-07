@@ -8,6 +8,9 @@
 #include "telemetry.h"
 #include "radio.h"
 
+#define ENABLE_TELEMETRY
+
+#ifdef ENABLE_TELEMETRY
 Radio radio;
 uint8_t telemetryData[TELEMETRY_TYPES][TELEMETRY_MAX];
 uint8_t telemetryIndex[TELEMETRY_TYPES];
@@ -72,3 +75,14 @@ void addTelemetryData( TelemetryType type, uint8_t value )
 		telemetryIndex[type] = 0;
 	}
 }
+#else
+void initTelemetry()
+{
+}
+void updateTelemetry()
+{
+}
+void addTelemetryData( TelemetryType type, uint8_t value )
+{
+}
+#endif
