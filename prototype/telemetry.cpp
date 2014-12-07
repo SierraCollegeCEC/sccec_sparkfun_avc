@@ -6,9 +6,9 @@
 #include <SPI.h>
 #include "common.h"
 #include "telemetry.h"
-#include "nRF24L01.h"
+#include "radio.h"
 
-nRF24L01 radio;
+Radio radio;
 uint8_t telemetryData[TELEMETRY_TYPES][TELEMETRY_MAX];
 uint8_t telemetryIndex[TELEMETRY_TYPES];
 uint8_t telemetryIndexLast[TELEMETRY_TYPES];
@@ -26,10 +26,8 @@ uint8_t temp[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18
 
 void initTelemetry()
 {
-	rf24Setup( &radio, spiRF24_mode, spiRF24 );
-	rf24WritePayload( &radio, temp, 32 );
-	Serial.println( rf24ReadRegister( &radio, FIFO_STATUS ), BIN );
-	Serial.println( rf24ReadRegister( &radio, CONFIG ), BIN );
+	radioSetup( &radio, spiRF24_mode, spiRF24 );
+	radioSend( &radio, temp, 32 );
 }
 
 void updateTelemetry()
@@ -49,13 +47,13 @@ void updateTelemetry()
 
 		if( toSend > 0 )
 		{
-			rf24Send( &radio, &idx, 1 );
-			rf24Send( &radio, &toSend, 1 );
+			radioSend( &radio, &idx, 1 );
+			radioSend( &radio, &toSend, 1 );
 
 			for( int i = 0; i < toSend; ++i )
 			{
 				/* TODO: Bundle all telemetry data into larger packets. Should this happen here or on the radio side? */
-				rf24Send( &radio, &telemetryData[idx][(i + telemetryIndexLast[idx]) % TELEMETRY_MAX], 1 );
+				radioSend( &radio, &telemetryData[idx][(i + telemetryIndexLast[idx]) % TELEMETRY_MAX], 1 );
 			}
 
 			telemetryIndexLast[idx] = telemetryIndex[idx];
