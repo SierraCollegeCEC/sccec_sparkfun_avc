@@ -105,15 +105,15 @@
 
 enum TransferMode
 {
-  RXMODE,
-  TXMODE
+	RXMODE,
+	TXMODE
 };
 
 typedef struct s_nRF24L01
 {
-  uint8_t pinCE;
-  uint8_t pinSS;
-  TransferMode mode;
+	uint8_t pinCE;
+	uint8_t pinSS;
+	TransferMode mode;
 } nRF24L01;
 
 void rf24Setup( nRF24L01* radio, uint8_t pinCE, uint8_t pinSS );

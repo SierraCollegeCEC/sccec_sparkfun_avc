@@ -13,9 +13,9 @@
  */
 typedef enum
 {
-  MOTION_TURNING,
-  NAVIGATION_ERROR,
-  SENSORS_MAG
+	MOTION_TURNING,
+	NAVIGATION_ERROR,
+	SENSORS_MAG
 } TelemetryType;
 
 /* If new types are added or removed from the enum, this needs to be changed to reflect that */
