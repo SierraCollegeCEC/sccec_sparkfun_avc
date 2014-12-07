@@ -20,11 +20,11 @@ void setup()
 
 void loop()
 {
-	  updateSensors();
-	  updateNav();
-	  updateMotion();
-	  updateTelemetry();
-	  
-	  delay( dt );
+	updateSensors();
+	updateNav();
+	updateMotion();
+	updateTelemetry();
+
+	delay( dt );
 }
 
