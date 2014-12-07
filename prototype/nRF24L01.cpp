@@ -106,6 +106,14 @@
 #define BIT(offset) (1<<offset)
 #define FREQ_MIN 2400
 #define FREQ_MAX 2525
+/*
+ * Address width values:
+ * 0x01 - 3 bytes
+ * 0x10 - 4 bytes
+ * 0x11 - 5 bytes
+ */
+#define ADDR_WIDTH 0x01
+#define ADDR 0xDEADFF
 
 /* Forward Declarations */
 void writeRegister( Radio* radio, uint8_t reg, uint8_t value );
@@ -138,8 +146,19 @@ void radioSetup( Radio* radio, uint8_t pinCE, uint8_t pinSS )
 
 		SPI.begin();
 
-		/* Automatically re-transmit packets */
-		writeRegister( radio, SETUP_RETR, (B0100 << ARD) | (B1111 << ARC) );
+		/*
+		 * Automatically re-transmit packets
+		 * ARD: Auto-Retransmit Delay: How long between retransmits (see datasheet for values)
+		 * ARC: Auto-Retransmit Count: How many times to retransmit
+		 * TODO: Clean up these magic numbers
+		 */
+		writeRegister( radio, SETUP_RETR, (B0100 << ARD) | (15 << ARC) );
+		writeRegister( radio, SETUP_AW, (ADDR_WIDTH << AW) );
+		/* Set transmit and recieve addresses to be the same (for bidirectional communication) */
+		writeRegister( radio, TX_ADDR, ADDR );
+		writeRegister( radio, RX_ADDR_P0, ADDR );
+
+		setFrequency( 2475 );
 
 		/* 
 		 * Startup times (from datasheet)
@@ -155,6 +174,7 @@ void radioSend( Radio* radio, uint8_t* buffer, uint8_t length )
 {
 	if( radio )
 	{
+		writeRegister( radio, CONFIG, readRegister( radio, CONFIG ) | BIT(PWR_UP) & ~(BIT(PRIM_RX)) );
 	}
 }
 
@@ -193,50 +213,42 @@ uint8_t readRegister( Radio* radio, uint8_t reg )
 
 void writePayload( Radio* radio, uint8_t* buffer, uint8_t length )
 {
-	if( radio )
+	uint8_t padding = PAYLOAD_SIZE - length;
+	digitalWrite( radio->pinSS, LOW );
+	SPI.transfer( W_TX_PAYLOAD );
+	while( length > 0 )
 	{
-		writeRegister( radio, CONFIG, readRegister( radio, CONFIG ) | BIT(PWR_UP) & ~(BIT(PRIM_RX)) );
-
-		uint8_t padding = PAYLOAD_SIZE - length;
-		digitalWrite( radio->pinSS, LOW );
-		SPI.transfer( W_TX_PAYLOAD );
-		while( length > 0 )
-		{
-			SPI.transfer( *buffer );
-			buffer++;
-			length--;
-		}
-		while( padding > 0 )
-		{
-			SPI.transfer( 0x00 );
-			padding--;
-		}
-		digitalWrite( radio->pinSS, HIGH );
-
-		Serial.println( readRegister( radio, CONFIG ), BIN );
+		SPI.transfer( *buffer );
+		buffer++;
+		length--;
 	}
+	while( padding > 0 )
+	{
+		SPI.transfer( 0x00 );
+		padding--;
+	}
+	digitalWrite( radio->pinSS, HIGH );
+
+	Serial.println( readRegister( radio, CONFIG ), BIN );
 }
 
 void readPayload( Radio* radio, uint8_t* buffer, uint8_t length )
 {
-	if( radio )
+	uint8_t padding = PAYLOAD_SIZE - length;
+	digitalWrite( radio->pinSS, LOW );
+	SPI.transfer( R_RX_PAYLOAD );
+	while( length > 0 )
 	{
-		uint8_t padding = PAYLOAD_SIZE - length;
-		digitalWrite( radio->pinSS, LOW );
-		SPI.transfer( R_RX_PAYLOAD );
-		while( length > 0 )
-		{
-			*buffer = SPI.transfer( 0xFF );
-			buffer++;
-			length--;
-		}
-		while( padding > 0 )
-		{
-			SPI.transfer( 0x00 );
-			padding--;
-		}
-		digitalWrite( radio->pinSS, HIGH );
+		*buffer = SPI.transfer( 0xFF );
+		buffer++;
+		length--;
 	}
+	while( padding > 0 )
+	{
+		SPI.transfer( 0x00 );
+		padding--;
+	}
+	digitalWrite( radio->pinSS, HIGH );
 }
 
 /*
@@ -246,10 +258,7 @@ void readPayload( Radio* radio, uint8_t* buffer, uint8_t length )
  */
 void setFrequency( Radio* radio, uint16_t freq )
 {
-	if( radio )
-	{
-		/* First clamps freq between FREQ_MIN and FREQ_MAX, then takes the remainder after a division with FREQ_MIN, 
-		   since this is what is needed in the register */
-		writeRegister( radio, RF_CH, (min( FREQ_MAX, max( freq, FREQ_MIN ) ) % FREQ_MIN) );
-	}
+	/* First clamps freq between FREQ_MIN and FREQ_MAX, then takes the remainder after a division with FREQ_MIN, 
+	   since this is what is needed in the register */
+	writeRegister( radio, RF_CH, (min( FREQ_MAX, max( freq, FREQ_MIN ) ) % FREQ_MIN) );
 }

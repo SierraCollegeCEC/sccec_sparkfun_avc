@@ -2,7 +2,8 @@
  * Sierra College Computer Engineering Club: Sparkfun AVC
  * Generic Radio API
  * This is a generic interface for a radio module. Each different chip would need to implement these functions
- * as well as any internal functions it would need.
+ * as well as any internal functions it would need. This API assumed point to point radio, and does not support
+ * a network of radios.
  * 
  * Authors: James Smith
  */
