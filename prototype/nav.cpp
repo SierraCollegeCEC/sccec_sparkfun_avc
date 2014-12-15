@@ -41,19 +41,12 @@ float findCorrection(vector current, vector desired)
   tempAngle = findAngle(desired) - findAngle(current);
 
   if ( abs(tempAngle) > 180)
-    {
-      /*
-       Use the other angle, in the other direction
-     */
+    { /* Use the other angle, in the other direction */
 
-      if ( tempAngle > 0)
-        {
-          correction = (360.0f - tempAngle) * -1;
-        }
+      if ( tempAngle > 0) 
+        { correction = tempAngle - 360f; }
       else
-        {
-          correction = (-360.0f - tempAngle) * -1;
-        }
+        { correction = tempAngle + 360f; }
     }
 
   else
