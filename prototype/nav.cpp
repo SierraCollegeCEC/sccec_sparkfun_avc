@@ -77,12 +77,11 @@ void updateNav()
        on every update.
   */
   navData* NavData;
-  vector desiredHeading;
   float  headingDiff;
   float adjustedHeading;
 
   NavData = getNavData();
-  desiredHeading = getDesiredHeading();
+  updateDesiredHeading();
   /* This NEEDS to accept NavData->pos as an argument, but I can't till
      it's defined in sensors.h. Returning stub value in the meantime for
      purposes of this commit.

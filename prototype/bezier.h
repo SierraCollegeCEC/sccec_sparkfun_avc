@@ -7,7 +7,7 @@
 #ifndef _BEZIER_H_
 #define _BEZIER_H_
 
-float getDesiredHeading(void);
+void updateDesiredHeading(void);
 /* Should use position datatype on next commit.
  */
 #endif

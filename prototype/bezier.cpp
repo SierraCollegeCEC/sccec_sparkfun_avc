@@ -5,11 +5,15 @@
  */
 
 #include "common.h"
-#include "nav.h"
 #include <stdlib.h>
 #include <math.h>
 #include "bezier.h"
 
-float getDesiredHeading(){
-  return 0.f;
+vector desiredHeading;
+
+void updateDesiredHeading(){
+
+  desiredHeading[0]= 0f;
+  desiredHeading[1]= 0f;
+
 }
