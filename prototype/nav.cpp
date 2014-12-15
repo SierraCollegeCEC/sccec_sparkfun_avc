@@ -21,15 +21,24 @@ void initNav()
   */
 }
 
-float findCorrection(float current, float desired)
+float findAngle(vector vec){
+
+  float angle =  180 * ( atan2( ( -1 * vec[1] ) , vec[0] ) / M_PI );
+  return angle;
+  
+}  
+  
+
+float findCorrection(vector current, vector desired)
 {
   /*
     Takes the current heading and desired heading, and
-    finds the (shortest) difference between the two.
+    finds the (shortest, signed) difference between the two.
   */
+
   float tempAngle, correction;
   
-  tempAngle = desired - current;
+  tempAngle = findAngle(desired) - findAngle(current);
 
   if ( abs(tempAngle) > 180)
     {
@@ -68,8 +77,8 @@ void updateNav()
        on every update.
   */
   navData* NavData;
-  float desiredHeading;
-  float headingDiff;
+  vector desiredHeading;
+  float  headingDiff;
   float adjustedHeading;
 
   NavData = getNavData();
