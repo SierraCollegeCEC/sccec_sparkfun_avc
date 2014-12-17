@@ -44,9 +44,9 @@ float findCorrection(vector current, vector desired)
     { /* Use the other angle, in the other direction */
 
       if ( tempAngle > 0) 
-        { correction = tempAngle - 360f; }
+        { correction = tempAngle - 360.f; }
       else
-        { correction = tempAngle + 360f; }
+        { correction = tempAngle + 360.f; }
     }
 
   else
@@ -74,13 +74,14 @@ void updateNav()
   float adjustedHeading;
 
   NavData = getNavData();
-  updateDesiredHeading();
-  /* This NEEDS to accept NavData->pos as an argument, but I can't till
+  
+  headingDiff = findCorrection(NavData->heading, getDesiredHeading());
+  
+  /* getDesiredHeading NEEDS to accept NavData->pos as an argument, but I can't till
      it's defined in sensors.h. Returning stub value in the meantime for
      purposes of this commit.
   */
-
-  headingDiff = findCorrection(NavData->heading, desiredHeading);
+  
   adjustedHeading = pidAdjust(headingDiff);
   
   MotionData.heading = adjustedHeading;

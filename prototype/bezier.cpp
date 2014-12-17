@@ -9,11 +9,13 @@
 #include <math.h>
 #include "bezier.h"
 
-vector desiredHeading;
+float desiredHeading[3];
 
-void updateDesiredHeading(){
-
-  desiredHeading[0]= 0f;
-  desiredHeading[1]= 0f;
+float * getDesiredHeading(void){
+  
+  desiredHeading[0]= 0.f;
+  desiredHeading[1]= 0.f;
+  
+  return desiredHeading;
 
 }
