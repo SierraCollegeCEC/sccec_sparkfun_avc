@@ -23,7 +23,7 @@ void initNav()
 
 float findAngle(vector vec){
 
-  float angle =  180 * ( atan2( ( -1 * vec[1] ) , vec[0] ) / M_PI );
+  float angle =  180 * ( atan2( ( -1 * vec.y ) , vec.x ) / M_PI );
   return angle;
   
 }  

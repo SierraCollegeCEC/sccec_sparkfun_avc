@@ -8,9 +8,6 @@
 #define _BEZIER_H_
 #include "common.h"
 
-extern float desiredHeading[3];
+vector getDesiredHeading(void);
 
-float * getDesiredHeading(void);
-/* Should use position datatype on next commit.
- */
 #endif
