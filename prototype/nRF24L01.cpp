@@ -7,6 +7,22 @@
  * TODO: Remove Arduino dependent implementations
  * TODO: After transmitting a packet, listen on an interrupt for ack and then return to RX mode
  * TODO: Iron out the bandwidth/retry stuff
+ * Temporary pin out on breadboard:
+ * 1: MISO
+ * 2: SCK
+ * 3: CE
+ * 4: GND
+ *    
+ * 6: IRQ
+ * 7: MOSI
+ * 8: CSN (SS)
+ * 9: VCC
+ * 
+ * SCK = 13
+ * MISO = 12
+ * MOSI = 11
+ * SS = 6
+ * CE = 7
  * Authors: James Smith
  */
 #include <SPI.h>
@@ -79,15 +95,20 @@
 #define TX_EMPTY    4
 #define RX_FULL     1
 #define RX_EMPTY    0
-#define DPL_P5	    5
-#define DPL_P4	    4
-#define DPL_P3	    3
-#define DPL_P2	    2
-#define DPL_P1	    1
-#define DPL_P0	    0
-#define EN_DPL	    2
+#define DPL_P5      5
+#define DPL_P4      4
+#define DPL_P3      3
+#define DPL_P2      2
+#define DPL_P1      1
+#define DPL_P0      0
+#define EN_DPL      2
 #define EN_ACK_PAY  1
 #define EN_DYN_ACK  0
+
+#define RF_DR_LOW   5
+#define RF_DR_HIGH  3
+#define RF_PWR_LOW  1
+#define RF_PWR_HIGH 2
 
 /* Instruction Mnemonics */
 #define R_REGISTER    0x00
@@ -103,8 +124,6 @@
 #define REUSE_TX_PL   0xE3
 #define NOP           0xFF
 
-#define PAYLOAD_SIZE 32
-
 #define BIT(offset) (1<<offset)
 const uint16_t FREQ_MIN = 2400;
 const uint16_t FREQ_MAX = 2525;
@@ -116,14 +135,17 @@ const uint16_t FREQ = 2475;
  * 0x11 - 5 bytes
  */
 const uint8_t ADDR_WIDTH = 0x01;
-const uint8_t ADDR[] = { 0xDE, 0xAD, 0xFF };
+const uint8_t ADDR[] = { 0xDE, 0xAD, 0xFF, 0x12, 0x34 };
+
+const uint8_t PAYLOAD_SIZE = 32;
 
 /* Forward Declarations */
 void writeRegister( Radio* radio, uint8_t reg, uint8_t value );
 void writeRegister( Radio* radio, uint8_t reg, const uint8_t* value, uint8_t length );
 uint8_t readRegister( Radio* radio, uint8_t reg );
+void readRegister( Radio* radio, uint8_t reg, uint8_t* buffer, uint8_t length );
 void setFrequency( Radio* radio, uint16_t freq );
-
+void printDebug( Radio* radio );
 /* 
  * Setup the nRF24L01+
  * The radio operates internally on a state machine. There are a couple of ways that we could
@@ -137,52 +159,78 @@ void setFrequency( Radio* radio, uint16_t freq );
  */
 void radioSetup( Radio* radio, uint8_t pinCE, uint8_t pinSS )
 {
-	if( radio )
-	{
-		radio->pinCE = pinCE;
-		radio->pinSS = pinSS;
+    if( radio )
+    {
+        radio->pinCE = pinCE;
+        radio->pinSS = pinSS;
 
-		/* Pin Setup */
-		pinMode( spiSCK, OUTPUT );
-		pinMode( spiMISO, INPUT );
-		pinMode( spiMOSI, OUTPUT );
-		pinMode( radio->pinCE, OUTPUT );
-		pinMode( radio->pinSS, OUTPUT );
+        /* Pin Setup */
+        pinMode( spiSCK, OUTPUT );
+        pinMode( spiMISO, INPUT );
+        pinMode( spiMOSI, OUTPUT );
+        pinMode( radio->pinCE, OUTPUT );
+        pinMode( radio->pinSS, OUTPUT );
 
-		SPI.setBitOrder( MSBFIRST );
-		SPI.setDataMode( SPI_MODE0 );
-		SPI.setClockDivider( SPI_CLOCK_DIV2 );
+        SPI.setBitOrder( MSBFIRST );
+        SPI.setDataMode( SPI_MODE0 );
+        SPI.setClockDivider( SPI_CLOCK_DIV4 );
 
-		digitalWrite( radio->pinCE, HIGH );
-		digitalWrite( radio->pinSS, HIGH );
+        digitalWrite( radio->pinCE, LOW );
+        digitalWrite( radio->pinSS, HIGH );
 
-		SPI.begin();
+        SPI.begin();
 
-		/*
-		 * Automatically re-transmit packets
-		 * ARD: Auto-Retransmit Delay: How long between retransmits (see datasheet for values)
-		 * ARC: Auto-Retransmit Count: How many times to retransmit. 0-15
-		 * TODO: Clean up these magic numbers
-		 */
-		writeRegister( radio, SETUP_RETR, (B0100 << ARD) | (15 << ARC) );
-		writeRegister( radio, SETUP_AW, (ADDR_WIDTH << AW) );
-		/* Set transmit and recieve addresses to be the same (for bidirectional communication) */
-		writeRegister( radio, TX_ADDR, ADDR, 2 + ADDR_WIDTH );
-		writeRegister( radio, RX_ADDR_P0, ADDR, 2 + ADDR_WIDTH );
+        /*
+         * Automatically re-transmit packets
+         * ARD: Auto-Retransmit Delay: How long between retransmits (see datasheet for values)
+         * ARC: Auto-Retransmit Count: How many times to retransmit. 0-15
+         * TODO: Clean up these magic numbers
+         */
+        writeRegister( radio, SETUP_RETR, (B0100 << ARD) | (15 << ARC) );
 
-		setFrequency( radio, FREQ );
+        /* RF SETUP */
+        writeRegister( radio, RF_SETUP, readRegister( radio, RF_SETUP ) & ~(BIT(RF_PWR_LOW) | BIT(RF_PWR_HIGH)) | BIT(RF_PWR_HIGH) );
 
-		/* Power up and go into PRX mode */
-		writeRegister( radio, CONFIG, readRegister( radio, CONFIG ) | BIT(PWR_UP) & BIT(PRIM_RX) );
+        setFrequency( radio, FREQ );
 
-		/* 
-		 * Startup times (from datasheet)
-		 *   Power Down -> Standby: 4.5ms (max)
-		 *   Standby -> TX/RX: 130μs (max)
-		 * Let the device have enough time to get into whatever state it wants
-		 */
-		delay( 5 );
-	}
+        /* Power up and go into PRX mode */
+        writeRegister( radio, CONFIG, readRegister(radio,CONFIG) | BIT(PWR_UP) | BIT(PRIM_RX) );
+        writeRegister( radio, STATUS, BIT(RX_DR) | BIT(TX_DS) | BIT(MAX_RT) );
+
+        /* Flush FIFO buffers, this clears up bugs when simply resetting the device (without fully powering down) */
+        digitalWrite( radio->pinSS, LOW );
+        SPI.transfer( FLUSH_RX );
+        digitalWrite( radio->pinSS, HIGH );
+
+        digitalWrite( radio->pinSS, LOW );
+        SPI.transfer( FLUSH_TX );
+        digitalWrite( radio->pinSS, HIGH );
+
+        //writeRegister( radio, SETUP_AW, (ADDR_WIDTH << AW) );
+        if( PTX )
+        {
+            writeRegister( radio, RX_ADDR_P0, ADDR, 5 );
+            writeRegister( radio, TX_ADDR, ADDR, 5 );
+            writeRegister( radio, RX_PW_P0, PAYLOAD_SIZE );
+        }
+        else
+        {
+            // LISTENING ON PIPE 1 ONLY
+            writeRegister( radio, RX_ADDR_P1, ADDR, 5);
+            writeRegister( radio, RX_PW_P1, PAYLOAD_SIZE );
+            writeRegister( radio, EN_RXADDR, readRegister(radio,EN_RXADDR) | BIT(ERX_P1) );
+            digitalWrite( radio->pinCE, HIGH );
+        }
+        
+        /* 
+         * Startup times (from datasheet)
+         *   Power Down -> Standby: 4.5ms (max)
+         *   Standby -> TX/RX: 130μs (max)
+         * Let the device have enough time to get into whatever state it wants
+         */
+        delay( 5 );
+        printDebug( radio );
+    }
 }
 
 /* 
@@ -193,41 +241,51 @@ void radioSetup( Radio* radio, uint8_t pinCE, uint8_t pinSS )
  */
 void radioSend( Radio* radio, uint8_t* buffer, uint8_t length )
 {
-	if( radio )
-	{
-		/* 
-		 * Write the payload. They must be a specific size, specified by PAYLOAD_SIZE, so if we arent
-		 * going to fill up a packet, just fill the rest of the payload with 0x00
-		 */
-		uint8_t padding = PAYLOAD_SIZE - length;
-		digitalWrite( radio->pinSS, LOW );
-		SPI.transfer( W_TX_PAYLOAD );
-		while( length > 0 )
-		{
-			SPI.transfer( *buffer );
-			buffer++;
-			length--;
-		}
-		while( padding > 0 )
-		{
-			SPI.transfer( 0x00 );
-			padding--;
-		}
-		digitalWrite( radio->pinSS, HIGH );
+    if( radio )
+    {
+        /* Power up PTX */
+        Serial.println( readRegister( radio, CONFIG ), BIN );
+        writeRegister( radio, CONFIG, readRegister( radio, CONFIG ) & ~(BIT(PRIM_RX)) );
+        delayMicroseconds(150);
 
-		Serial.println( readRegister( radio, CONFIG ), BIN );
-		writeRegister( radio, CONFIG, readRegister( radio, CONFIG ) & ~(BIT(PRIM_RX)) );
+        /* 
+         * Write the payload. They must be a specific size, specified by PAYLOAD_SIZE, so if we arent
+         * going to fill up a packet, just fill the rest of the payload with 0x00
+         */
+        uint8_t padding = PAYLOAD_SIZE - length;
+        digitalWrite( radio->pinSS, LOW );
+        SPI.transfer( W_TX_PAYLOAD );
+        while( length > 0 )
+        {
+            SPI.transfer( *buffer );
+            buffer++;
+            length--;
+        }
+        while( padding > 0 )
+        {
+            SPI.transfer( 0x00 );
+            padding--;
+        }
+        digitalWrite( radio->pinSS, HIGH );
 
-		/* This is a bad way to do this but for now it will work. This should be in an interrupt */
-		bool waitingForAck = true;
-		while( waitingForAck )
-		{
-			waitingForAck = (readRegister( radio, STATUS ) & (BIT(TX_DS) | BIT(MAX_RT)));
-		}
+        digitalWrite( radio->pinCE, HIGH );
+        delayMicroseconds( 15 );
+        digitalWrite( radio->pinCE, LOW );
 
-		/* Send is finished, go back to listening mode */
-		writeRegister( radio, CONFIG, readRegister( radio, CONFIG ) | BIT(PRIM_RX) );
-	}
+        /* This is a bad way to do this but for now it will work. This should be in an interrupt */
+        bool waitingForAck = true;
+        uint32_t sent_at = millis();
+        uint32_t timeout = 500;
+        while( waitingForAck && timeout < (millis() - sent_at) )
+        {
+            Serial.println( readRegister( radio, STATUS ), BIN );
+            waitingForAck = (readRegister( radio, STATUS ) & (BIT(TX_DS) | BIT(MAX_RT)));
+        }
+
+        /* Send is finished, go back to listening mode */
+        //writeRegister( radio, CONFIG, readRegister( radio, CONFIG ) | BIT(PRIM_RX) );
+        writeRegister( radio, STATUS, BIT(RX_DR) | BIT(TX_DS) | BIT(MAX_RT) );
+    }
 }
 
 /* 
@@ -235,11 +293,24 @@ void radioSend( Radio* radio, uint8_t* buffer, uint8_t length )
  */
 bool radioHasData( Radio* radio )
 {
-	if( radio )
-	{
-		return (readRegister( radio, STATUS ) & BIT(RX_DR));
-	}
-	return false;
+    if( radio )
+    {
+        uint8_t status;
+        digitalWrite( radio->pinSS, LOW );
+        status = SPI.transfer( NOP );
+        digitalWrite( radio->pinSS, HIGH );
+
+        bool result = (status & BIT(RX_DR));
+
+        if( result )
+        {
+            /* Reset recieve bit */
+            writeRegister( radio, STATUS, BIT(RX_DR) );
+        }
+
+        return result;
+    }
+    return false;
 }
 
 /* 
@@ -248,24 +319,24 @@ bool radioHasData( Radio* radio )
  */
 void radioRecieve( Radio* radio, uint8_t* buffer, uint8_t length )
 {
-	if( radio )
-	{
-		uint8_t padding = PAYLOAD_SIZE - length;
-		digitalWrite( radio->pinSS, LOW );
-		SPI.transfer( R_RX_PAYLOAD );
-		while( length > 0 )
-		{
-			*buffer = SPI.transfer( 0xFF );
-			buffer++;
-			length--;
-		}
-		while( padding > 0 )
-		{
-			SPI.transfer( 0x00 );
-			padding--;
-		}
-		digitalWrite( radio->pinSS, HIGH );
-	}
+    if( radio )
+    {
+        uint8_t padding = PAYLOAD_SIZE - length;
+        digitalWrite( radio->pinSS, LOW );
+        SPI.transfer( R_RX_PAYLOAD );
+        while( length > 0 )
+        {
+            *buffer = SPI.transfer( 0xFF );
+            buffer++;
+            length--;
+        }
+        while( padding > 0 )
+        {
+            SPI.transfer( 0x00 );
+            padding--;
+        }
+        digitalWrite( radio->pinSS, HIGH );
+    }
 }
 
 /* 
@@ -282,15 +353,15 @@ void radioRecieve( Radio* radio, uint8_t* buffer, uint8_t length )
  */
 void writeRegister( Radio* radio, uint8_t reg, const uint8_t* value, uint8_t length )
 {
-	digitalWrite( radio->pinSS, LOW );
-	SPI.transfer( W_REGISTER | (REGISTER_MASK * reg) );
-	while( length > 0 )
-	{
-		SPI.transfer( *value );
-		value++;
-		length--;
-	}
-	digitalWrite( radio->pinSS, HIGH );
+    digitalWrite( radio->pinSS, LOW );
+    SPI.transfer( W_REGISTER | (REGISTER_MASK & reg) );
+    while( length > 0 )
+    {
+        SPI.transfer( *value );
+        value++;
+        length--;
+    }
+    digitalWrite( radio->pinSS, HIGH );
 }
 
 /* 
@@ -300,7 +371,7 @@ void writeRegister( Radio* radio, uint8_t reg, const uint8_t* value, uint8_t len
  */
 void writeRegister( Radio* radio, uint8_t reg, uint8_t value )
 {
-	writeRegister( radio, reg, &value, 1 );
+    writeRegister( radio, reg, &value, 1 );
 }
 
 /*
@@ -310,13 +381,30 @@ void writeRegister( Radio* radio, uint8_t reg, uint8_t value )
  */
 uint8_t readRegister( Radio* radio, uint8_t reg )
 {
-	int value = 0;
-	digitalWrite( radio->pinSS, LOW );
-	/* TODO: Does this return an error code? */
-	SPI.transfer( R_REGISTER | (REGISTER_MASK & reg) );
-	value = SPI.transfer( 0xFF );
-	digitalWrite( radio->pinSS, HIGH );
-	return value;
+    digitalWrite( radio->pinSS, LOW );
+    /* TODO: Does this return an error code? */
+    SPI.transfer( R_REGISTER | (REGISTER_MASK & reg) );
+    int value = SPI.transfer( 0xFF );
+    digitalWrite( radio->pinSS, HIGH );
+    return value;
+}
+
+/*
+ * Read from a register on the nRF24L01+
+ * Returns the value as a byte
+ * TODO: Support for reading from registers that are longer than 1 byte!
+ */
+void readRegister( Radio* radio, uint8_t reg, uint8_t* buffer, uint8_t length )
+{
+    digitalWrite( radio->pinSS, LOW );
+    SPI.transfer( R_REGISTER | (REGISTER_MASK & reg) );
+    while( length > 0 )
+    {
+        *buffer = SPI.transfer( 0xFF );
+        buffer++;
+        length--;
+    }
+    digitalWrite( radio->pinSS, HIGH );
 }
 
 /*
@@ -326,10 +414,65 @@ uint8_t readRegister( Radio* radio, uint8_t reg )
  */
 void setFrequency( Radio* radio, uint16_t freq )
 {
-	/* First clamps freq between FREQ_MIN and FREQ_MAX, then takes the remainder after a division with FREQ_MIN, 
-	   since this is what is needed in the register. We can use 1 byte for this because the range is 0-127 for the
-	   register, but based on our clamping it will only range from 0-125 */
-	freq = min( FREQ_MAX, max( freq, FREQ_MIN ) );
-	uint8_t value = freq % FREQ_MIN;
-	writeRegister( radio, RF_CH, value );
+    /* First clamps freq between FREQ_MIN and FREQ_MAX, then takes the remainder after a division with FREQ_MIN, 
+       since this is what is needed in the register. We can use 1 byte for this because the range is 0-127 for the
+       register, but based on our clamping it will only range from 0-125 */
+    freq = min( FREQ_MAX, max( freq, FREQ_MIN ) );
+    uint8_t value = freq % FREQ_MIN;
+    writeRegister( radio, RF_CH, value );
+}
+
+void printDebug( Radio* radio )
+{
+    // Print status register
+    uint8_t status;
+    digitalWrite( radio->pinSS, LOW );
+    status = SPI.transfer( NOP );
+    digitalWrite( radio->pinSS, HIGH );
+    Serial.print( "STATUS:     " );
+    Serial.println( status, BIN );
+
+    uint8_t addr[5] = {0,0,0,0,0};
+    
+    Serial.print( "RX_ADDR_P0: " );
+    readRegister( radio, RX_ADDR_P0, addr, 5 );
+    Serial.print( addr[0], HEX );
+    Serial.print( addr[1], HEX );
+    Serial.print( addr[2], HEX );
+    Serial.print( addr[3], HEX );
+    Serial.println( addr[4], HEX );
+    
+    Serial.print( "RX_ADDR_P1: " );
+    readRegister( radio, RX_ADDR_P1, addr, 5 );
+    Serial.print( addr[0], HEX );
+    Serial.print( addr[1], HEX );
+    Serial.print( addr[2], HEX );
+    Serial.print( addr[3], HEX );
+    Serial.println( addr[4], HEX );
+
+    Serial.print( "TX_ADDR:    " );
+    readRegister( radio, TX_ADDR, addr, 5 );
+    Serial.print( addr[0], HEX );
+    Serial.print( addr[1], HEX );
+    Serial.print( addr[2], HEX );
+    Serial.print( addr[3], HEX );
+    Serial.println( addr[4], HEX );
+
+    Serial.print( "RX_PW_P0:   " );
+    Serial.println( readRegister( radio, RX_PW_P0 ), DEC );
+    Serial.print( "RX_PW_P1:   " );
+    Serial.println( readRegister( radio, RX_PW_P1 ), DEC );
+
+    Serial.print( "EN_AA:      " );
+    Serial.println( readRegister( radio, EN_AA ), BIN );
+    Serial.print( "EN_RXADDR:  " );
+    Serial.println( readRegister( radio, EN_RXADDR ), BIN );
+    Serial.print( "RF_CH:      " );
+    Serial.println( readRegister( radio, RF_CH ), BIN );
+    Serial.print( "RF_SETUP:   " );
+    Serial.println( readRegister( radio, RF_SETUP ), BIN );
+    Serial.print( "CONFIG:     " );
+    Serial.println( readRegister( radio, CONFIG ), BIN );
+    Serial.print( "DYNPD:      " );
+    Serial.println( readRegister( radio, DYNPD ), BIN );
 }

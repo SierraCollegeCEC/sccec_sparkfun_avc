@@ -25,42 +25,40 @@ const char* telemetryNames[TELEMETRY_TYPES] =
 };
 */
 
-uint8_t temp[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 
-				   17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31 };
+uint8_t data[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 
+				   17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32 };
 
 void initTelemetry()
 {
+	Serial.println( "Booting" );
 	radioSetup( &radio, spiRF24_mode, spiRF24 );
-	radioSend( &radio, temp, 32 );
+	//radioSend( &radio, temp, 32 );
 }
 
 void updateTelemetry()
 {
-	//Serial.println( rf24ReadRegister( &radio, FIFO_STATUS ), BIN );
-	for( uint8_t idx = 0; idx < TELEMETRY_TYPES; ++idx )
+	if( PTX )
 	{
-		uint8_t toSend = 0;
-		if( telemetryIndex[idx] < telemetryIndexLast[idx] )
+		radioSend( &radio, data, 32 );
+	}
+	else
+	{
+		if( radioHasData( &radio ) )
 		{
-	 		toSend = (TELEMETRY_MAX - telemetryIndexLast[idx]) + telemetryIndex[idx];
-		}
-		else
-		{
-			toSend = telemetryIndex[idx] - telemetryIndexLast[idx];
-		}
+			Serial.println( "Recieving" );
+			radioRecieve( &radio, data, 32 );
 
-		if( toSend > 0 )
-		{
-			radioSend( &radio, &idx, 1 );
-			radioSend( &radio, &toSend, 1 );
-
-			for( int i = 0; i < toSend; ++i )
+			Serial.print("Got buttons ");
+			int i = 32;
+			for( int i = 0; i < 32; ++i )
 			{
-				/* TODO: Bundle all telemetry data into larger packets. Should this happen here or on the radio side? */
-				radioSend( &radio, &telemetryData[idx][(i + telemetryIndexLast[idx]) % TELEMETRY_MAX], 1 );
+				if ( data[i] )
+				{
+					Serial.print( data[i] );
+					Serial.print( " " );
+				}
 			}
-
-			telemetryIndexLast[idx] = telemetryIndex[idx];
+			Serial.println();
 		}
 	}
 }
