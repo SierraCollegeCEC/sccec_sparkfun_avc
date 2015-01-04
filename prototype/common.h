@@ -28,5 +28,14 @@ const int spiMOSI = 11;
 const int spiRF24 = 6; // SS
 const int spiRF24_mode = 7; // CE
 
+/*
+ * Vector Datatype
+ */
+
+typedef struct s_vector {
+  float x;
+  float y;
+} vector;
+
 #endif
 
