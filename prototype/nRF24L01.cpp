@@ -188,14 +188,14 @@ void radioSetup( Radio* radio, uint8_t pinCE, uint8_t pinSS )
 		flushBuffers( radio );
 
 		//writeRegister( radio, SETUP_AW, (ADDR_WIDTH << AW) );
-        writeRegister( radio, TX_ADDR, ADDR, 5 );
+		writeRegister( radio, TX_ADDR, ADDR, 5 );
 
-        /* Listening address */
+		/* Listening address */
 		writeRegister( radio, RX_ADDR_P1, ADDR, 5);
 		writeRegister( radio, EN_RXADDR, readRegister(radio,EN_RXADDR) | BIT(ERX_P1) );
-        writeRegister( radio, RX_PW_P1, PAYLOAD_SIZE );
+		writeRegister( radio, RX_PW_P1, PAYLOAD_SIZE );
 
-        digitalWrite( radio->pinCE, HIGH );
+		digitalWrite( radio->pinCE, HIGH );
 		
 		/* 
 		 * Startup times (from datasheet)
