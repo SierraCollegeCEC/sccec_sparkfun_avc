@@ -19,11 +19,10 @@ typedef struct s_Radio
 } Radio;
 
 void radioSetup( Radio* radio, uint8_t pinCE, uint8_t pinSS );
-void radioSend( Radio* radio, uint8_t* buffer, uint8_t length );
+bool radioSend( Radio* radio, uint8_t* buffer, uint8_t length );
 bool radioHasData( Radio* radio );
 void radioRecieve( Radio* radio, uint8_t* buffer, uint8_t length );
 
-/* Debug var for radio comm right now */
-const bool PTX = false;
+#define MAX_PACKET_SIZE 32
 
 #endif

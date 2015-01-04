@@ -8,28 +8,14 @@
 #define _TELEMETRY_H_
 
 /*
- * If you want to add a new telemetry type, be sure you increase the TELEMETRY_TYPES define so
- * that memory is allocated. Also add an entry to the telemetryNames table in telemetry.cpp
+ * This is the typedef for function pointers that will respond to events from the telemetry
+ * system. These events are fired when messages are recieved from the reciever
  */
-typedef enum
-{
-	MOTION_TURNING,
-	NAVIGATION_ERROR,
-	SENSORS_MAG
-} TelemetryType;
-
-/* If new types are added or removed from the enum, this needs to be changed to reflect that */
-#define TELEMETRY_TYPES 3
-#define TELEMETRY_MAX 16
-
-/* Open up telemetry.cpp and add a name for any new categories you add */
-/* TODO: This is only used on the RX side, which is not currently implemented
-extern const char* telemetryNames[TELEMETRY_TYPES];
-*/
+typedef void (*telemetryEventHandler)(char*,float);
 
 void initTelemetry();
 void updateTelemetry();
-
-void addTelemetryData( TelemetryType type, int32_t value );
+void addTelemetryEventHandler( telemetryEventHandler func );
+void removeTelemetryEventHandler( telemetryEventHandler func );
 #endif
 
