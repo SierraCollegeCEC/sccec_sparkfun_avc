@@ -8,15 +8,10 @@
 #include "sensors.h"
 #include <stdlib.h>
 #include <math.h>
-
-/*
-  We'll need math and stdlib... someday.
-  TODO: What standard libraries are available
-  on the TI?
-*/
+#include "pid.h"
+#include "bezier.h"
 
 motionData MotionData;
-float lastHeadingDiff, headingDiff, totalErr;
 
 void initNav()
 {
@@ -26,30 +21,32 @@ void initNav()
   */
 }
 
-float findCorrection(float current, float desired)
+float findAngle(vector vec){
+
+  float angle =  180 * ( atan2( ( -1 * vec.y ) , vec.x ) / M_PI );
+  return angle;
+  
+}  
+  
+
+float findCorrection(vector current, vector desired)
 {
   /*
     Takes the current heading and desired heading, and
-    finds the (shortest) difference between the two.
+    finds the (shortest, signed) difference between the two.
   */
+
   float tempAngle, correction;
   
-  tempAngle = desired - current;
+  tempAngle = findAngle(desired) - findAngle(current);
 
   if ( abs(tempAngle) > 180)
-    {
-      /*
-       Use the other angle, in the other direction
-     */
+    { /* Use the other angle, in the other direction */
 
-      if ( tempAngle > 0)
-        {
-          correction = (360.0f - tempAngle) * -1;
-        }
+      if ( tempAngle > 0) 
+        { correction = tempAngle - 360.f; }
       else
-        {
-          correction = (-360.0f - tempAngle) * -1;
-        }
+        { correction = tempAngle + 360.f; }
     }
 
   else
@@ -58,66 +55,36 @@ float findCorrection(float current, float desired)
   return correction;
 }
 
-float pidAdjust(float headingDiff)
-{
-  /*
-    Takes a value and applies the PID controller to it.
-    Currently only does a proportional correction.
-  */
-  float newHeading;
-  float kp;
-  float kd;
-  float ki;
-
-  kp = 3.f;
-  kd = 2.f;
-  ki = 0.1f;
-
-  /*
-    Maybe this is a good value. Maybe it's not! Who knows!
-  */
-
-  newHeading = headingDiff * kp
-  /* Proportional Correction */
-               + (headingDiff - lastHeadingDiff) * kd / dt
-  /* Derivative Correction */
-               + (totalErr * ki);
-  /* Integral Correction */
-
-  return newHeading;
-}
-
 void updateNav()
 {
   /*
     This function:
-     - gets the navigation data from sensors;
-     - "gets" (constant for now) desired heading;
-     - finds difference;
-     - applies PID (just P for now);
+     - gets the navigation data from sensors (heading, position);
+     - gets desired values from Bezier Curves (position);
+     - finds difference between desired position and real position
+       to obtain desired heading;
+     - find difference between desired heading and real heading
+     - applies PID to heading differences;
      - creates instructions for motion module;
      - and pushes instructions to MotionData
-     on every update.
+       on every update.
   */
   navData* NavData;
-  float desiredHeading;
-  float headingDiff;
-  float adjustedCorrection;
-  
-  NavData = getNavData();
-  desiredHeading = M1HEADING;
+  float  headingDiff;
+  float adjustedHeading;
 
-  headingDiff = findCorrection(NavData->heading, desiredHeading);
-  totalErr += headingDiff;
-  adjustedCorrection = pidAdjust(headingDiff);
+  NavData = getNavData();
   
-  MotionData.heading = adjustedCorrection;
-  /* Correction factor to account for interface difference.
-     Motion considers negative to be right; navigation
-     considers negative to be left (compass directions)
+  headingDiff = findCorrection(NavData->heading, getDesiredHeading());
+  
+  /* getDesiredHeading NEEDS to accept NavData->pos as an argument, but I can't till
+     it's defined in sensors.h. Returning stub value in the meantime for
+     purposes of this commit.
   */
   
-  lastHeadingDiff = headingDiff;
+  adjustedHeading = pidAdjust(headingDiff);
+  
+  MotionData.heading = adjustedHeading;
   
 }
 

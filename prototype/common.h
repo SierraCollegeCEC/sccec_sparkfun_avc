@@ -21,5 +21,14 @@ const uint8_t CLK = 7;
 const uint8_t EN = 11;
 const uint8_t DATA = 12;
 
+/*
+ * Vector Datatype
+ */
+
+typedef struct s_vector {
+  float x;
+  float y;
+} vector;
+
 #endif
 
