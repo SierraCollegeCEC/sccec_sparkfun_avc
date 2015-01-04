@@ -11,6 +11,8 @@
 
 vector getDesiredHeading(void){
   
+  vector desiredHeading;
+  
   desiredHeading.x= 0.f;
   desiredHeading.y= 0.f;
   
