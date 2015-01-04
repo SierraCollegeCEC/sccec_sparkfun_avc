@@ -9,8 +9,8 @@
 
 typedef struct s_navData
 {
-  /* In degrees of compass */
-  float heading;
+	/* In degrees of compass */
+	float heading;
 } navData;
 
 void initSensors();
