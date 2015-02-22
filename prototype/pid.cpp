@@ -7,36 +7,41 @@
 #include "common.h"
 #include <stdlib.h>
 #include <math.h>
+#include "pid.h"
 
 float lastHeadingDiff, totalErr;
 
-float pidAdjust(float headingDiff)
+void setErrParams(errParams * p, float kp, float kd, float ki, float maxInt){
+  
+  /* Constructs an errParams struct and sets defaults. */
+
+  p->kp = kp;
+  p->kd = kd;
+  p->ki = ki;
+  p->maxInt = maxInt;
+  p-> lastErr = 0.f;
+  p-> totalErr = 0.f;
+}
+
+float pidAdjust(float err, errParams * p)
 {
   /*
-    Takes a value and applies the PID controller to it.
-    Currently only does a proportional correction.
+    Takes a value and its associated parameters, and applies the PID controller to it.
+    We use a pointer so we don't have to copy all these floats everywhere.
   */
-  float newHeading;
-  float kp, kd, ki;
   
-  kp = 3.f;
-  kd = 2.f;
-  ki = 0.1f;
+  float correction;
   
-  /*
-    Maybe this is a good value. Maybe it's not! Who knows!
-  */
-
-  totalErr += headingDiff; 
-
-  newHeading = headingDiff * kp
+  p->totalErr += err;
+  
+  correction = err * p->kp
     /* Proportional Correction */
-    + (headingDiff - lastHeadingDiff) * kd / dt
+    + (err - p->lastErr) * p->kd / dt
     /* Derivative Correction */
-    + fmax(totalErr, 10) * ki;
+    + fmax(p->totalErr, p->maxInt) * p->ki;
   /* Integral Correction */
 
-  lastHeadingDiff = headingDiff;
+  p->lastErr = correction;
 
-  return newHeading;
+  return correction;
 }

@@ -12,13 +12,15 @@
 #include "bezier.h"
 
 motionData MotionData;
+errParams headingParams, speedParams;
 
 void initNav()
 {
-  /*
-    Nothing goes here yet.
-    For future milestones, include Bezier curve data here.
-  */
+
+  /*initmap(); Hi! Implement me!*/
+
+  setErrParams(&headingParams, 3.f, 2.f, 0.1f, .1f); /* Heading PID values. */
+  
 }
 
 float findAngle(vector vec){
@@ -79,7 +81,7 @@ void updateNav()
   
   headingDiff = findCorrection(NavData->heading, getDesiredHeading(NavData->position));
   
-  adjustedHeading = pidAdjust(headingDiff);
+  adjustedHeading = pidAdjust(headingDiff, &headingParams);
   
   MotionData.heading = adjustedHeading;
   
