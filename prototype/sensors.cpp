@@ -135,8 +135,10 @@ void hm55b_reset()
 	}
 }
 
-int hm55b_read()
+vector hm55b_read()
 {
+
+        vector heading;
 	pinMode( DATA, OUTPUT );
 	digitalWrite( EN, LOW );
 	hm55b_shift_out( B1000, 3 );
@@ -148,20 +150,19 @@ int hm55b_read()
 	hm55b_shift_out( B1100, 3 );
 	int read_command_result = hm55b_shift_in( 3 );
 	
-	int x_value = hm55b_shift_in( 11 );
-	int y_value = hm55b_shift_in( 11 );
+	heading.x = hm55b_shift_in( 11 );
+	heading.y = hm55b_shift_in( 11 );
 	
 	digitalWrite( EN, HIGH );
 	
-	int angle = 180 * ( atan2( ( -1 * y_value ) , x_value ) / M_PI );
 	if ( DEBUGGING )
 	{
-  
+          float angle =  180 * ( atan2( ( -1 * heading.y ) , heading.x ) / M_PI );
 		Serial.print( "Angle: " );
 		Serial.print( angle );
 		Serial.print( "\n" );
 	}
-	return angle;
+	return heading;
 }
 
 
@@ -177,17 +178,7 @@ void initSensors()
 
 void updateSensors()
 {
-  float heading = (float)hm55b_read();
-  if( heading < 0 )
-  {
-    heading = abs(heading);
-  }
-  else
-  {
-    heading = 360.0f - heading;
-  }
-  Serial.println( heading );
-  NavData.heading = heading;
+   NavData.heading = hm55b_read();
 }
 
 navData* getNavData()
