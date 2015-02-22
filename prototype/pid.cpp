@@ -33,7 +33,7 @@ float pidAdjust(float headingDiff)
     /* Proportional Correction */
     + (headingDiff - lastHeadingDiff) * kd / dt
     /* Derivative Correction */
-    + (totalErr * ki);
+    + fmax(totalErr, 10) * ki;
   /* Integral Correction */
 
   lastHeadingDiff = headingDiff;

@@ -8,6 +8,10 @@
 #define _BEZIER_H_
 #include "common.h"
 
-vector getDesiredHeading(void);
+void initMap(void);
+/* Initialize the control points defining the map. */
+
+vector getDesiredHeading(vector currentPos);
+/* Get a desired heading, given where you currently are. */
 
 #endif
