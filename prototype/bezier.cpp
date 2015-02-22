@@ -136,9 +136,13 @@ float findClosestT(vector currentPos){
     else
       { interval = interval / 2; }
   }
+
   /* If we're nearing the end of a curve, go on to the next one. */
-  curve += 4; /* I think that's how this works?
-  t=0;
+  if ( (1 - t) < . 95 )
+    {
+      curve += 4; /* I think that's how this works? */
+      t=0;
+    }
   
   lastT = t; /* Start at this point later, to save iterations. */
   
