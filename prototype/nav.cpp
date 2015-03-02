@@ -63,12 +63,12 @@ void updateNav()
 {
   /*
     This function:
-    - gets the navigation data from sensors (heading, position);
-    - gets desired values from Bezier Curves (position);
+    - gets the navigation data from sensors (heading, position)
+    - gets desired values from Bezier Curves (position, velocity)
     - finds difference between desired position and real position
     to obtain desired heading;
     - find difference between desired heading and real heading
-    - applies PID to heading differences;
+    - applies PID to heading differences and speed
     - creates instructions for motion module;
     - and pushes instructions to MotionData
     on every update.
