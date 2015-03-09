@@ -13,35 +13,35 @@ float lastHeadingDiff, totalErr;
 
 void setErrParams(errParams * p, float kp, float kd, float ki, float maxInt){
   
-  /* Constructs an errParams struct and sets defaults. */
+	/* Constructs an errParams struct and sets defaults. */
 
-  p->kp = kp;
-  p->kd = kd;
-  p->ki = ki;
-  p->maxInt = maxInt;
-  p-> lastErr = 0.f;
-  p-> totalErr = 0.f;
+	p->kp = kp;
+	p->kd = kd;
+	p->ki = ki;
+	p->maxInt = maxInt;
+	p-> lastErr = 0.f;
+	p-> totalErr = 0.f;
 }
 
 float pidAdjust(float err, errParams * p)
 {
-  /*
-    Takes a value and its associated parameters, and applies the PID controller to it.
-    We use a pointer so we don't have to copy all these floats everywhere.
-  */
+	/*
+	  Takes a value and its associated parameters, and applies the PID controller to it.
+	  We use a pointer so we don't have to copy all these floats everywhere.
+	*/
   
-  float correction;
+	float correction;
   
-  p->totalErr += err;
+	p->totalErr += err;
   
-  correction = err * p->kp
-    /* Proportional Correction */
-    + (err - p->lastErr) * p->kd / dt
-    /* Derivative Correction */
-    + fmax(p->totalErr, p->maxInt) * p->ki;
-  /* Integral Correction */
+	correction = err * p->kp
+		/* Proportional Correction */
+		+ (err - p->lastErr) * p->kd / dt
+		/* Derivative Correction */
+		+ fmax(p->totalErr, p->maxInt) * p->ki;
+	/* Integral Correction */
 
-  p->lastErr = correction;
+	p->lastErr = correction;
 
-  return correction;
+	return correction;
 }

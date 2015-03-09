@@ -15,10 +15,10 @@
 
 typedef struct s_motionData
 {
-  /* In degrees */
-  float heading;
-  /* In some yet to be determined unit */
-  float speed;
+	/* In degrees */
+	float heading;
+	/* In some yet to be determined unit */
+	float speed;
 } motionData;
 
 void initNav();
