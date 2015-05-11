@@ -63,7 +63,8 @@ observed state to the predicted state, and applies a gain value to
 this difference to determine a weighted average between the
 two. Lastly, the filter updates what it thinks its accuracy currently
 is. The new state estimation is sent to the navigation subsystem
-inside a navData struct. 
+inside a navData struct. The relevant files are sensors.cpp and
+kalman.cpp, and their header files.
 		
 ### Navigation Subsystem
 The navigation subsystem begins by reading the filtered heading,
@@ -90,8 +91,33 @@ header files.
 The motion subsystem extracts the heading and velocity corrections and
 applies a PID controller to both of these values. The gains are
 configurable. The returned values are merely sent to the servo and ecs
-drivers, and the hardware responds. The relevant files are motion.cpp/h
+drivers, and the hardware responds. The relevant files are motion.cpp
 and pid.cpp, and their header files.
+
+## How to Use our Code
+This code is [licensed](license) under the MIT License, which gives
+any potential user the freedom to rewrite, repurpose, and redistribute
+this code without any assumption of warranty, so long as the license
+is redistributed along with this code. If you want to use our code
+with your own hardware, you need to write drivers for both the sensors
+and the motion units. A driver merely needs to implement the
+methods specified in the hardware section. Beyond this, however, the
+Kalman filter equations need to be reformulated. This includes adding
+an extra row to the measurement matrix for every sensor added, as well
+as adding another row and column to the measurement covariance matrix
+to represent the variance of the sensor added (its covariance is
+assumed to be independent of all of the other sensors). Simulating the
+matrix multiplication of those rows in code is necessary as
+well. An example of a sensor that we did not use but perhaps you might
+is a wheel encoder. Lastly, the scheduler and integrator need to be
+reconfigured to take full advantage of the sampling frequency of your
+sensors.  We recommend you precompute the Kalman gain and inline it
+just as we have, because actual matrix multiplication is an
+unnecessary expense in this domain, and the gain converges to a
+constant matrix. Lastly,you might want to adjust the PID values we
+have set, although we quite like our values and think they are
+unlikely to change from one ECS/steering configuration to another.
+
 
 ## Acknowledgements
 [James
@@ -113,7 +139,7 @@ throughout this project.
 
 [Kristoffer Semelka](https://github.com/soderstroff/) is responsible
 for the navigation subsystem, the bezier curve implementation, the
-Kalman filter equations specific to this project and their specific
+Kalman filter equations specific to this project and their actual
 implementation, and the writing of this documentation.
 
 ## License
