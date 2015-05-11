@@ -92,3 +92,48 @@ applies a PID controller to both of these values. The gains are
 configurable. The returned values are merely sent to the servo and ecs
 drivers, and the hardware responds. The relevant files are motion.cpp/h
 and pid.cpp, and their header files.
+
+### Acknowledgements
+[James
+Smith](https://github.com/jamesdsmith/) is the lead developer for this
+project. He is responsible for much of the
+overarching design of this software, the primary author of over half
+of the code written, the author of some of the initial tooling and the
+telemetry system for easier testing and remote configurability, the
+one who proposed using bezier curves, pid controllers, and kalman
+filters, and an invaluable resource due to his decade long experience
+in professional software development.
+
+[Alex Norell](https://github.com/AlexNorell/) is
+responsible for the selection and purchase of the majority of the
+hardware, the writing the sensors subsystem, the assembly of the vehicle
+itself, and the progenitor of this entire project. His sheer knowledge
+of computer hardware was indispensable throughout this project.
+
+[Kristoffer Semelka](https://github.com/soderstroff/) is responsible
+for the navigation subsystem, the bezier curve implementation, the
+Kalman filter equations specific to this project, and the writing of
+this technical design document.
+
+### License
+The MIT License (MIT)
+
+Copyright (c) 2014 James Smith, Alex Norell, Kristoffer Semelka
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
