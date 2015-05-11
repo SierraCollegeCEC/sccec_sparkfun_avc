@@ -24,7 +24,7 @@ nonmembers of our organization
 5. [Hardware Used] (#hardware)
 6. [How to Use our Code] (#how-to-use-our-code)
 7. [Acknowledgements] (#acknowledgements)
-8. [License] (#License)
+8. [License] (#license)
 
 ## Design
 This software is divided into three major components: the
@@ -93,7 +93,7 @@ configurable. The returned values are merely sent to the servo and ecs
 drivers, and the hardware responds. The relevant files are motion.cpp/h
 and pid.cpp, and their header files.
 
-### Acknowledgements
+## Acknowledgements
 [James
 Smith](https://github.com/jamesdsmith/) is the lead developer for this
 project. He is responsible for much of the
@@ -101,21 +101,22 @@ overarching design of this software, the primary author of over half
 of the code written, the author of some of the initial tooling and the
 telemetry system for easier testing and remote configurability, the
 one who proposed using bezier curves, pid controllers, and kalman
-filters, and an invaluable resource due to his decade long experience
+filters, and an invaluable resource due to his decade of experience
 in professional software development.
 
 [Alex Norell](https://github.com/AlexNorell/) is
 responsible for the selection and purchase of the majority of the
-hardware, the writing the sensors subsystem, the assembly of the vehicle
+hardware, the writing of the sensors subsystem, the assembly of the vehicle
 itself, and the progenitor of this entire project. His sheer knowledge
-of computer hardware was indispensable throughout this project.
+of computer hardware components and low level design was indispensable
+throughout this project.
 
 [Kristoffer Semelka](https://github.com/soderstroff/) is responsible
 for the navigation subsystem, the bezier curve implementation, the
-Kalman filter equations specific to this project, and the writing of
-this technical design document.
+Kalman filter equations specific to this project and their specific
+implementation, and the writing of this documentation.
 
-### License
+## License
 The MIT License (MIT)
 
 Copyright (c) 2014 James Smith, Alex Norell, Kristoffer Semelka
