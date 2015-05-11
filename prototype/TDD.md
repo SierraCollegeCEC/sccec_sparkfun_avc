@@ -15,15 +15,15 @@ nonmembers of our organization
 
 ## Table of Contents
 1. [Design](#design)
-2. [Technical Specification](#Technical Specification)
-	 1. [Sensors Subsystem] (#Sensors Subsystem)
-	 2. [Navigation Subsystem] (#Navigation Subsystem)
-	 3. [Motion Subsystem] (#Motion Subsystem)
-3. [Kalman Filter Implementation](#Kalman Filter Implementation)
-4. [Bezier Curve Equations](#Bezier Curve Equations)
-5. [Hardware Used] (#Hardware)
-6. [How to Use our Code] (#How to Use our Code)
-7. [Acknowledgements] (#Acknowledgements)
+2. [Technical Specification](#technical-specification)
+	 1. [Sensors Subsystem] (#sensors-subsystem)
+	 2. [Navigation Subsystem] (#navigation-subsystem)
+	 3. [Motion Subsystem] (#motion-subsystem)
+3. [Kalman Filter Implementation](#kalman-filter-implementation)
+4. [Bezier Curve Equations](#bezier-curve-equations)
+5. [Hardware Used] (#hardware)
+6. [How to Use our Code] (#how-to-use-our-code)
+7. [Acknowledgements] (#acknowledgements)
 8. [License] (#License)
 
 ## Design
