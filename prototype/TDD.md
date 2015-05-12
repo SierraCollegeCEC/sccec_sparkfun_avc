@@ -62,10 +62,10 @@ previous record state estimation. The kalman filter then compares the
 observed state to the predicted state, and applies a gain value to
 this difference to determine a weighted average between the
 two. Lastly, the filter updates what it thinks its accuracy currently
-is. These details are expounded upon in the section on the Kalman
-filter. The new state estimation is sent to the navigation subsystem
-inside a navData struct. The relevant files are sensors.cpp and
-kalman.cpp, and their header files.
+is. The details are in the Kalman filter section. The new state
+estimation is sent to the navigation subsystem inside a navData
+struct. The relevant files are sensors.cpp and kalman.cpp, and their
+header files.
 		
 ### Navigation Subsystem
 The navigation subsystem begins by reading the filtered heading,
@@ -109,21 +109,20 @@ The
 especially illuminating in this regard.
 
 In short, there are only a few major components of a Kalman
-filter. The first is the vector of state variables, s, which represent
-the "true" state of the system at any point in time. In our use-case,
-the vector of state variables is simply composed of:
+filter. The first is the vector of state variables, s, which represents
+the state of the system at any point in time. In our case,
+this vector is composed of:
 - the absolute x and y coordinates, where y is in the direction of
-North and x East, and
-- the velocities dx/dt and dy/dt, which are the standard time
-derivatives
-- and the heading, which is the direction the vehicle is facing.
+North and x East
+- the standard time derivatives dx/dt and dy/dt
+- and the heading, which is the compass direction the vehicle is facing.
 
 s = [x, y, dx/dt, dy/dt, theta]
 
 The second component is some rule for transitioning from one state to
-another, assuming no input into the system, written in the form of a
-matrix of coefficients F. If the system is nonlinear, this is a Jacobian
-of partials. Our matrix is a linear 5 x 5:
+another, written in the form of a matrix of coefficients F. If the
+system is nonlinear, this is a Jacobian of partials. Our matrix is a
+linear 5 x 5:
 
 R1: [1  0  dt  0   0]  
 R2: [0  1  0   dt  0]  
@@ -136,42 +135,45 @@ dx/dt (or dy/dt), the velocity is assumed to remain constant, and the
 heading is assumed to remain constant.
 
 The third component is some input vector u. This is traditionally the
-"control" applied to a system - it operates on its own accord until
-you move it in some manner to a more optimal state. A very naive
+"control" applied to a system - forces, acceleration, etc. The wrong
 approach to modeling control in our case would be to let u be the
 vector [u_t, u_theta], where u_t is the throttle and u_theta is the
-angle of steering. This choice of control makes everything modeled
-nonlinearly, and you have to resort to awful Jacobians. Instead of
-that, we employ an Alternative Direct Kalman Filter. The typical
-direct Kalman Filter models everything in the most straightforward
-way: a gyroscope is a sensor, and must be measured. The input to the
-system is the actual control, namely the steering and throttle. So our
-control would be throttle and steering and the sensors would be
-gyroscope, accelerometer, magnetometer, and gps module. The
-alternative direct kalman filter assumes that gyroscope and
-accelerometer data are already very good estimations for the control
-applied to a system: these, then, become your "input" to the
-system. These Kalman filter then essentially "checks" the inertial
-navigation units against the less accurate but drift-stable
-magnetometers and gps units. The Kalman filter becomes linear,
-computational resources are saved, and accuracy actually becomes
-better because an attempt to model all of the dynamics of a rattling,
-racing rc car on pavement would introdue error purely from
-oversimplification in the model.
+angle of steering. This choice of control results in a nonlinear
+relationship between states, measurement, and control, and a Jacobian
+matrix has to be calculated. Instead of that, we employ an Alternative
+Direct Kalman Filter.
 
-So, with those comments aside, we are justified in using a different
-control. The accelerometer and gyroscope data are integrated
-numerically across the 10 samples from each. The gyroscope is
-integrated once to get angular displacement. The accelerometer data is
-integrated once to get change in velocity, and then the history of
-measured velocities is integrated to get a final displacement in
-position. The change of velocity and the displacement are relative to
-the body frame of the vehicle: these are resolved by using the
-gyroscope data to rotate the vectors into the global frame.
+The typical direct Kalman Filter models everything in the most straightforward
+way: sensors are measured. The input to the system is the control. Our
+control would be throttle and steering, and the sensors would be
+the gyroscope, accelerometer, magnetometer, and gps module. The
+alternative direct kalman filter takes advantage of the fact that
+gyroscope and accelerometer data are already very good estimations for
+the control applied to a system: these, then, become your "input" to
+the system. The mechanism of the Kalman filter then practically
+corrects the bias drifting inertial navigation units against the less
+accurate but drift-stable magnetometers and gps units. The Kalman
+filter becomes linear, computational resources are saved, and accuracy
+actually becomes better because an attempt to model all of the
+dynamics of a rattling, racing rc car on pavement would introdue error
+purely from oversimplification in the model.
 
-Our control vector is thus: u = [dx, dy, d^2x, d^2y, dtheta], namely
-displacement, change in velocity, and change in angle. An input rule B
-has to he applied to convert the control into changes in state.
+With those comments aside, we are justified in using a different
+control than what would be assumed from a straightforward
+interpretation of Kalman filter equations. The accelerometer and
+gyroscope data are integrated numerically across the 10 samples from
+each. The gyroscope is integrated once to get angular
+displacement. The accelerometer data is integrated once to get change
+in velocity, and then the history of measured velocities is integrated
+to get a final displacement in position. The change of velocity and
+the displacement are relative to the body frame of the vehicle: these
+are resolved by using the gyroscope data to rotate the vectors into
+the global frame.
+
+Our control vector is therefore: u = [dx, dy, d^2x, d^2y,
+dtheta]. This is displacement, change in velocity, and change in
+angle. An input rule B has to be applied to convert the control into
+changes in state. 
 
 TK: Control matrix
 
@@ -221,20 +223,20 @@ defined for a very clear explanation of how the Kalman filter itself
 actually works.
 
 A high level overview:
--The Kalman filter starts with its last state estimate. It predicts what
+- The Kalman filter starts with its last state estimate. It predicts what
 the next state should be by evaluating F s_k + B u_k, since the last
 input was known. This is known as the *a priori* ("before the facts") estimate.
--The filter puts its estimate into the measurement model and compares
+- The filter puts its estimate into the measurement model and compares
 that to the measurement z by taking the difference. This is known as
 the residual.
--Then, the filter calculates how much it should correct between
+- Then, the filter calculates how much it should correct between
 whatever it observes and what it estimated (remember that the filter
 provides the best guess given those two; this is called the "Kalman
 gain")
--The Kalman gain is applied to the residual and adds it to the a
+- The Kalman gain is applied to the residual and adds it to the a
 priori estimate, resulting in the *a posteriori* ("after the facts")
 estimate.
--The Kalman filter then figures out its new "error" matrix, which is
+- The Kalman filter then figures out its new "error" matrix, which is
 its best guess for how well it's doing as an estimator. This is used in the
 calculation of the Kalman gain.
 
@@ -260,7 +262,7 @@ as adding another row and column to the measurement covariance matrix
 to represent the variance of the sensor added (its covariance is
 assumed to be independent of all of the other sensors). Simulating the
 matrix multiplication of those rows in code is necessary as
-well. An example of a sensor that we did not use but perhaps you might
+well. An example of a sensor that we did not use, but perhaps you might,
 is a wheel encoder. Lastly, the scheduler and integrator need to be
 reconfigured to take full advantage of the sampling frequency of your
 sensors.  We recommend you precompute the Kalman gain and inline it
