@@ -118,7 +118,7 @@ North and x East, and
 derivatives
 - and the heading, which is the direction the vehicle is facing.
 
-s = <x, y, dx/dt, dy/dt, theta>
+s = [x, y, dx/dt, dy/dt, theta]
 
 The second component is some rule for transitioning from one state to
 another, assuming no input into the system, written in the form of a
@@ -139,7 +139,7 @@ The third component is some input vector u. This is traditionally the
 "control" applied to a system - it operates on its own accord until
 you move it in some manner to a more optimal state. A very naive
 approach to modeling control in our case would be to let u be the
-vector <u_t, u_theta>, where u_t is the throttle and u_theta is the
+vector [u_t, u_theta], where u_t is the throttle and u_theta is the
 angle of steering. This choice of control makes everything modeled
 nonlinearly, and you have to resort to awful Jacobians. Instead of
 that, we employ an Alternative Direct Kalman Filter. The typical
@@ -169,7 +169,7 @@ position. The change of velocity and the displacement are relative to
 the body frame of the vehicle: these are resolved by using the
 gyroscope data to rotate the vectors into the global frame.
 
-Our control vector is thus: u = <dx, dy, d^2x, d^2y, dtheta>, namely
+Our control vector is thus: u = [dx, dy, d^2x, d^2y, dtheta], namely
 displacement, change in velocity, and change in angle. An input rule B
 has to he applied to convert the control into changes in state.
 
@@ -198,7 +198,7 @@ We need a vector z that represents the measurement we observe at time
 k. This will typically just be every sensor you have installed. Ours
 is quite tame:
 
-z = <x, y, dx/dt, dy/dt, theta>
+z = [x, y, dx/dt, dy/dt, theta]
 
 The first four measurements are provided by a GPS sensor; the last is
 provided by a magnetometer. 
