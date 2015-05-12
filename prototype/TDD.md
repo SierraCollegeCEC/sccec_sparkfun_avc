@@ -125,11 +125,11 @@ another, assuming no input into the system, written in the form of a
 matrix of coefficients F. If the system is nonlinear, this is a Jacobian
 of partials. Our matrix is a linear 5 x 5:
 
-R1: [1  0  dt  0   0]
-R2: [0  1  0   dt  0]
-R3: [0  0  1   0   0]
-R4: [0  0  0   1   0]
-R5: [0  0  0   0   1]
+R1: [1  0  dt  0   0]  
+R2: [0  1  0   dt  0]  
+R3: [0  0  1   0   0]  
+R4: [0  0  0   1   0]  
+R5: [0  0  0   0   1]  
 
 These simply represent the rather trivial equations x(or y) = 1 + dt *
 dx/dt (or dy/dt), the velocity is assumed to remain constant, and the
