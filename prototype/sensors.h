@@ -7,16 +7,20 @@
 #ifndef _SENSORS_H_
 #define _SENSORS_H_
 
-typedef struct s_navData
-{
-  /* In degrees of compass */
-  vector heading;
-  vector position;
-} navData;
-
 void initSensors();
 void updateSensors();
-navData* getNavData();
+
+#define INSDATA_FIELDS 5
+typedef enum INSData_fields {disp_x, disp_y, change_vel_x, change_vel_y,
+														 yaw} INSData_field;
+typedef float *INSData;
+
+#define SENSORDATA_FIELDS 5
+typedef enum sensorData_fields {pos_x, pos_y, vel_x, vel_y, yaw} sensorData_field;
+typedef float *sensorData;
+
+INSData getINSData();
+sensorData getSensorData();
 
 #endif
 
