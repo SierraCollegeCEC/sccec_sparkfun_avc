@@ -6,18 +6,18 @@
 
 #include "sensors.h"
 
-extern navData current;
-static navData prediction;
-static sensorData error;
-static sensorData measurement;
-static sensorData INS;
+extern navData current;         /* The current state. */
+static navData prediction;      /* A prediction of the next state. */
+static sensorData measurement;  /* The GPS and Magnetometer data. */
+static INSData INS;             /* Inertial Navigation System data, which
+																 * consists of acceleromter and gyro data. */
+static sensorData error;        /* Difference between error and measurement. */
 
 void initFilter()
 {
-	/* Initializes the Kalman filter.
-
-
-	*/
+	/* Initializes the Kalman filter.	*/
+	INS = getINSData();
+	measurement = getSensorData();
 }
 
 void updateFilter()
@@ -62,10 +62,10 @@ void predict()
 	prediction[pos_y] = step(current[pos_y], current[vel_y],
 													 INS[displ_y]);
 
-	prediction.vel.x = current.vel.x + INS[vel_x];
-	prediction.vel.y = current.vel.y + INS[vel_y];
+	prediction[vel_x] = current[vel_x] + INS[vel_x];
+	prediction[vel_y] = current[vel_y] + INS[vel_y];
 
-	prediction[heading] = current[heading] + sensors[yaw];
+	prediction[heading] = current[heading] + INS[yaw];
 }
 
 float step(float initial, float velocity, float displacement){

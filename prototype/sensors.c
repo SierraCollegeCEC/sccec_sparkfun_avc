@@ -31,140 +31,14 @@
 #include <math.h>
 #include <Arduino.h>
 
+/* Drivers */
+#include "drivers/hm55b.h" /* Magenetometer */
+
 /* Debugging Flag */
 const int DEBUGGING = 0;
 
 sensorData SensorData;
-
-/* HM55B Commands */
-int hm55b_shift_in( int bits )
-{
-	pinMode( DATA, INPUT );
-	int result = 0;
-	
-	if ( DEBUGGING )
-	{
-		Serial.print( "Shifting in ");
-		Serial.print( bits );
-		Serial.print( " bits. Recieved: " );
-	}
-	
-	for( int i = bits; i >= 0; i-- )
-	{
-		digitalWrite( CLK, HIGH );
-		delayMicroseconds(1);
-		if ( digitalRead( DATA ) == HIGH )
-		{
-			result = ( result << 1 ) + 1;
-			if ( DEBUGGING )
-			{
-				Serial.print( "1" );
-			}
-		}
-		else
-		{
-			result = result << 1;
-			if ( DEBUGGING )
-			{
-				Serial.print( "0" );
-			}
-		}
-		digitalWrite( CLK, LOW );
-		delayMicroseconds(1);
-	}
-	if ( DEBUGGING )
-	{
-		Serial.print( "\n" );
-	}
-	
-	if ( ( result & 1 << 11 ) == 1 << 11 )
-	{
-		result = ( B11111000 << 8 ) | result;
-	}
-	return result;
-}
-
-void hm55b_shift_out ( int value, int bits )
-{
-	if ( DEBUGGING )
-	{
-		Serial.print( "Shifting out " );
-		Serial.print( bits );
-		Serial.print( " bits. Sending " ); 
-		Serial.print( value );
-		Serial.print(" Sent: " );
-	}
-	for( int i = bits; i >= 0; i-- )
-	{
-		digitalWrite( CLK, LOW );
-		if ( ( value & 1 << i ) == ( 1 << i ) )
-		{
-			digitalWrite( DATA, HIGH );
-			if ( DEBUGGING )
-			{
-				Serial.print( "1" );
-			}
-		}
-		else
-		{
-			digitalWrite( DATA, LOW );
-			if ( DEBUGGING )
-			{
-				Serial.print( "0" );
-			}
-		}
-		digitalWrite( CLK, HIGH );
-		delayMicroseconds(1);
-	}
-	if ( DEBUGGING )
-	{
-		Serial.print( "\n" );
-	}
-	
-}
-
-void hm55b_reset()
-{
-	pinMode( DATA, OUTPUT );
-	digitalWrite( EN, LOW );
-	hm55b_shift_out( B0000, 3 );
-	digitalWrite( EN, HIGH);
-	if ( DEBUGGING )
-	{
-		Serial.print( "Reset HM55B\n" );
-	}
-}
-
-vector hm55b_read()
-{
-
-        vector heading;
-	pinMode( DATA, OUTPUT );
-	digitalWrite( EN, LOW );
-	hm55b_shift_out( B1000, 3 );
-	digitalWrite( EN, HIGH );
-	delay(40);
-	
-	pinMode( DATA, OUTPUT );
-	digitalWrite( EN, LOW );
-	hm55b_shift_out( B1100, 3 );
-	int read_command_result = hm55b_shift_in( 3 );
-	
-	heading.x = hm55b_shift_in( 11 );
-	heading.y = hm55b_shift_in( 11 );
-	
-	digitalWrite( EN, HIGH );
-	
-	if ( DEBUGGING )
-	{
-          float angle =  180 * ( atan2( ( -1 * heading.y ) , heading.x ) / M_PI );
-		Serial.print( "Angle: " );
-		Serial.print( angle );
-		Serial.print( "\n" );
-	}
-	return heading;
-}
-
+INSData INS;
 
 void initSensors()
 {
@@ -172,16 +46,42 @@ void initSensors()
 	pinMode( CLK, OUTPUT );
 	pinMode( DATA, INPUT );
 
-	hm55b_reset();
+	mag_reset();
 	int filter_array[10];
+}
+
+void integrateGyro(float reading)
+{
+	INS[yaw] += reading * dt;
+}
+
+void integrateAccel(vector readings)
+{
+	INS[change_vel_x] += readings.x * dt^2 / 2;
+	INS[change_vel_y] += readings.y * dt^2 / 2;
+
+	INS[displ_x] += change_vel_x * dt;
+	INS[displ_y] += change_vel_y * dt;
+}
+
+void resetIntegrators()
+{
+	for(int i = 0; i < INSDATA_FIELDS; i++){
+		INS[i] = 0.f;
+	}
 }
 
 void updateSensors()
 {
-   NavData.heading = hm55b_read();
+	SensorData[heading] = mag_read();
 }
 
-sensorData* getSensorData()
+sensorData getSensorData()
 {
   return &SensorData;
+}
+
+INSData getINSData()
+{
+	return &INSData;
 }
