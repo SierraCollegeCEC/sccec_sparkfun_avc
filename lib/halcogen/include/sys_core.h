@@ -1,7 +1,7 @@
 /** @file sys_core.h
 *   @brief System Core Header File
-*   @date 9.Sep.2014
-*   @version 04.01.00
+*   @date 17.Nov.2014
+*   @version 04.02.00
 *   
 *   This file contains:
 *   - Core Interface Functions
@@ -9,7 +9,40 @@
 *   which are relevant for the System driver.
 */
 
-/* (c) Texas Instruments 2009-2014, All rights reserved. */
+/* 
+* Copyright (C) 2009-2014 Texas Instruments Incorporated - http://www.ti.com/ 
+* 
+* 
+*  Redistribution and use in source and binary forms, with or without 
+*  modification, are permitted provided that the following conditions 
+*  are met:
+*
+*    Redistributions of source code must retain the above copyright 
+*    notice, this list of conditions and the following disclaimer.
+*
+*    Redistributions in binary form must reproduce the above copyright
+*    notice, this list of conditions and the following disclaimer in the 
+*    documentation and/or other materials provided with the   
+*    distribution.
+*
+*    Neither the name of Texas Instruments Incorporated nor the names of
+*    its contributors may be used to endorse or promote products derived
+*    from this software without specific prior written permission.
+*
+*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+*  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+*  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+*  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
+*  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+*  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+*  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+*  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+*  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
+*  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+*  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*
+*/
+
 
 #ifndef __SYS_CORE_H__
 #define __SYS_CORE_H__
@@ -50,6 +83,11 @@ void _gotoCPUIdle_(void);
 *   @brief Enable Irq offset propagation via Vic controller
 */
 void _coreEnableIrqVicOffset_(void);
+
+/** @fn void _coreEnableVfp_(void)
+*   @brief Enable vector floating point unit
+*/
+void _coreEnableVfp_(void);
 
 /** @fn void _coreEnableEventBusExport_(void)
 *   @brief Enable event bus export for external monitoring modules
@@ -251,6 +289,14 @@ void _esmCcmErrorsClear_(void);
 *   instructions in Auxiliary Control register.
 */
 void _errata_CORTEXR4_66_(void);
+
+/** @fn void _errata_CORTEXR4_57_(void)
+*   @brief Work Around for Errata CORTEX-R4#57
+*
+*   Disable out-of-order single-precision floating point  
+*   multiply-accumulate instruction completion.
+*/
+void _errata_CORTEXR4_57_(void);
 
 #ifdef __cplusplus
 }

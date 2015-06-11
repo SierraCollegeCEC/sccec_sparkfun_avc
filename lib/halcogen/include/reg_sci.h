@@ -1,7 +1,7 @@
 /** @file reg_sci.h
 *   @brief SCI Register Layer Header File
-*   @date 9.Sep.2014
-*   @version 04.01.00
+*   @date 17.Nov.2014
+*   @version 04.02.00
 *   
 *   This file contains:
 *   - Definitions
@@ -11,7 +11,40 @@
 *   which are relevant for the SCI driver.
 */
 
-/* (c) Texas Instruments 2009-2014, All rights reserved. */
+/* 
+* Copyright (C) 2009-2014 Texas Instruments Incorporated - http://www.ti.com/ 
+* 
+* 
+*  Redistribution and use in source and binary forms, with or without 
+*  modification, are permitted provided that the following conditions 
+*  are met:
+*
+*    Redistributions of source code must retain the above copyright 
+*    notice, this list of conditions and the following disclaimer.
+*
+*    Redistributions in binary form must reproduce the above copyright
+*    notice, this list of conditions and the following disclaimer in the 
+*    documentation and/or other materials provided with the   
+*    distribution.
+*
+*    Neither the name of Texas Instruments Incorporated nor the names of
+*    its contributors may be used to endorse or promote products derived
+*    from this software without specific prior written permission.
+*
+*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+*  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+*  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+*  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
+*  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+*  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+*  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+*  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+*  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
+*  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+*  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*
+*/
+
 
 #ifndef __REG_SCI_H__
 #define __REG_SCI_H__
@@ -39,7 +72,7 @@ typedef volatile struct sciBase
 {
     uint32 GCR0;          /**< 0x0000 Global Control Register 0 */
     uint32 GCR1;          /**< 0x0004 Global Control Register 1 */
-    uint32 GCR2;         /**< 0x0008 Global Control Register 2.  */
+    uint32 GCR2;         /**< 0x0008 Global Control Register 2. Note: Applicable only to LIN – SCI Compatibility Mode,Reserved for standalone SCI*/
     uint32 SETINT;       /**< 0x000C Set Interrupt Enable Register */
     uint32 CLEARINT;      /**< 0x0010 Clear Interrupt Enable Register */
     uint32 SETINTLVL;    /**< 0x0014 Set Interrupt Level Register */
@@ -64,6 +97,23 @@ typedef volatile struct sciBase
     uint32 rsdv2[12U];    /**< 0x0060: Reserved                               */
     uint32 IODFTCTRL;     /**< 0x0090: I/O Error Enable Register */
 } sciBASE_t;
+
+
+/** @def sciREG
+*   @brief  Register Frame Pointer
+*
+*   This pointer is used by the SCI driver to access the sci module registers.
+*/
+#define sciREG ((sciBASE_t *)0xFFF7E500U)
+
+
+/** @def sciPORT
+*   @brief SCI GIO Port Register Pointer
+*
+*   Pointer used by the GIO driver to access I/O PORT of SCI
+*   (use the GIO drivers to access the port pins).
+*/
+#define sciPORT ((gioPORT_t *)0xFFF7E540U)
 
 
 /** @def scilinREG

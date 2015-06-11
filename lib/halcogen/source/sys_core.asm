@@ -1,7 +1,38 @@
 ;-------------------------------------------------------------------------------
 ; sys_core.asm
 ;
-; (c) Texas Instruments 2009-2013, All rights reserved.
+; Copyright (C) 2009-2014 Texas Instruments Incorporated - http://www.ti.com/ 
+; 
+; 
+;  Redistribution and use in source and binary forms, with or without 
+;  modification, are permitted provided that the following conditions 
+;  are met:
+;
+;    Redistributions of source code must retain the above copyright 
+;    notice, this list of conditions and the following disclaimer.
+;
+;    Redistributions in binary form must reproduce the above copyright
+;    notice, this list of conditions and the following disclaimer in the 
+;    documentation and/or other materials provided with the   
+;    distribution.
+;
+;    Neither the name of Texas Instruments Incorporated nor the names of
+;    its contributors may be used to endorse or promote products derived
+;    from this software without specific prior written permission.
+;
+;  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+;  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+;  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+;  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
+;  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+;  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+;  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+;  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+;  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
+;  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+;  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+;
+;
 ;
 
     .text
@@ -68,6 +99,29 @@ _coreInitRegisters_
         mrs r1,cpsr
         msr spsr_cxsf, r1         
 
+
+        mrc   p15,     #0x00,      r2,       c1, c0, #0x02
+        orr   r2,      r2,         #0xF00000
+        mcr   p15,     #0x00,      r2,       c1, c0, #0x02
+        mov   r2,      #0x40000000
+        fmxr  fpexc,   r2
+
+        fmdrr d0,         r1,     r1
+        fmdrr d1,         r1,     r1
+        fmdrr d2,         r1,     r1
+        fmdrr d3,         r1,     r1
+        fmdrr d4,         r1,     r1
+        fmdrr d5,         r1,     r1
+        fmdrr d6,         r1,     r1
+        fmdrr d7,         r1,     r1
+        fmdrr d8,         r1,     r1
+        fmdrr d9,         r1,     r1
+        fmdrr d10,        r1,     r1
+        fmdrr d11,        r1,     r1
+        fmdrr d12,        r1,     r1
+        fmdrr d13,        r1,     r1
+        fmdrr d14,        r1,     r1
+        fmdrr d15,        r1,     r1
         bl    next1
 next1
         bl    next2
@@ -151,6 +205,26 @@ _gotoCPUIdle_
         
     .endasmfunc
     
+
+;-------------------------------------------------------------------------------
+; Enable VFP Unit
+; SourceId : CORE_SourceId_005
+; DesignId : CORE_DesignId_006
+; Requirements: HL_SR492, HL_SR476
+
+    .def     _coreEnableVfp_
+    .asmfunc
+
+_coreEnableVfp_
+
+        mrc   p15,     #0x00,      r0,       c1, c0, #0x02
+        orr   r0,      r0,         #0xF00000
+        mcr   p15,     #0x00,      r0,       c1, c0, #0x02
+        mov   r0,      #0x40000000
+        fmxr  fpexc,   r0
+        bx    lr
+
+    .endasmfunc
 
 ;-------------------------------------------------------------------------------
 ; Enable Event Bus Export
@@ -627,6 +701,27 @@ VIM_INTREQ        .word 0xFFFFFE20
 
         .endasmfunc    
 
+;-------------------------------------------------------------------------------
+; Work Around for Errata CORTEX-R4#57:
+; 
+; Errata Description: 
+;            Conditional VMRS APSR_Nzcv, FPSCR May Evaluate With Incorrect Flags
+; Workaround:
+;            Disable out-of-order single-precision floating point 
+;            multiply-accumulate instruction completion 
+
+        .def     _errata_CORTEXR4_57_
+        .asmfunc
+
+_errata_CORTEXR4_57_
+
+        push {r0}
+        mrc p15, #0, r0, c15, c0, #0 ; Read Secondary Auxiliary Control Register 
+        orr r0, r0, #0x10000         ; Set BIT 16 (Set DOOFMACS) 
+        mcr p15, #0, r0, c15, c0, #0 ; Write Secondary Auxiliary Control Register 
+        pop {r0}
+        bx lr
+    .endasmfunc
 
 ;-------------------------------------------------------------------------------
 ; Work Around for Errata CORTEX-R4#66:

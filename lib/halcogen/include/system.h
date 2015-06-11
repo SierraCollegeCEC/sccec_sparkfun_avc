@@ -1,7 +1,7 @@
 /** @file system.h
 *   @brief System Driver Header File
-*   @date 9.Sep.2014
-*   @version 04.01.00
+*   @date 17.Nov.2014
+*   @version 04.02.00
 *   
 *   This file contains:
 *   - Definitions
@@ -10,7 +10,40 @@
 *   which are relevant for the System driver.
 */
 
-/* (c) Texas Instruments 2009-2014, All rights reserved. */
+/* 
+* Copyright (C) 2009-2014 Texas Instruments Incorporated - http://www.ti.com/ 
+* 
+* 
+*  Redistribution and use in source and binary forms, with or without 
+*  modification, are permitted provided that the following conditions 
+*  are met:
+*
+*    Redistributions of source code must retain the above copyright 
+*    notice, this list of conditions and the following disclaimer.
+*
+*    Redistributions in binary form must reproduce the above copyright
+*    notice, this list of conditions and the following disclaimer in the 
+*    documentation and/or other materials provided with the   
+*    distribution.
+*
+*    Neither the name of Texas Instruments Incorporated nor the names of
+*    its contributors may be used to endorse or promote products derived
+*    from this software without specific prior written permission.
+*
+*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+*  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+*  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+*  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
+*  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+*  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+*  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+*  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+*  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
+*  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+*  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*
+*/
+
 
 #ifndef __SYS_SYSTEM_H__
 #define __SYS_SYSTEM_H__
@@ -44,14 +77,14 @@ extern "C" {
 */
 enum systemClockSource
 {
-    SYS_OSC       		= 0U,  /**< Alias for oscillator clock Source                */
-    SYS_PLL1      		= 1U,  /**< Alias for Pll1 clock Source                      */
-    SYS_EXTERNAL1  		= 3U,  /**< Alias for external clock Source                  */
-    SYS_LPO_LOW   		= 4U,  /**< Alias for low power oscillator low clock Source  */
-    SYS_LPO_HIGH  		= 5U,  /**< Alias for low power oscillator high clock Source */
-    SYS_PLL2    		= 6U,  /**< Alias for Pll2 clock Source                      */
-    SYS_EXTERNAL2 		= 7U,  /**< Alias for external 2 clock Source                */
-    SYS_VCLK      		= 9U   /**< Alias for synchronous VCLK1 clock Source         */
+    SYS_OSC             = 0U,  /**< Alias for oscillator clock Source                */
+    SYS_PLL1            = 1U,  /**< Alias for Pll1 clock Source                      */
+    SYS_EXTERNAL1       = 3U,  /**< Alias for external clock Source                  */
+    SYS_LPO_LOW         = 4U,  /**< Alias for low power oscillator low clock Source  */
+    SYS_LPO_HIGH        = 5U,  /**< Alias for low power oscillator high clock Source */
+    SYS_PLL2            = 6U,  /**< Alias for Pll2 clock Source                      */
+    SYS_EXTERNAL2       = 7U,  /**< Alias for external 2 clock Source                */
+    SYS_VCLK            = 9U   /**< Alias for synchronous VCLK1 clock Source         */
 };
 
 #define SYS_DOZE_MODE        0x000F3F02U
@@ -82,7 +115,7 @@ enum systemClockSource
 *
 *   PLL 1 clock source exported from HALCoGen GUI
 */
-#define PLL1_FREQ    80.00F
+#define PLL1_FREQ    160.00F
 
 /** @def LPO_LF_FREQ
 *   @brief LPO Low Freq Oscillator source exported from HALCoGen GUI
@@ -103,21 +136,21 @@ enum systemClockSource
 *
 *   PLL 2 clock source exported from HALCoGen GUI
 */
-#define PLL2_FREQ    80.00F
+#define PLL2_FREQ    160.00F
 
 /** @def GCLK_FREQ
 *   @brief GCLK domain frequency exported from HALCoGen GUI
 *
 *   GCLK domain frequency exported from HALCoGen GUI
 */
-#define GCLK_FREQ    80.000F
+#define GCLK_FREQ    160.000F
 
 /** @def HCLK_FREQ
 *   @brief HCLK domain frequency exported from HALCoGen GUI
 *
 *   HCLK domain frequency exported from HALCoGen GUI
 */
-#define HCLK_FREQ    80.000F
+#define HCLK_FREQ    160.000F
 
 /** @def RTI_FREQ
 *   @brief RTI Clock frequency exported from HALCoGen GUI
@@ -138,21 +171,21 @@ enum systemClockSource
 *
 *   AVCLK2 Domain frequency exported from HALCoGen GUI
 */
-#define AVCLK2_FREQ  0.0F
+#define AVCLK2_FREQ  80.000F
 
 /** @def AVCLK3_FREQ
 *   @brief AVCLK3 Domain frequency exported from HALCoGen GUI
 *
 *   AVCLK3 Domain frequency exported from HALCoGen GUI
 */
-#define AVCLK3_FREQ  0.0F
+#define AVCLK3_FREQ  0.000F
 
 /** @def AVCLK4_FREQ
 *   @brief AVCLK4 Domain frequency exported from HALCoGen GUI
 *
 *   AVCLK4 Domain frequency exported from HALCoGen GUI
 */
-#define AVCLK4_FREQ  0.0F
+#define AVCLK4_FREQ  80.000F
 
 /** @def VCLK1_FREQ
 *   @brief VCLK1 Domain frequency exported from HALCoGen GUI
@@ -173,14 +206,14 @@ enum systemClockSource
 *
 *   VCLK3 Domain frequency exported from HALCoGen GUI
 */
-#define VCLK3_FREQ   40.000F
+#define VCLK3_FREQ   80.000F
 
 /** @def VCLK4_FREQ
 *   @brief VCLK4 Domain frequency exported from HALCoGen GUI
 *
 *   VCLK4 Domain frequency exported from HALCoGen GUI
 */
-#define VCLK4_FREQ   0.0F
+#define VCLK4_FREQ   80.000F
 
 
 /** @def SYS_PRE1
@@ -218,7 +251,7 @@ enum systemClockSource
 /* Configuration registers */
 typedef struct system_config_reg
 {
-	uint32 CONFIG_SYSPC1;
+    uint32 CONFIG_SYSPC1;
     uint32 CONFIG_SYSPC2;
     uint32 CONFIG_SYSPC7;
     uint32 CONFIG_SYSPC8;
@@ -246,54 +279,58 @@ typedef struct system_config_reg
     uint32 CONFIG_ECPCNTL;
     uint32 CONFIG_DEVCR1;
     uint32 CONFIG_SYSECR;
+    uint32 CONFIG_PLLCTL3;
     uint32 CONFIG_STCCLKDIV;
+    uint32 CONFIG_CLK2CNTL;
+    uint32 CONFIG_VCLKACON1;
     uint32 CONFIG_CLKSLIP;
     uint32 CONFIG_EFC_CTLEN;
 } system_config_reg_t;
 
 /* Configuration registers initial value */
-#define SYS_SYSPC1_CONFIGVALUE	0U
+#define SYS_SYSPC1_CONFIGVALUE  0U
 
-#define SYS_SYSPC2_CONFIGVALUE	1U
+#define SYS_SYSPC2_CONFIGVALUE  1U
 
-#define SYS_SYSPC7_CONFIGVALUE	0U
+#define SYS_SYSPC7_CONFIGVALUE  0U
 
-#define SYS_SYSPC8_CONFIGVALUE	0U
+#define SYS_SYSPC8_CONFIGVALUE  0U
 
-#define SYS_SYSPC9_CONFIGVALUE	1U
+#define SYS_SYSPC9_CONFIGVALUE  1U
 
-#define SYS_CSDIS_CONFIGVALUE	(0x00000000U\
-								| 0x00000000U \
-								| 0x00000008U \
-								| 0x00000080U \
-								| 0x00000000U \
-								| 0x00000040U \
-								| 0x00000000U\
-                                | 0x4U)
-					  
-#define SYS_CDDIS_CONFIGVALUE   ( (uint32)((uint32)0 << 4U )\
-                                | (uint32)((uint32)1 << 5U )\
-                                | (uint32)((uint32)0 << 8U )\
-                                | (uint32)((uint32)0 << 10U)\
-                                | (uint32)((uint32)0 << 11U) )
-					  
+#define SYS_CSDIS_CONFIGVALUE   ( 0x00000000U\
+                                | 0x00000000U \
+                                | 0x00000008U \
+                                | 0x00000080U \
+                                | 0x00000000U \
+                                | 0x00000000U \
+                                | 0x00000000U\
+                                | 0x4U )
+                      
+#define SYS_CDDIS_CONFIGVALUE   ( (uint32)((uint32)0U << 4U )\
+                                | (uint32)((uint32)0U << 5U )\
+                                | (uint32)((uint32)0U << 8U )\
+								| (uint32)((uint32)0U << 9U )\
+                                | (uint32)((uint32)1U << 10U)\
+                                | (uint32)((uint32)0U << 11U) )
+                      
 #define SYS_GHVSRC_CONFIGVALUE  ( (uint32)((uint32)SYS_OSC << 24U) \
                                 | (uint32)((uint32)SYS_OSC << 16U) \
                                 | (uint32)((uint32)SYS_PLL1 << 0U) )
-								
+                                
 #define SYS_VCLKASRC_CONFIGVALUE    ( (uint32)((uint32)SYS_VCLK << 8U)\
                                     | (uint32)((uint32)SYS_VCLK << 0U) )
-									
+                                    
 #define SYS_RCLKSRC_CONFIGVALUE     ( (uint32)((uint32)1U << 24U)\
                                     | (uint32)((uint32)SYS_VCLK << 16U)\
                                     | (uint32)((uint32)1U << 8U)\
                                     | (uint32)((uint32)SYS_VCLK << 0U) )
-									
-#define SYS_MSTGCR_CONFIGVALUE		0x00000105U
+                                    
+#define SYS_MSTGCR_CONFIGVALUE      0x00000105U
 
-#define SYS_MINITGCR_CONFIGVALUE 	0x5U
+#define SYS_MINITGCR_CONFIGVALUE    0x5U
 
-#define SYS_MSINENA_CONFIGVALUE		0U
+#define SYS_MSINENA_CONFIGVALUE     0U
 
 #define SYS_PLLCTL1_CONFIGVALUE_1   ( (uint32)0x00000000U \
                                     | (uint32)0x20000000U \
@@ -301,51 +338,62 @@ typedef struct system_config_reg
                                     | (uint32)0x00000000U \
                                     | (uint32)((uint32)(6U - 1U)<< 16U)\
                                     | (uint32)((uint32)(120U - 1U)<< 8U) )
-									
-#define SYS_PLLCTL1_CONFIGVALUE_2   (((SYS_PLLCTL1_CONFIGVALUE_1) & 0xE0FFFFFFU) | (uint32)((uint32)(2U - 1U) << 24U))
-									
+                                    
+#define SYS_PLLCTL1_CONFIGVALUE_2   (((SYS_PLLCTL1_CONFIGVALUE_1) & 0xE0FFFFFFU) | (uint32)((uint32)(1U - 1U) << 24U))
+                                    
 #define SYS_PLLCTL2_CONFIGVALUE     ( (uint32)0x00000000U\
                                     | (uint32)((uint32)255U << 22U)\
                                     | (uint32)((uint32)7U << 12U)\
                                     | (uint32)((uint32)(2U - 1U)<< 9U)\
                                     | (uint32)61U)
-									
-#define SYS_UERFLAG_CONFIGVALUE		0U
+                                    
+#define SYS_UERFLAG_CONFIGVALUE     0U
 
 #define SYS_LPOMONCTL_CONFIGVALUE_1 ((uint32)((uint32)1U << 24U) | LPO_TRIM_VALUE)
 #define SYS_LPOMONCTL_CONFIGVALUE_2 ((uint32)((uint32)1U << 24U) | (uint32)((uint32)16U << 8U) | 16U)
 
-#define SYS_CLKTEST_CONFIGVALUE		0x000A0000U
+#define SYS_CLKTEST_CONFIGVALUE     0x000A0000U
 
-#define SYS_DFTCTRLREG1_CONFIGVALUE	0x00002205U
+#define SYS_DFTCTRLREG1_CONFIGVALUE 0x00002205U
 
-#define SYS_DFTCTRLREG2_CONFIGVALUE	0x5U
+#define SYS_DFTCTRLREG2_CONFIGVALUE 0x5U
 
-#define SYS_GPREG1_CONFIGVALUE	0x0005FFFFU
-
-#define SYS_RAMGCR_CONFIGVALUE	0x00050000U
-
-#define SYS_BMMCR1_CONFIGVALUE	0xAU
-
-#define SYS_MMUGCR_CONFIGVALUE	0U
+#define SYS_GPREG1_CONFIGVALUE      0x0005FFFFU
+                                    
+#define SYS_RAMGCR_CONFIGVALUE      0x00050000U
+                                    
+#define SYS_BMMCR1_CONFIGVALUE      0xAU
+                                    
+#define SYS_MMUGCR_CONFIGVALUE      0U
 
 #define SYS_CLKCNTL_CONFIGVALUE     ( 0x00000100U \
-                                    | (uint32)((uint32)0U << 16U) \
-                                    | (uint32)((uint32)0U << 24U) ) 
-								
+                                    | (uint32)((uint32)1U << 16U) \
+                                    | (uint32)((uint32)1U << 24U) ) 
+                                    
 #define SYS_ECPCNTL_CONFIGVALUE     ( (uint32)((uint32)0U << 24U)\
                                     | (uint32)((uint32)0U << 23U)\
                                     | (uint32)((uint32)(8U - 1U) & 0xFFFFU) )
-								
-#define SYS_DEVCR1_CONFIGVALUE	0xAU
-
-#define SYS_SYSECR_CONFIGVALUE	0x00004000U
-									
+                                    
+#define SYS_DEVCR1_CONFIGVALUE      0xAU
+                                    
+#define SYS_SYSECR_CONFIGVALUE      0x00004000U
+#define SYS2_PLLCTL3_CONFIGVALUE_1  ( (uint32)((uint32)(2U - 1U) << 29U)\
+                                    | (uint32)((uint32)0x1FU << 24U) \
+                                    | (uint32)((uint32)(6U - 1U)<< 16U) \
+                                    | (uint32)((uint32)(120U - 1U) << 8U) )
+                                    
 #define SYS2_PLLCTL3_CONFIGVALUE_2  (((SYS2_PLLCTL3_CONFIGVALUE_1) & 0xE0FFFFFFU) | (uint32)((uint32)(1U - 1U) << 24U))
-#define SYS2_STCCLKDIV_CONFIGVALUE	0U
-#define SYS2_CLKSLIP_CONFIGVALUE	0x5U
-#define SYS2_EFC_CTLEN_CONFIGVALUE	0x5U
-	
+#define SYS2_STCCLKDIV_CONFIGVALUE  0U
+#define SYS2_CLK2CNTL_CONFIGVALUE   (1U | 0x00000100U)
+#define SYS2_VCLKACON1_CONFIGVALUE  ( (uint32)((uint32)1U << 24U) \
+                                    | (uint32)((uint32)1U << 20U) \
+                                    | (uint32)((uint32)SYS_VCLK << 16U)\
+                                    | (uint32)((uint32)1U << 8U)\
+                                    | (uint32)((uint32)1U << 4U) \
+                                    | (uint32)((uint32)SYS_VCLK << 0U) )
+#define SYS2_CLKSLIP_CONFIGVALUE    0x5U
+#define SYS2_EFC_CTLEN_CONFIGVALUE  0x5U
+    
 void systemGetConfigValue(system_config_reg_t *config_reg, config_value_type_t type);
 
 /* USER CODE BEGIN (1) */
@@ -373,8 +421,8 @@ enum flashWPowerModes
 /* USER CODE END */
 
 
-#define FSM_WR_ENA_HL		(*(volatile uint32 *)0xFFF87288U)
-#define EEPROM_CONFIG_HL	(*(volatile uint32 *)0xFFF872B8U)
+#define FSM_WR_ENA_HL       (*(volatile uint32 *)0xFFF87288U)
+#define EEPROM_CONFIG_HL    (*(volatile uint32 *)0xFFF872B8U)
 
 /* Configuration registers */
 typedef struct tcmflash_config_reg
@@ -396,28 +444,28 @@ typedef struct tcmflash_config_reg
 } tcmflash_config_reg_t;
 
 /* Configuration registers initial value */
-#define TCMFLASH_FRDCNTL_CONFIGVALUE        (0x00000000U | (uint32)((uint32)1U << 8U) | (uint32)((uint32)0U << 4U) |  1U)
-#define TCMFLASH_FEDACCTRL1_CONFIGVALUE		0x000A0005U
-#define TCMFLASH_FEDACCTRL2_CONFIGVALUE		0U
-#define TCMFLASH_FEDACSDIS_CONFIGVALUE		0U
-#define TCMFLASH_FBPROT_CONFIGVALUE			0U
-#define TCMFLASH_FBSE_CONFIGVALUE			0U
-#define TCMFLASH_FBAC_CONFIGVALUE			0xFU
+#define TCMFLASH_FRDCNTL_CONFIGVALUE        (0x00000000U | (uint32)((uint32)3U << 8U) | (uint32)((uint32)1U << 4U) |  1U)
+#define TCMFLASH_FEDACCTRL1_CONFIGVALUE     0x000A0005U
+#define TCMFLASH_FEDACCTRL2_CONFIGVALUE     0U
+#define TCMFLASH_FEDACSDIS_CONFIGVALUE      0U
+#define TCMFLASH_FBPROT_CONFIGVALUE         0U
+#define TCMFLASH_FBSE_CONFIGVALUE           0U
+#define TCMFLASH_FBAC_CONFIGVALUE           0xFU
 #define TCMFLASH_FBFALLBACK_CONFIGVALUE     ( (uint32)((uint32)SYS_ACTIVE << 14U) \
                                             | (uint32)((uint32)3U << 12U) \
                                             | (uint32)((uint32)3U << 10U) \
                                             | (uint32)((uint32)3U << 8U) \
                                             | (uint32)((uint32)3U << 6U) \
                                             | (uint32)((uint32)3U << 4U) \
-                                            | (uint32)((uint32)3U << 2U) \
+                                            | (uint32)((uint32)SYS_ACTIVE << 2U) \
                                             | (uint32)((uint32)SYS_ACTIVE << 0U) )
-						  
-#define TCMFLASH_FPAC1_CONFIGVALUE			0x00C80001U
-#define TCMFLASH_FPAC2_CONFIGVALUE			0U
-#define TCMFLASH_FMAC_CONFIGVALUE			0U
-#define TCMFLASH_FLOCK_CONFIGVALUE			0x55AAU
-#define TCMFLASH_FDIAGCTRL_CONFIGVALUE		0x000A0000U
-#define TCMFLASH_FEDACSDIS2_CONFIGVALUE		0U
+                          
+#define TCMFLASH_FPAC1_CONFIGVALUE          0x00C80001U
+#define TCMFLASH_FPAC2_CONFIGVALUE          0U
+#define TCMFLASH_FMAC_CONFIGVALUE           0U
+#define TCMFLASH_FLOCK_CONFIGVALUE          0x55AAU
+#define TCMFLASH_FDIAGCTRL_CONFIGVALUE      0x000A0000U
+#define TCMFLASH_FEDACSDIS2_CONFIGVALUE     0U
 
 void tcmflashGetConfigValue(tcmflash_config_reg_t *config_reg, config_value_type_t type);
 
@@ -449,11 +497,11 @@ typedef struct sram_config_reg
 } sram_config_reg_t;
 
 /* Configuration registers initial value */
-#define SRAM_RAMCTRL_CONFIGVALUE		0x0005000AU
-#define SRAM_RAMTHRESHOLD_CONFIGVALUE	1U
-#define SRAM_RAMINTCTRL_CONFIGVALUE	1U
-#define SRAM_RAMTEST_CONFIGVALUE		0x5U
-#define SRAM_RAMADDRDECVECT_CONFIGVALUE	0U
+#define SRAM_RAMCTRL_CONFIGVALUE        0x0005000AU
+#define SRAM_RAMTHRESHOLD_CONFIGVALUE   1U
+#define SRAM_RAMINTCTRL_CONFIGVALUE 1U
+#define SRAM_RAMTEST_CONFIGVALUE        0x5U
+#define SRAM_RAMADDRDECVECT_CONFIGVALUE 0U
 
 void sramGetConfigValue(sram_config_reg_t *config_reg, config_value_type_t type);
 #ifdef __cplusplus
