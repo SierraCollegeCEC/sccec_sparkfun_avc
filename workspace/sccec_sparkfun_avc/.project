@@ -28,93 +28,12 @@
 		<link>
 			<name>lib</name>
 			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
+			<locationURI>$%7BPARENT-2-PROJECT_LOC%7D/lib</locationURI>
 		</link>
 		<link>
 			<name>src</name>
 			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>lib/halcogen</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>src/inc</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>src/main.c</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/src/main.c</locationURI>
-		</link>
-		<link>
-			<name>src/motion.c</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/src/motion.c</locationURI>
-		</link>
-		<link>
-			<name>src/navigation.c</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/src/navigation.c</locationURI>
-		</link>
-		<link>
-			<name>src/schedule.c</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/src/schedule.c</locationURI>
-		</link>
-		<link>
-			<name>src/sensors.c</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/src/sensors.c</locationURI>
-		</link>
-		<link>
-			<name>lib/halcogen/include</name>
-			<type>2</type>
-			<locationURI>PARENT-2-PROJECT_LOC/lib/halcogen/include</locationURI>
-		</link>
-		<link>
-			<name>lib/halcogen/source</name>
-			<type>2</type>
-			<locationURI>PARENT-2-PROJECT_LOC/lib/halcogen/source</locationURI>
-		</link>
-		<link>
-			<name>src/inc/common.h</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/src/inc/common.h</locationURI>
-		</link>
-		<link>
-			<name>src/inc/motion.h</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/src/inc/motion.h</locationURI>
-		</link>
-		<link>
-			<name>src/inc/navigation.h</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/src/inc/navigation.h</locationURI>
-		</link>
-		<link>
-			<name>src/inc/schedule.h</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/src/inc/schedule.h</locationURI>
-		</link>
-		<link>
-			<name>src/inc/sensors.h</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/src/inc/sensors.h</locationURI>
+			<locationURI>$%7BPARENT-2-PROJECT_LOC%7D/src</locationURI>
 		</link>
 	</linkedResources>
-	<filteredResources>
-		<filter>
-			<id>1415349515975</id>
-			<name>lib</name>
-			<type>22</type>
-			<matcher>
-				<id>org.eclipse.ui.ide.multiFilter</id>
-				<arguments>1.0-name-matches-false-false-sys_main.c</arguments>
-			</matcher>
-		</filter>
-	</filteredResources>
 </projectDescription>
