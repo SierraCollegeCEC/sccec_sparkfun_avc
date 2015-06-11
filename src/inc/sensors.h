@@ -13,11 +13,11 @@ void updateSensors();
 #define INSDATA_FIELDS 5
 typedef enum INSData_fields {disp_x, disp_y, change_vel_x, change_vel_y,
 														 yaw} INSData_field;
-typedef float *INSData;
+typedef float INSData[INSDATA_FIELDS];
 
-#define SENSORDATA_FIELDS 5
+#define SENSOR_DATA_FIELDS 5
 typedef enum sensorData_fields {pos_x, pos_y, vel_x, vel_y, yaw} sensorData_field;
-typedef float *sensorData;
+typedef float sensorData[SENSOR_DATA_FIELDS];
 
 INSData getINSData();
 sensorData getSensorData();

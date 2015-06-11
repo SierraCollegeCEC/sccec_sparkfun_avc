@@ -10,8 +10,16 @@ extern navData current;         /* The current state. */
 static navData prediction;      /* A prediction of the next state. */
 static sensorData measurement;  /* The GPS and Magnetometer data. */
 static INSData INS;             /* Inertial Navigation System data, which
-																 * consists of acceleromter and gyro data. */
+								 * consists of acceleromter and gyro data. */
 static sensorData error;        /* Difference between error and measurement. */
+extern KalmanGain kalman = {	/* Kalman gain, which is the linear correction
+								 * factor applied to the error term. */
+	{.01, .01, .01, .01, .01},
+	{.01, .01, .01, .01, .01},
+	{.01, .01, .01, .01, .01},
+	{.01, .01, .01, .01, .01},
+	{.01, .01, .01, .01, .01}
+}        
 
 void initFilter()
 {
@@ -40,7 +48,7 @@ void updateFilter()
 	 */
 
 	predict(); /* Prediction */
-  compare(); /* Comparison */
+	compare(); /* Comparison */
 	filter(); /* Correction */
 	
 }
@@ -68,7 +76,8 @@ void predict()
 	prediction[heading] = current[heading] + INS[yaw];
 }
 
-float step(float initial, float velocity, float displacement){
+float step(float initial, float velocity, float displacement)
+{
 	return initial + velocity * dt + displacement; 
 }
 
@@ -105,7 +114,7 @@ void filter()
 		 The kalman gain matrix is a constant defined elsewhere.
 		 dotting a matrix[i] with a vector is the equivalent of
 		 the dot product of the ith row of the matrix with the
-		 vector; standard matrix multiplication.
+		 vector; this is standard matrix multiplication.
 	*/
 	
 	navData_iterate(i){
