@@ -14,7 +14,7 @@
 /* AVC */
 #include "schedule.h"
 #include "sensors.h"
-#include "navigation.h"
+#include "nav.h"
 #include "motion.h"
 
 int counter = 0;
