@@ -1,13 +1,46 @@
 /** @file sys_selftest.c
 *   @brief Selftest Source File
-*   @date 9.Sep.2014
-*   @version 04.01.00
+*   @date 17.Nov.2014
+*   @version 04.02.00
 *
 *   This file contains:
 *   - Selftest API's
 */
 
-/* (c) Texas Instruments 2009-2014, All rights reserved. */
+/* 
+* Copyright (C) 2009-2014 Texas Instruments Incorporated - http://www.ti.com/ 
+* 
+* 
+*  Redistribution and use in source and binary forms, with or without 
+*  modification, are permitted provided that the following conditions 
+*  are met:
+*
+*    Redistributions of source code must retain the above copyright 
+*    notice, this list of conditions and the following disclaimer.
+*
+*    Redistributions in binary form must reproduce the above copyright
+*    notice, this list of conditions and the following disclaimer in the 
+*    documentation and/or other materials provided with the   
+*    distribution.
+*
+*    Neither the name of Texas Instruments Incorporated nor the names of
+*    its contributors may be used to endorse or promote products derived
+*    from this software without specific prior written permission.
+*
+*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+*  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+*  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+*  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
+*  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+*  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+*  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+*  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+*  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
+*  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+*  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*
+*/
+
 
 /* USER CODE BEGIN (0) */
 /* USER CODE END */
@@ -204,7 +237,7 @@ void stcSelfCheck(void)
     /* wait for 16 VBUS clock cycles at least, based on HCLK to VCLK ratio */
 	/*SAFETYMCUSW 134 S MR:12.2 <APPROVED> "Wait for few clock cycles (Value of i not used)" */
 	/*SAFETYMCUSW 134 S MR:12.2 <APPROVED> "Wait for few clock cycles (Value of i not used)" */
-    for (i=0U; i<(16U + (16U * 0U)); i++){ /* Wait */ }
+    for (i=0U; i<(16U + (16U * 1U)); i++){ /* Wait */ }
 
     /* Enable self-test */
     stcREG->STCGCR1 = 0xAU;
@@ -251,7 +284,7 @@ void cpuSelfTest(uint32 no_of_intervals, uint32 max_timeout, boolean restart_tes
     /* wait for 16 VBUS clock cycles at least, based on HCLK to VCLK ratio */
 	/*SAFETYMCUSW 134 S MR:12.2 <APPROVED> "Wait for few clock cycles (Value of i not used)" */
 	/*SAFETYMCUSW 134 S MR:12.2 <APPROVED> "Wait for few clock cycles (Value of i not used)" */
-    for (i=0U; i<(16U + (16U * 0U)); i++){ /* Wait */ }
+    for (i=0U; i<(16U + (16U * 1U)); i++){ /* Wait */ }
 
     /* Enable self-test */
     stcREG->STCGCR1 = 0xAU;
@@ -279,18 +312,20 @@ void pbistSelfCheck(void)
 /* USER CODE BEGIN (13) */
 /* USER CODE END */
     /* Run a diagnostic check on the memory self-test controller */
+    /* First set up the PBIST ROM clock as this clock frequency is limited to 90MHz */
 
     /* Disable PBIST clocks and ROM clock */
     pbistREG->PACT = 0x0U;
     
+    /* PBIST ROM clock frequency = HCLK frequency /2 */
     /* Disable memory self controller */
-    systemREG1->MSTGCR = 0x00000005U;                
+    systemREG1->MSTGCR = 0x00000105U;                
     
     /* Disable Memory Initialization controller */
     systemREG1->MINITGCR = 0x5U;
 
     /* Enable memory self controller */
-    systemREG1->MSTGCR = 0x0000000AU;                               
+    systemREG1->MSTGCR = 0x0000010AU;                               
 
     /* Clear PBIST Done */
     systemREG1->MSTCGSTAT = 0x1U;
@@ -301,7 +336,7 @@ void pbistSelfCheck(void)
     /* wait for 32 VBUS clock cycles at least, based on HCLK to VCLK ratio */
 	/*SAFETYMCUSW 134 S MR:12.2 <APPROVED> "Wait for few clock cycles (Value of i not used)" */
 	/*SAFETYMCUSW 134 S MR:12.2 <APPROVED> "Wait for few clock cycles (Value of i not used)" */
-    for (i=0U; i<(32U + (32U * 0U)); i++){ /* Wait */ }
+    for (i=0U; i<(32U + (32U * 1U)); i++){ /* Wait */ }
 
 /* USER CODE BEGIN (14) */
 /* USER CODE END */
@@ -386,8 +421,9 @@ void pbistRun(uint32 raminfoL, uint32 algomask)
 /* USER CODE BEGIN (17) */
 /* USER CODE END */
 
+    /* PBIST ROM clock frequency = HCLK frequency /2 */
     /* Disable memory self controller */
-    systemREG1->MSTGCR = 0x00000005U;
+    systemREG1->MSTGCR = 0x00000105U;
 
     /* Disable Memory Initialization controller */
     systemREG1->MINITGCR = 0x5U;
@@ -396,12 +432,12 @@ void pbistRun(uint32 raminfoL, uint32 algomask)
     systemREG1->MSINENA = 0x1U;
 
     /* Enable memory self controller */
-    systemREG1->MSTGCR = 0x0000000AU;
+    systemREG1->MSTGCR = 0x0000010AU;
 
     /* wait for 32 VBUS clock cycles at least, based on HCLK to VCLK ratio */
 	/*SAFETYMCUSW 134 S MR:12.2 <APPROVED> "Wait for few clock cycles (Value of i not used)" */
 	/*SAFETYMCUSW 134 S MR:12.2 <APPROVED> "Wait for few clock cycles (Value of i not used)" */
-    for (i=0U; i<(32U + (32U * 0U)); i++){ /* Wait */ }
+    for (i=0U; i<(32U + (32U * 1U)); i++){ /* Wait */ }
 
 /* USER CODE BEGIN (18) */
 /* USER CODE END */
@@ -1192,10 +1228,64 @@ void vimParityCheck(void)
 /* USER CODE END */
 }
 
+
+/** @fn void dmaParityCheck(void)
+*   @brief Routine to check DMA control packet RAM parity error detection and signaling mechanism
+*
+*   Routine to check DMA control packet RAM parity error detection and signaling mechanism
+*/
+/* SourceId : SELFTEST_SourceId_021 */
+/* DesignId : SELFTEST_DesignId_022 */
+/* Requirements : HL_SR388 */
+void dmaParityCheck(void)
+{
+    volatile uint32 dmaread = 0U;
+    uint32 dmaparcr_bk = DMA_PARCR;
+
 /* USER CODE BEGIN (51) */
 /* USER CODE END */
+
+    /* Enable parity checking and parity test mode */
+    DMA_PARCR = 0x0000010AU;
+
+    /* Flip a bit in DMA RAM parity location */
+    DMARAMPARLOC ^= 0x1U;
+
+    /* Disable parity test mode */
+    DMA_PARCR = 0x0000000AU;
+
+    /* Cause parity error */
+    dmaread = DMARAMLOC;
+
+    /* Check if ESM group1 channel 3 is flagged */
+    if ((esmREG->SR1[0U] & 0x8U) == 0U)
+    {
+        /* DMA RAM parity error was not flagged to ESM. */
+        selftestFailNotification(DMAPARITYCHECK_FAIL1);
+    }
+    else
+    {
+        /* clear DMA parity error flag in DMA */
+        DMA_PARADDR = 0x01000000U;
+
+        /* clear ESM group1 channel 3 flag */
+        esmREG->SR1[0U] = 0x8U;
+
+        /* Enable parity checking and parity test mode */
+        DMA_PARCR = 0x0000010AU;
+
+        /* Revert back to correct data, flip bit 0 of the parity location */
+        DMARAMPARLOC ^= 0x1U;
+    }
+
+    /* Restrore Parity Control register */
+    DMA_PARCR = dmaparcr_bk;
+
 /* USER CODE BEGIN (52) */
 /* USER CODE END */
+}
+
+
 /** @fn void het1ParityCheck(void)
 *   @brief Routine to check HET1 RAM parity error detection and signaling mechanism
 *
@@ -1305,14 +1395,122 @@ void htu1ParityCheck(void)
 
 }
 
+
+/** @fn void het2ParityCheck(void)
+*   @brief Routine to check HET2 RAM parity error detection and signaling mechanism
+*
+*   Routine to check HET2 RAM parity error detection and signaling mechanism
+*/
+/* SourceId : SELFTEST_SourceId_024 */
+/* DesignId : SELFTEST_DesignId_024 */
+/* Requirements : HL_SR389 */
+void het2ParityCheck(void)
+{
+    volatile uint32 nhetread = 0U;
+    uint32 hetpcr_bk = hetREG2->PCR;
+	uint32 esmCh7Stat, esmCh34Stat = 0U;
+	
 /* USER CODE BEGIN (57) */
 /* USER CODE END */
+
+    /* Set TEST mode and enable parity checking */
+    hetREG2->PCR = 0x0000010AU;
+
+    /* flip parity bit */
+    NHET2RAMPARLOC ^= 0x1U;
+
+    /* Disable TEST mode */
+    hetREG2->PCR = 0x0000000AU;
+
+    /* read to cause parity error */
+    nhetread = NHET2RAMLOC;
+
+    /* check if ESM group1 channel 7 or 34 (If not reserved) is flagged */
+	esmCh7Stat  = esmREG->SR1[0U] & 0x80U;
+	esmCh34Stat = esmREG->SR4[0U] & 0x4U;
+    if ((esmCh7Stat == 0U) && (esmCh34Stat ==0U))
+    {
+        /* NHET2 RAM parity error was not flagged to ESM. */
+        selftestFailNotification(HET2PARITYCHECK_FAIL1);
+    }
+    else
+    {
+        /* clear ESM group1 channel 7 flag */
+        esmREG->SR1[0U] = 0x80U;
+
+        /* clear ESM group1 channel 34 flag */
+        esmREG->SR4[0U] = 0x4U;
+
+        /* Set TEST mode and enable parity checking */
+        hetREG2->PCR = 0x0000010AU;
+
+        /* Revert back to correct data, flip bit 0 of the parity location */
+        NHET2RAMPARLOC ^= 0x1U;
+    }
+
+    /* Restore parity control register */
+    hetREG2->PCR = hetpcr_bk;
+
 /* USER CODE BEGIN (58) */
 /* USER CODE END */
+}
+
+
+/** @fn void htu2ParityCheck(void)
+*   @brief Routine to check HTU2 RAM parity error detection and signaling mechanism
+*
+*   Routine to check HTU2 RAM parity error detection and signaling mechanism
+*/
+/* SourceId : SELFTEST_SourceId_025 */
+/* DesignId : SELFTEST_DesignId_025 */
+/* Requirements : HL_SR390 */
+void htu2ParityCheck(void)
+{
+    volatile uint32 hturead = 0U;
+    uint32 htupcr_bk = htuREG2->PCR;
+
 /* USER CODE BEGIN (59) */
 /* USER CODE END */
+
+    /* Enable parity and TEST mode */
+    htuREG2->PCR = 0x0000010AU;
+
+    /* flip parity bit */
+    HTU2PARLOC ^= 0x1U;
+
+    /* Disable parity RAM test mode */
+    htuREG2->PCR = 0x0000000AU;
+
+    /* read to cause parity error */
+    hturead = HTU2RAMLOC;
+
+    /* check if ESM group1 channel 8 is flagged */
+    if ((esmREG->SR1[0U] & 0x100U) == 0U)
+    {
+        /* HTU2 RAM parity error was not flagged to ESM. */
+        selftestFailNotification(HTU2PARITYCHECK_FAIL1);
+    }
+    else
+    {
+        /* Clear HTU parity error flag */
+        htuREG2->PAR = 0x00010000U;
+        esmREG->SR1[0U] = 0x100U;
+
+        /* Enable parity and TEST mode */
+        htuREG2->PCR = 0x0000010AU;
+
+        /* Revert back to correct data, flip bit 0 of the parity location */
+        HTU2PARLOC ^= 0x1U;
+    }
+
+    /* Restore parity control register*/
+    htuREG2->PCR = htupcr_bk;
+
 /* USER CODE BEGIN (60) */
 /* USER CODE END */
+}
+
+
 /** @fn void adc1ParityCheck(void)
 *   @brief Routine to check ADC1 RAM parity error detection and signaling mechanism
 *
@@ -1365,11 +1563,60 @@ void adc1ParityCheck(void)
 /* USER CODE BEGIN (62) */
 /* USER CODE END */
 }
+
+
+/** @fn void adc2ParityCheck(void)
+*   @brief Routine to check ADC2 RAM parity error detection and signaling mechanism
+*
+*   Routine to check ADC2 RAM parity error detection and signaling mechanism
+*/
+/* SourceId : SELFTEST_SourceId_027 */
+/* DesignId : SELFTEST_DesignId_023 */
+/* Requirements : HL_SR387 */
+void adc2ParityCheck(void)
+{
+    volatile uint32 adcramread = 0U;
+    uint32 adcparcr_bk = adcREG2->PARCR;
+
 /* USER CODE BEGIN (63) */
 /* USER CODE END */
 
+    /* Set the TEST bit in the PARCR and enable parity checking */
+    adcREG2->PARCR = 0x10AU;
+
+    /* Invert the parity bits inside the ADC2 RAM's first location */
+    adcPARRAM2 = ~(adcPARRAM2);
+
+    /* clear the TEST bit */
+    adcREG2->PARCR = 0x00AU;
+
+    /* This read is expected to trigger a parity error */
+    adcramread = adcRAM2;
+
+    /* Check for ESM group1 channel 1 to be flagged */
+    if ((esmREG->SR1[0U] & 0x2U) == 0U)
+    {
+        /* no ADC2 RAM parity error was flagged to ESM */
+        selftestFailNotification(ADC2PARITYCHECK_FAIL1);
+    }
+    else
+    {
+        /* clear ADC2 RAM parity error flag */
+        esmREG->SR1[0U] = 0x2U;
+
+        /* Set the TEST bit in the PARCR and enable parity checking */
+        adcREG2->PARCR = 0x10AU;
+
+        /* Revert back the parity bits to correct data */
+        adcPARRAM2 = ~(adcPARRAM2);
+    }
+
+    /* Restore parity control register*/
+    adcREG2->PARCR = adcparcr_bk;
+
 /* USER CODE BEGIN (64) */
 /* USER CODE END */
+}
 
 /** @fn void can1ParityCheck(void)
 *   @brief Routine to check CAN1 RAM parity error detection and signaling mechanism
@@ -1499,10 +1746,70 @@ void can2ParityCheck(void)
 }
 
 
+/** @fn void can3ParityCheck(void)
+*   @brief Routine to check CAN3 RAM parity error detection and signaling mechanism
+*
+*   Routine to check CAN3 RAM parity error detection and signaling mechanism
+*/
+/* SourceId : SELFTEST_SourceId_030 */
+/* DesignId : SELFTEST_DesignId_026 */
+/* Requirements : HL_SR393 */
+void can3ParityCheck(void)
+{
+    volatile uint32 canread = 0U;
+    /*SAFETYMCUSW 134 S MR:12.2 <APPROVED> "LDRA Tool issue" */
+    uint32 canctl_bk = canREG3->CTL;
+
 /* USER CODE BEGIN (69) */
 /* USER CODE END */
+
+    /* Disable parity, init mode, TEST mode */
+    canREG3->CTL = 0x00001481U;
+
+    /* Enable RAM Direct Access mode */
+    canREG3->TEST = 0x00000200U;
+
+    /* flip the parity bit */
+    canPARRAM3 ^= 0x00001000U;
+
+    /* Enable parity, disable init, still TEST mode */
+    canREG3->CTL = 0x00002880U;
+
+    /* Read location with parity error */
+    canread = canRAM3;
+
+    /* check if ESM group1 channel 22 is flagged */
+    if ((esmREG->SR1[0U] & 0x00400000U) == 0U)
+    {
+        /* No DCAN3 RAM parity error was flagged to ESM */
+        selftestFailNotification(CAN3PARITYCHECK_FAIL1);
+    }
+    else
+    {
+        /* clear ESM group1 channel 22 flag */
+        esmREG->SR1[0U] = 0x00400000U;
+
+        /* Disable parity, init mode, TEST mode */
+        canREG3->CTL = 0x00001481U;
+
+        /* Revert back to correct data, flip bit 0 of the parity location */
+        canPARRAM3 ^= 0x00001000U;
+    }
+
+    /* Disable RAM Direct Access mode */
+    canREG3->TEST = 0x00000000U;
+
+    /* disable TEST mode */
+    canREG3->CTL = canctl_bk;
+
+    /* Read Error and Status register to clear Parity Error bit */
+    canread = canREG3->ES;
+
 /* USER CODE BEGIN (70) */
 /* USER CODE END */
+}
+
+
 /** @fn void mibspi1ParityCheck(void)
 *   @brief Routine to check MIBSPI1 RAM parity error detection and signaling mechanism
 *
@@ -1567,14 +1874,133 @@ void mibspi1ParityCheck(void)
 /* USER CODE END */
 }
 
+/** @fn void mibspi3ParityCheck(void)
+*   @brief Routine to check MIBSPI3 RAM parity error detection and signaling mechanism
+*
+*   Routine to check MIBSPI3 RAM parity error detection and signaling mechanism
+*/
+/* SourceId : SELFTEST_SourceId_032 */
+/* DesignId : SELFTEST_DesignId_027 */
+/* Requirements : HL_SR386 */
+void mibspi3ParityCheck(void)
+{
+    volatile uint32 spiread = 0U;
+    uint32 mibspie_bk = mibspiREG3->MIBSPIE;
+    uint32 mibspictl_bk = mibspiREG3->UERRCTRL;
+
 /* USER CODE BEGIN (73) */
 /* USER CODE END */
+
+    /* enable multi-buffered mode */
+    mibspiREG3->MIBSPIE = 0x1U;
+
+    /* enable parity test mode */
+    mibspiREG3->UERRCTRL |= 0x00000100U;
+
+    /* flip bit 0 of the parity location */
+    mibspiPARRAM3 ^= 0x1U;
+
+    /* enable parity error detection */
+    mibspiREG3->UERRCTRL = (mibspiREG3->UERRCTRL & 0xFFFFFFF0U) | (0xAU);
+
+    /* disable parity test mode */
+    mibspiREG3->UERRCTRL &= 0xFFFFFEFFU;
+
+    /* read from MibSPI3 RAM to cause parity error */
+    spiread = MIBSPI3RAMLOC;
+
+    /* check if ESM group1 channel 18 is flagged */
+    if ((esmREG->SR1[0U] & 0x40000U) == 0U)
+    {
+        /* No MibSPI3 RAM parity error was flagged to ESM. */
+        selftestFailNotification(MIBSPI3PARITYCHECK_FAIL1);
+    }
+    else
+    {
+        /* clear parity error flags */
+        mibspiREG3->UERRSTAT = 0x3U;
+
+        /* clear ESM group1 channel 18 flag */
+        esmREG->SR1[0U] = 0x40000U;
+
+        /* enable parity test mode */
+        mibspiREG3->UERRCTRL |= 0x00000100U;
+
+        /* Revert back to correct data, flip bit 0 of the parity location */
+        mibspiPARRAM3 ^= 0x1U;
+    }
+
+    /* Restore MIBSPI control registers */
+    mibspiREG3->UERRCTRL = mibspictl_bk;
+    mibspiREG3->MIBSPIE = mibspie_bk;
+
 /* USER CODE BEGIN (74) */
 /* USER CODE END */
+}
+
+/** @fn void mibspi5ParityCheck(void)
+*   @brief Routine to check MIBSPI5 RAM parity error detection and signaling mechanism
+*
+*   Routine to check MIBSPI5 RAM parity error detection and signaling mechanism
+*/
+/* SourceId : SELFTEST_SourceId_033 */
+/* DesignId : SELFTEST_DesignId_027 */
+/* Requirements : HL_SR386 */
+void mibspi5ParityCheck(void)
+{
+    volatile uint32 spiread = 0U;
+    uint32 mibspie_bk = mibspiREG5->MIBSPIE;
+    uint32 mibspictl_bk = mibspiREG5->UERRCTRL;
+
 /* USER CODE BEGIN (75) */
 /* USER CODE END */
+
+    /* enable multi-buffered mode */
+    mibspiREG5->MIBSPIE = 0x1U;
+
+    /* enable parity test mode */
+    mibspiREG5->UERRCTRL |= 0x00000100U;
+
+    /* flip bit 0 of the parity location */
+    mibspiPARRAM5 ^= 0x1U;
+
+    /* enable parity error detection */
+    mibspiREG5->UERRCTRL = (mibspiREG5->UERRCTRL & 0xFFFFFFF0U) | (0xAU);
+
+    /* disable parity test mode */
+    mibspiREG5->UERRCTRL &= 0xFFFFFEFFU;
+
+    /* read from MibSPI5 RAM to cause parity error */
+    spiread = MIBSPI5RAMLOC;
+
+    /* check if ESM group1 channel 24 is flagged */
+    if ((esmREG->SR1[0U] & 0x01000000U) == 0U)
+    {
+        /* No MibSPI5 RAM parity error was flagged to ESM. */
+        selftestFailNotification(MIBSPI5PARITYCHECK_FAIL1);
+    }
+    else
+    {
+        /* clear parity error flags */
+        mibspiREG5->UERRSTAT = 0x3U;
+
+        /* clear ESM group1 channel 24 flag */
+        esmREG->SR1[0U] = 0x01000000U;
+
+        /* enable parity test mode */
+        mibspiREG5->UERRCTRL |= 0x00000100U;
+
+        /* Revert back to correct data, flip bit 0 of the parity location */
+        mibspiPARRAM5 ^= 0x1U;
+    }
+
+    /* Restore MIBSPI control registers */
+    mibspiREG5->UERRCTRL = mibspictl_bk;
+    mibspiREG5->MIBSPIE = mibspie_bk;
+
 /* USER CODE BEGIN (76) */
 /* USER CODE END */
+}
 
 /** @fn void checkRAMECC(void)
 *   @brief Check TCRAM ECC error detection logic.
@@ -1908,6 +2334,64 @@ void checkPLL1Slip(void)
     }
 }
 
+/** @fn void checkPLL2Slip(void)
+*   @brief Check PLL2 Slip detection logic.
+*
+*   This function checks PLL2 Slip detection logic.
+*/
+/* SourceId : SELFTEST_SourceId_038 */
+/* DesignId : SELFTEST_DesignId_031 */
+/* Requirements : HL_SR384 */
+void checkPLL2Slip(void)
+{
+    uint32 ghvsrc_bk;
+
+    /* Back up the the register GHVSRC */
+    ghvsrc_bk = systemREG1->GHVSRC;
+
+    /* Switch all clock domains to oscillator */
+    systemREG1->GHVSRC = 0x00000000U;
+	
+    /* Force a PLL2 Slip */
+    systemREG2->PLLCTL3 ^= 0x8000U;
+
+    /*SAFETYMCUSW 28 D MR:NA <APPROVED> "Hardware status bit read check" */
+    while((esmREG->SR4[0U] & 0x400U) != 0x400U)
+    {
+        /* Wait till ESM flag is set */
+    }
+
+    /* Disable PLL2 */
+    systemREG1->CSDISSET = 0x40U;
+
+    /* Wait till PLL2 is disabled */
+    /*SAFETYMCUSW 28 D MR:NA <APPROVED> "Hardware status bit read check" */
+    while((systemREG1->CSDIS & 0x40U) == 0U)
+    {
+    } /* Wait */
+
+    /* Restore the PLL 2 multiplier value */
+    systemREG2->PLLCTL3 ^= 0x8000U;
+
+    /* Enable PLL2 */
+    systemREG1->CSDISCLR = 0x40U;
+
+    /* Wait till PLL2 is disabled */
+    /*SAFETYMCUSW 28 D MR:NA <APPROVED> "Hardware status bit read check" */
+    while((systemREG1->CSDIS & 0x40U) != 0U)
+    {
+    } /* Wait */
+
+    /* Switch back to the initial clock source */
+    systemREG1->GHVSRC = ghvsrc_bk;
+
+    /* Clear PLL slip flag */
+    systemREG1->GBLSTAT = 0x300U;
+
+    /* Clear ESM flag */
+    esmREG->SR4[0U] = 0x400U;
+}
+
 
 /** @fn void checkRAMAddrParity(void)
 *   @brief Check TCRAM Address parity error detection and signaling mechanism.
@@ -1919,7 +2403,7 @@ void checkPLL1Slip(void)
 /* Requirements : HL_SR409 */
 void checkRAMAddrParity(void)
 {
-    register volatile uint64 ramread;
+    register uint64 ramread;
 	volatile uint32 regread;
 	uint32 tcram1ErrStat, tcram2ErrStat;
 	
@@ -1929,7 +2413,7 @@ void checkRAMAddrParity(void)
 
     /* Read from both RAM banks */
     ramread = tcramA1bit;
-    ramread = tcramB1bit;
+    ramread = ramread | tcramB1bit; /* XOR-ing with ramread to avoid warnings */
 
     /* Switch back to Address parity scheme */
     tcram1REG->RAMCTRL = 0x0005000AU;
@@ -2304,6 +2788,11 @@ void errata_PBIST_4(void)
     _pmuStopCounters_(pmuCYCLE_COUNTER);
     pmuCalibration=_pmuGetCycleCount_();
 
+    /* ROM_init Setup using special reserved registers as part of errata fix */
+    /* (Only to be used in this function) */
+    *(volatile uint32 *)0xFFFF0400U = 0x0000000AU;
+    *(volatile uint32 *)0xFFFF040CU = 0x0000EE0AU;
+
     /* Loop for Executing PBIST ROM and STC ROM */
     for (ROM_count = 0U; ROM_count < 2U; ROM_count++)
     {
@@ -2319,14 +2808,15 @@ void errata_PBIST_4(void)
         }
         else
         {
+            /* PBIST ROM clock frequency = HCLK frequency /2 */
             /* Disable memory self controller */
-            systemREG1->MSTGCR = 0x00000005U;
+            systemREG1->MSTGCR = 0x00000105U;
             
             /* Disable Memory Initialization controller */
             systemREG1->MINITGCR = 0x5U;
 
             /* Enable memory self controller */
-            systemREG1->MSTGCR = 0x000000AU;                               
+            systemREG1->MSTGCR = 0x0000010AU;                               
 
             /* Clear PBIST Done */
             systemREG1->MSTCGSTAT = 0x1U;
@@ -2335,7 +2825,7 @@ void errata_PBIST_4(void)
             systemREG1->MSINENA = 0x1U;
 
 			/*SAFETYMCUSW 134 S MR:12.2 <APPROVED> "Wait for few clock cycles (Value of i not used)" */
-	        /*SAFETYMCUSW 134 S MR:12.2 <APPROVED> "Wait for few clock cycles (Value of i not used)" */
+	        /*SAFETYMCUSW 134 S MR:12.2 <APPROVED> "Wait for few clock cycles (Value of i not used)" */	
             /* wait for 32 VBUS clock cycles at least, based on HCLK to VCLK ratio */
             for (i=0U; i<(32U + (32U * 1U)); i++){ /* Wait */ }
 
@@ -2372,14 +2862,14 @@ void errata_PBIST_4(void)
             {               
                 /* SELECT STC ROM */    
                 *(volatile uint32 *)0xFFFFE520U = 0xFFF0007CU;
-                *(volatile uint32 *)0xFFFFE524U = 0x06B3FFFFU;
+                *(volatile uint32 *)0xFFFFE524U = 0x0A63FFFFU;
                 pbistREG->RAMT                  = 0x02002008U;
             }
 
             /*  Setup using special reserved registers as part of errata fix */
             /*      (Only to be used in this function) */
             pbistREG->rsvd1[4U]    = 1U;
-            pbistREG->rsvd1[0U]    = 2U;
+            pbistREG->rsvd1[0U]    = 3U;
 
             /* Start PMU counter */
 			_pmuResetCounters_();
@@ -2430,6 +2920,12 @@ void errata_PBIST_4(void)
         }
     } /* ROM Loop */
 
+    /* ROM restore default setup */
+    /* (must be completed before continuing) */
+    *(volatile uint32 *)0xFFFF040CU = 0x0000AA0AU;
+    *(volatile uint32 *)0xFFFF040CU = 0x0000AA05U;
+	*(volatile uint32 *)0xFFFF0400U = 0x00000005U;
+
 	_pmuDisableCountersGlobal_();
 }
 
@@ -2444,12 +2940,17 @@ void errata_PBIST_4(void)
 #pragma WEAK(enableParity)
 void enableParity(void)
 {
-    VIM_PARCTL = 0xAU;             /* Enable VIM RAM parity */
+    DMA_PARCR = 0xAU;                      /* Enable DMA RAM parity */
+    VIM_PARCTL = 0xAU;                     /* Enable VIM RAM parity */
     canREG1->CTL = ((uint32)0xAU << 10U) | 1U;    /* Enable CAN1 RAM parity */
     canREG2->CTL = ((uint32)0xAU << 10U) | 1U;    /* Enable CAN2 RAM parity */
-    adcREG1->PARCR = 0xAU;         /* Enable ADC1 RAM parity */
-    hetREG1->PCR = 0xAU;           /* Enable HET1 RAM parity */
-    htuREG1->PCR = 0xAU;           /* Enable HTU1 RAM parity */
+    canREG3->CTL = ((uint32)0xAU << 10U) | 1U;    /* Enable CAN3 RAM parity */
+    adcREG1->PARCR = 0xAU;                 /* Enable ADC1 RAM parity */
+    adcREG2->PARCR = 0xAU;                 /* Enable ADC2 RAM parity */
+    hetREG1->PCR = 0xAU;                   /* Enable HET1 RAM parity */
+    htuREG1->PCR = 0xAU;                   /* Enable HTU1 RAM parity */
+    hetREG2->PCR = 0xAU;                   /* Enable HET2 RAM parity */
+    htuREG2->PCR = 0xAU;                   /* Enable HTU2 RAM parity */
 }
 
 /** @fn void disableParity(void)
@@ -2462,10 +2963,15 @@ void enableParity(void)
 #pragma WEAK(disableParity)
 void disableParity(void)
 {
-    VIM_PARCTL = 0x5U;             /* Disable VIM RAM parity */
+    DMA_PARCR = 0x5U;                      /* Disable DMA RAM parity */
+    VIM_PARCTL = 0x5U;                     /* Disable VIM RAM parity */
     canREG1->CTL = ((uint32)0x5U << 10U) | 1U;    /* Disable CAN1 RAM parity */
     canREG2->CTL = ((uint32)0x5U << 10U) | 1U;    /* Disable CAN2 RAM parity */
-    adcREG1->PARCR = 0x5U;         /* Disable ADC1 RAM parity */
-    hetREG1->PCR = 0x5U;           /* Disable HET1 RAM parity */
-    htuREG1->PCR = 0x5U;           /* Disable HTU1 RAM parity */
+    canREG3->CTL = ((uint32)0x5U << 10U) | 1U;    /* Disable CAN3 RAM parity */
+    adcREG1->PARCR = 0x5U;                 /* Disable ADC1 RAM parity */
+    adcREG2->PARCR = 0x5U;                 /* Disable ADC2 RAM parity */
+    hetREG1->PCR = 0x5U;                   /* Disable HET1 RAM parity */
+    htuREG1->PCR = 0x5U;                   /* Disable HTU1 RAM parity */
+    hetREG2->PCR = 0x5U;                   /* Disable HET2 RAM parity */
+    htuREG2->PCR = 0x5U;                   /* Disable HTU2 RAM parity */
 }

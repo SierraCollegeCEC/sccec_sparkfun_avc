@@ -1,19 +1,7 @@
 /**********************************************************************************************************************
- *  COPYRIGHT
- *  -------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *                 TEXAS INSTRUMENTS INCORPORATED PROPRIETARY INFORMATION
- *
- *                 Property of Texas Instruments, Unauthorized reproduction and/or distribution
- *                 is strictly prohibited.  This product  is  protected  under  copyright  law
- *                 and  trade  secret law as an  unpublished work.
- *                 (C) Copyright Texas Instruments - 2014.  All rights reserved.
- *
- *  \endverbatim
- *  -------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------
- *         File:  Device_RM57.c
+ *         File:  Device_TMS570LS12.h
  *      Project:  Tms570_TIFEEDriver
  *       Module:  TIFEEDriver
  *    Generator:  None
@@ -29,12 +17,47 @@
  * 01.15.00		  06Jun2014    Vishwanath Reddy 	                 History Added.
  *********************************************************************************************************************/
 
+/* 
+* Copyright (C) 2009-2014 Texas Instruments Incorporated - http://www.ti.com/ 
+* 
+* 
+*  Redistribution and use in source and binary forms, with or without 
+*  modification, are permitted provided that the following conditions 
+*  are met:
+*
+*    Redistributions of source code must retain the above copyright 
+*    notice, this list of conditions and the following disclaimer.
+*
+*    Redistributions in binary form must reproduce the above copyright
+*    notice, this list of conditions and the following disclaimer in the 
+*    documentation and/or other materials provided with the   
+*    distribution.
+*
+*    Neither the name of Texas Instruments Incorporated nor the names of
+*    its contributors may be used to endorse or promote products derived
+*    from this software without specific prior written permission.
+*
+*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+*  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+*  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+*  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
+*  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+*  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+*  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+*  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+*  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
+*  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+*  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*
+*/
+
+
  /*********************************************************************************************************************
  * INCLUDES
  *********************************************************************************************************************/
 
-#ifndef DEVICE_TMS570LS04_H
-#define DEVICE_TMS570LS04_H
+#ifndef DEVICE_TMS570LS12x_H
+#define DEVICE_TMS570LS12x_H
 
 
 /** @def DEVICE_CONFIGURATION_VERSION
@@ -74,6 +97,7 @@
 */
 #define DEVICE_NUMBER_OF_READ_CYCLE_THRESHOLDS 4U   /* Defines the number of Read Cycle Thresholds */
 
+
 /* Include Files */
 #ifndef _PLATFORM_TYPES_H_
 #define _PLATFORM_TYPES_H_
@@ -82,6 +106,6 @@
 #include "Std_Types.h"
 #include "Device_types.h"
 
-#endif /* DEVICE_TMS570LS04_H */
+#endif /* DEVICE_TMS570LS12x_H */
 
 /* End of File */

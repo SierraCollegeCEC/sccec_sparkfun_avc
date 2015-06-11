@@ -1,7 +1,7 @@
 /** @file CRC.h
 *   @brief CRC Driver Header File
-*   @date 9.Sep.2014
-*   @version 04.01.00
+*   @date 17.Nov.2014
+*   @version 04.02.00
 *   
 *   This file contains:
 *   - Definitions
@@ -11,7 +11,40 @@
 *   which are relevant for the CRC driver.
 */
 
-/* (c) Texas Instruments 2009-2014, All rights reserved. */
+/* 
+* Copyright (C) 2009-2014 Texas Instruments Incorporated - http://www.ti.com/ 
+* 
+* 
+*  Redistribution and use in source and binary forms, with or without 
+*  modification, are permitted provided that the following conditions 
+*  are met:
+*
+*    Redistributions of source code must retain the above copyright 
+*    notice, this list of conditions and the following disclaimer.
+*
+*    Redistributions in binary form must reproduce the above copyright
+*    notice, this list of conditions and the following disclaimer in the 
+*    documentation and/or other materials provided with the   
+*    distribution.
+*
+*    Neither the name of Texas Instruments Incorporated nor the names of
+*    its contributors may be used to endorse or promote products derived
+*    from this software without specific prior written permission.
+*
+*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+*  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+*  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+*  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
+*  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+*  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+*  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+*  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+*  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
+*  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+*  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*
+*/
+
 
 #ifndef __CRC_H__
 #define __CRC_H__
@@ -214,11 +247,29 @@ typedef struct crc_config_reg
     uint32 CONFIG_CTRL0;
 	uint32 CONFIG_CTRL1;
 	uint32 CONFIG_CTRL2;
+    uint32 CONFIG_INTS;
+    uint32 CONFIG_PCOUNT_REG1;
+    uint32 CONFIG_SCOUNT_REG1;
+    uint32 CONFIG_WDTOPLD1;
+    uint32 CONFIG_BCTOPLD1;
+    uint32 CONFIG_PCOUNT_REG2;
+    uint32 CONFIG_SCOUNT_REG2;
+    uint32 CONFIG_WDTOPLD2;
+    uint32 CONFIG_BCTOPLD2;
 }crc_config_reg_t;
 		
 #define CRC_CTRL0_CONFIGVALUE			0x00000000U
 #define CRC_CTRL1_CONFIGVALUE			0x00000000U
 #define CRC_CTRL2_CONFIGVALUE			((uint32)((uint32)0U << 4U) | (uint32)(CRC_FULL_CPU)  | (uint32)((uint32)CRC_FULL_CPU << 8U))
+#define CRC_INTS_CONFIGVALUE			(0x00000000U | 0x00000000U | 0x00000000U | 0x00000000U | 0x00000000U | 0x00000000U | 0x00000000U | 0x00000000U | 0x00000000U | 0x00000000U)
+#define CRC_PCOUNT_REG1_CONFIGVALUE		(0x00000000U)
+#define CRC_SCOUNT_REG1_CONFIGVALUE		(0x00000000U)
+#define CRC_WDTOPLD1_CONFIGVALUE		(0x00000000U)
+#define CRC_BCTOPLD1_CONFIGVALUE		(0x00000000U)
+#define CRC_PCOUNT_REG2_CONFIGVALUE		(0x00000000U)
+#define CRC_SCOUNT_REG2_CONFIGVALUE		(0x00000000U)
+#define CRC_WDTOPLD2_CONFIGVALUE		(0x00000000U)
+#define CRC_BCTOPLD2_CONFIGVALUE		(0x00000000U)
 
 /** 
  *  @defgroup CRC CRC
@@ -243,8 +294,14 @@ typedef struct crc_config_reg
 void crcInit(void);
 void crcSendPowerDown(crcBASE_t *crc);
 void crcSignGen(crcBASE_t *crc,crcModConfig_t *param);
+void crcSetConfig(crcBASE_t *crc,crcConfig_t *param);
 uint64 crcGetPSASig(crcBASE_t *crc,uint32 channel);
+uint64 crcGetSectorSig(crcBASE_t *crc,uint32 channel);
+uint32 crcGetFailedSector(crcBASE_t *crc,uint32 channel);
+uint32 crcGetIntrPend(crcBASE_t *crc,uint32 channel);
 void crcChannelReset(crcBASE_t *crc,uint32 channel);
+void crcEnableNotification(crcBASE_t *crc, uint32 flags);
+void crcDisableNotification(crcBASE_t *crc, uint32 flags);
 void crcGetConfigValue(crc_config_reg_t *config_reg, config_value_type_t type);
 
 /** @fn void crcNotification(crcBASE_t *crc, uint32 flags)

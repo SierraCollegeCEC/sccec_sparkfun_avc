@@ -1,7 +1,7 @@
 /** @file reg_mibspi.h
 *   @brief MIBSPI Register Layer Header File
-*   @date 9.Sep.2014
-*   @version 04.01.00
+*   @date 17.Nov.2014
+*   @version 04.02.00
 *   
 *   This file contains:
 *   - Definitions
@@ -11,7 +11,40 @@
 *   which are relevant for the MIBSPI driver.
 */
 
-/* (c) Texas Instruments 2009-2014, All rights reserved. */
+/* 
+* Copyright (C) 2009-2014 Texas Instruments Incorporated - http://www.ti.com/ 
+* 
+* 
+*  Redistribution and use in source and binary forms, with or without 
+*  modification, are permitted provided that the following conditions 
+*  are met:
+*
+*    Redistributions of source code must retain the above copyright 
+*    notice, this list of conditions and the following disclaimer.
+*
+*    Redistributions in binary form must reproduce the above copyright
+*    notice, this list of conditions and the following disclaimer in the 
+*    documentation and/or other materials provided with the   
+*    distribution.
+*
+*    Neither the name of Texas Instruments Incorporated nor the names of
+*    its contributors may be used to endorse or promote products derived
+*    from this software without specific prior written permission.
+*
+*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+*  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+*  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+*  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
+*  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+*  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+*  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+*  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+*  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
+*  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+*  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*
+*/
+
 
 #ifndef __REG_MIBSPI_H__
 #define __REG_MIBSPI_H__
@@ -106,7 +139,37 @@ typedef volatile struct mibspiBase
 */
 #define mibspiPORT1 ((gioPORT_t *)0xFFF7F418U)
 
+/** @def mibspiREG3
+*   @brief MIBSPI3 Register Frame Pointer
+*
+*   This pointer is used by the MIBSPI driver to access the mibspi module registers.
+*/
+#define mibspiREG3 ((mibspiBASE_t *)0xFFF7F800U)
 
+
+/** @def mibspiPORT3
+*   @brief MIBSPI3 GIO Port Register Pointer
+*
+*   Pointer used by the GIO driver to access I/O PORT of MIBSPI3
+*   (use the GIO drivers to access the port pins).
+*/
+#define mibspiPORT3 ((gioPORT_t *)0xFFF7F818U)
+
+/** @def mibspiREG5
+*   @brief MIBSPI5 Register Frame Pointer
+*
+*   This pointer is used by the MIBSPI driver to access the mibspi module registers.
+*/
+#define mibspiREG5 ((mibspiBASE_t *)0xFFF7FC00U)
+
+
+/** @def mibspiPORT5
+*   @brief MIBSPI5 GIO Port Register Pointer
+*
+*   Pointer used by the GIO driver to access I/O PORT of MIBSPI5
+*   (use the GIO drivers to access the port pins).
+*/
+#define mibspiPORT5 ((gioPORT_t *)0xFFF7FC18U)
 
 
 /** @struct mibspiRamBase
@@ -151,12 +214,41 @@ typedef volatile struct mibspiRamBase
 */
 #define mibspiRAM1 ((mibspiRAM_t *)0xFF0E0000U)
 
+/** @def mibspiRAM3
+*   @brief MIBSPI3 Buffer RAM Pointer
+*
+*   This pointer is used by the MIBSPI driver to access the mibspi buffer memory.
+*/
+#define mibspiRAM3 ((mibspiRAM_t *)0xFF0C0000U)
+
+/** @def mibspiRAM5
+*   @brief MIBSPI5 Buffer RAM Pointer
+*
+*   This pointer is used by the MIBSPI driver to access the mibspi buffer memory.
+*/
+#define mibspiRAM5 ((mibspiRAM_t *)0xFF0A0000U)
+
 /** @def mibspiPARRAM1
 *   @brief MIBSPI1 Buffer RAM PARITY Pointer
 *
 *   This pointer is used by the MIBSPI driver to access the mibspi buffer memory.
 */
 #define mibspiPARRAM1 (*(volatile uint32 *)(0xFF0E0000U + 0x00000400U))
+
+/** @def mibspiPARRAM3
+*   @brief MIBSPI3 Buffer RAM PARITY Pointer
+*
+*   This pointer is used by the MIBSPI driver to access the mibspi buffer memory.
+*/
+#define mibspiPARRAM3 (*(volatile uint32 *)(0xFF0C0000U + 0x00000400U))
+
+
+/** @def mibspiPARRAM5
+*   @brief MIBSPI5 Buffer RAM PARITY Pointer
+*
+*   This pointer is used by the MIBSPI driver to access the mibspi buffer memory.
+*/
+#define mibspiPARRAM5 (*(volatile uint32 *)(0xFF0A0000U + 0x00000400U))
 
 /* USER CODE BEGIN (1) */
 /* USER CODE END */

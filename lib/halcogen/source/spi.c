@@ -1,9 +1,41 @@
 /** @file spi.c
 *   @brief SPI Driver Implementation File
-*   @date 9.Sep.2014
-*   @version 04.01.00
+*   @date 17.Nov.2014
+*   @version 04.02.00
+*/
+
+/* 
+* Copyright (C) 2009-2014 Texas Instruments Incorporated - http://www.ti.com/ 
+* 
+* 
+*  Redistribution and use in source and binary forms, with or without 
+*  modification, are permitted provided that the following conditions 
+*  are met:
 *
-*   (c) Texas Instruments 2009-2014, All rights reserved.
+*    Redistributions of source code must retain the above copyright 
+*    notice, this list of conditions and the following disclaimer.
+*
+*    Redistributions in binary form must reproduce the above copyright
+*    notice, this list of conditions and the following disclaimer in the 
+*    documentation and/or other materials provided with the   
+*    distribution.
+*
+*    Neither the name of Texas Instruments Incorporated nor the names of
+*    its contributors may be used to endorse or promote products derived
+*    from this software without specific prior written permission.
+*
+*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+*  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+*  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+*  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
+*  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+*  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+*  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+*  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+*  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
+*  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+*  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*
 */
 
 /* USER CODE BEGIN (0) */
@@ -27,7 +59,7 @@ static struct g_spiPacket
     uint16  * rxdata_ptr;
     SpiDataStatus_t tx_data_status;
     SpiDataStatus_t rx_data_status;
-} g_spiPacket_t[3U];
+} g_spiPacket_t[5U];
 
 /** @fn void spiInit(void)
 *   @brief Initializes the SPI Driver
@@ -136,60 +168,84 @@ void spiInit(void)
                     | (uint32)((uint32)1U << 1U)  /* SCS[1] */
                     | (uint32)((uint32)1U << 2U)  /* SCS[2] */
                     | (uint32)((uint32)1U << 3U)  /* SCS[3] */
+                    | (uint32)((uint32)1U << 4U)  /* SCS[4] */
+                    | (uint32)((uint32)1U << 5U)  /* SCS[5] */
                     | (uint32)((uint32)0U << 8U)  /* ENA */
                     | (uint32)((uint32)0U << 9U)  /* CLK */
                     | (uint32)((uint32)0U << 10U)  /* SIMO[0] */
-                    | (uint32)((uint32)0U << 11U);  /* SOMI[0] */
+                    | (uint32)((uint32)0U << 11U)  /* SOMI[0] */
+                    | (uint32)((uint32)0U << 17U)  /* SIMO[1] */
+                    | (uint32)((uint32)0U << 25U); /* SOMI[1] */
 
     /** - SPI1 Port direction */
     spiREG1->PC1  =   (uint32)((uint32)1U << 0U)  /* SCS[0] */
                     | (uint32)((uint32)1U << 1U)  /* SCS[1] */
                     | (uint32)((uint32)1U << 2U)  /* SCS[2] */
                     | (uint32)((uint32)1U << 3U)  /* SCS[3] */
+                    | (uint32)((uint32)1U << 4U)  /* SCS[4] */
+                    | (uint32)((uint32)1U << 5U)  /* SCS[5] */
                     | (uint32)((uint32)0U << 8U)  /* ENA */
                     | (uint32)((uint32)1U << 9U)  /* CLK */
                     | (uint32)((uint32)1U << 10U)  /* SIMO[0] */
-                    | (uint32)((uint32)0U << 11U); /* SOMI[0] */
+                    | (uint32)((uint32)0U << 11U)  /* SOMI[0] */
+                    | (uint32)((uint32)0U << 17U)  /* SIMO[1] */
+                    | (uint32)((uint32)0U << 25U); /* SOMI[1] */
 
     /** - SPI1 Port open drain enable */
     spiREG1->PC6  =   (uint32)((uint32)0U << 0U)  /* SCS[0] */
                     | (uint32)((uint32)0U << 1U)  /* SCS[1] */
                     | (uint32)((uint32)0U << 2U)  /* SCS[2] */
                     | (uint32)((uint32)0U << 3U)  /* SCS[3] */
+                    | (uint32)((uint32)0U << 4U)  /* SCS[4] */
+                    | (uint32)((uint32)0U << 5U)  /* SCS[5] */
                     | (uint32)((uint32)0U << 8U)  /* ENA */
                     | (uint32)((uint32)0U << 9U)  /* CLK */
                     | (uint32)((uint32)0U << 10U)  /* SIMO[0] */
-                    | (uint32)((uint32)0U << 11U); /* SOMI[0] */
+                    | (uint32)((uint32)0U << 11U)  /* SOMI[0] */
+                    | (uint32)((uint32)0U << 17U)  /* SIMO[1] */
+                    | (uint32)((uint32)0U << 25U); /* SOMI[1] */
 
     /** - SPI1 Port pullup / pulldown selection */
     spiREG1->PC8  =   (uint32)((uint32)1U << 0U)  /* SCS[0] */
                     | (uint32)((uint32)1U << 1U)  /* SCS[1] */
                     | (uint32)((uint32)1U << 2U)  /* SCS[2] */
                     | (uint32)((uint32)1U << 3U)  /* SCS[3] */
+                    | (uint32)((uint32)1U << 4U)  /* SCS[4] */
+                    | (uint32)((uint32)1U << 5U)  /* SCS[5] */
                     | (uint32)((uint32)1U << 8U)  /* ENA */
                     | (uint32)((uint32)1U << 9U)  /* CLK */
                     | (uint32)((uint32)1U << 10U)  /* SIMO[0] */
-                    | (uint32)((uint32)1U << 11U); /* SOMI[0] */
+                    | (uint32)((uint32)1U << 11U)  /* SOMI[0] */
+                    | (uint32)((uint32)1U << 17U)  /* SIMO[1] */
+                    | (uint32)((uint32)1U << 25U); /* SOMI[1] */
 
     /** - SPI1 Port pullup / pulldown enable*/
     spiREG1->PC7  =   (uint32)((uint32)0U << 0U)  /* SCS[0] */
                     | (uint32)((uint32)0U << 1U)  /* SCS[1] */
                     | (uint32)((uint32)0U << 2U)  /* SCS[2] */
                     | (uint32)((uint32)0U << 3U)  /* SCS[3] */
+                    | (uint32)((uint32)0U << 4U)  /* SCS[4] */
+                    | (uint32)((uint32)0U << 5U)  /* SCS[5] */
                     | (uint32)((uint32)0U << 8U)  /* ENA */
                     | (uint32)((uint32)0U << 9U)  /* CLK */
                     | (uint32)((uint32)0U << 10U)  /* SIMO[0] */
-                    | (uint32)((uint32)0U << 11U); /* SOMI[0] */
+                    | (uint32)((uint32)0U << 11U)  /* SOMI[0] */
+                    | (uint32)((uint32)0U << 17U)  /* SIMO[1] */
+                    | (uint32)((uint32)0U << 25U); /* SOMI[1] */
 
     /* SPI1 set all pins to functional */
     spiREG1->PC0  =   (uint32)((uint32)1U << 0U)  /* SCS[0] */
                     | (uint32)((uint32)1U << 1U)  /* SCS[1] */
                     | (uint32)((uint32)1U << 2U)  /* SCS[2] */
                     | (uint32)((uint32)1U << 3U)  /* SCS[3] */
+                    | (uint32)((uint32)1U << 4U)  /* SCS[4] */
+                    | (uint32)((uint32)1U << 5U)  /* SCS[5] */
                     | (uint32)((uint32)1U << 8U)  /* ENA */
                     | (uint32)((uint32)1U << 9U)  /* CLK */
                     | (uint32)((uint32)1U << 10U)  /* SIMO[0] */
-                    | (uint32)((uint32)1U << 11U); /* SOMI[0] */
+                    | (uint32)((uint32)1U << 11U)  /* SOMI[0] */
+                    | (uint32)((uint32)1U << 17U)  /* SIMO[1] */
+                    | (uint32)((uint32)1U << 25U); /* SOMI[1] */
 
     /** - Initialize TX and RX data buffer Status */
     g_spiPacket_t[0U].tx_data_status  = SPI_READY;
@@ -197,6 +253,10 @@ void spiInit(void)
 
     /** - Finally start SPI1 */
     spiREG1->GCR1 = (spiREG1->GCR1 & 0xFEFFFFFFU) | 0x01000000U;
+
+
+
+
 
 
 
@@ -303,7 +363,7 @@ uint32 spiReceiveData(spiBASE_t *spi, spiDAT1_t *dataconfig_t, uint32 blocksize,
 /* Requirements : HL_SR134 */
 void spiGetData(spiBASE_t *spi, spiDAT1_t *dataconfig_t, uint32 blocksize, uint16 * destbuff)
 {
-     uint32 index = spi == spiREG1 ? 0U :(spi==spiREG2 ? 1U : 2U);
+     uint32 index = (spi == spiREG1) ? 0U :((spi==spiREG2) ? 1U : ((spi==spiREG3) ? 2U:((spi==spiREG4) ? 3U:4U)));
 
 /* USER CODE BEGIN (8) */
 /* USER CODE END */
@@ -398,7 +458,7 @@ uint32 spiTransmitData(spiBASE_t *spi, spiDAT1_t *dataconfig_t, uint32 blocksize
 /* Requirements : HL_SR132 */
 void spiSendData(spiBASE_t *spi, spiDAT1_t *dataconfig_t, uint32 blocksize, uint16 * srcbuff)
 {
-     uint32 index = spi == spiREG1 ? 0U :(spi==spiREG2 ? 1U : 2U);
+        uint32 index = (spi == spiREG1) ? 0U :((spi==spiREG2) ? 1U : ((spi==spiREG3) ? 2U:((spi==spiREG4) ? 3U:4U)));
 
 /* USER CODE BEGIN (12) */
 /* USER CODE END */
@@ -442,7 +502,7 @@ uint32 spiTransmitAndReceiveData(spiBASE_t *spi, spiDAT1_t *dataconfig_t, uint32
 /* USER CODE END */
     while(blocksize != 0U)
     {
-        if((spi->FLG & 0x000000FFU) !=0U)
+        if((spi->FLG & 0x000000FFU) != 0U)
         {
            break;
         }
@@ -501,7 +561,7 @@ void spiSendAndGetData(spiBASE_t *spi, spiDAT1_t *dataconfig_t, uint32 blocksize
 /* USER CODE BEGIN (17) */
 /* USER CODE END */
 
-    uint32 index = spi == spiREG1 ? 0U :(spi==spiREG2 ? 1U : 2U);
+    uint32 index = (spi == spiREG1) ? 0U :((spi==spiREG2) ? 1U : ((spi==spiREG3) ? 2U:((spi==spiREG4) ? 3U:4U)));
 
     g_spiPacket_t[index].tx_length       = blocksize;
     g_spiPacket_t[index].rx_length       = blocksize;
@@ -534,7 +594,7 @@ SpiDataStatus_t SpiTxStatus(spiBASE_t *spi)
 /* USER CODE BEGIN (19) */
 /* USER CODE END */
 
-    uint32 index = spi == spiREG1 ? 0U :(spi==spiREG2 ? 1U : 2U);
+    uint32 index = (spi == spiREG1) ? 0U :((spi==spiREG2) ? 1U : ((spi==spiREG3) ? 2U:((spi==spiREG4) ? 3U:4U)));
     return(g_spiPacket_t[index].tx_data_status);
 }
 
@@ -558,7 +618,7 @@ SpiDataStatus_t SpiRxStatus(spiBASE_t *spi)
 /* USER CODE BEGIN (21) */
 /* USER CODE END */
 
-    uint32 index = spi == spiREG1 ? 0U :(spi==spiREG2 ? 1U : 2U);
+    uint32 index = (spi == spiREG1) ? 0U :((spi==spiREG2) ? 1U : ((spi==spiREG3) ? 2U:((spi==spiREG4) ? 3U:4U)));
     return(g_spiPacket_t[index].rx_data_status);
 }
 
@@ -713,6 +773,13 @@ void spi1GetConfigValue(spi_config_reg_t *config_reg, config_value_type_t type)
         config_reg->CONFIG_FMT3  = spiREG1->FMT3;
     }
 }
+
+
+
+
+
+
+
 
 
 

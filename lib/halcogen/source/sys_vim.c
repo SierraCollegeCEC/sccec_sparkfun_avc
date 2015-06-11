@@ -1,11 +1,44 @@
 /** @file sys_vim.c 
 *   @brief VIM Driver Implementation File
-*   @date 9.Sep.2014
-*   @version 04.01.00
+*   @date 17.Nov.2014
+*   @version 04.02.00
 *
 */
 
-/* (c) Texas Instruments 2009-2014, All rights reserved. */
+/* 
+* Copyright (C) 2009-2014 Texas Instruments Incorporated - http://www.ti.com/ 
+* 
+* 
+*  Redistribution and use in source and binary forms, with or without 
+*  modification, are permitted provided that the following conditions 
+*  are met:
+*
+*    Redistributions of source code must retain the above copyright 
+*    notice, this list of conditions and the following disclaimer.
+*
+*    Redistributions in binary form must reproduce the above copyright
+*    notice, this list of conditions and the following disclaimer in the 
+*    documentation and/or other materials provided with the   
+*    distribution.
+*
+*    Neither the name of Texas Instruments Incorporated nor the names of
+*    its contributors may be used to endorse or promote products derived
+*    from this software without specific prior written permission.
+*
+*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+*  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+*  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+*  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
+*  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+*  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+*  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+*  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+*  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
+*  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+*  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*
+*/
+
 
 
 #include "sys_vim.h"
@@ -33,12 +66,12 @@ typedef volatile struct vimRam
 
 #define vimRAM ((vimRAM_t *)0xFFF82000U)
 
-static const t_isrFuncPTR s_vim_init[96U] =
+static const t_isrFuncPTR s_vim_init[128U] =
 {
     &phantomInterrupt,
     &esmHighInterrupt,            /* Channel 0 */
     &phantomInterrupt,            /* Channel 1 */
-    &rtiCompare0Interrupt,            /* Channel 2 */
+    &phantomInterrupt,            /* Channel 2 */
     &phantomInterrupt,            /* Channel 3 */
     &phantomInterrupt,            /* Channel 4 */
     &phantomInterrupt,            /* Channel 5 */
@@ -131,8 +164,39 @@ static const t_isrFuncPTR s_vim_init[96U] =
     &phantomInterrupt,            /* Channel 92 */
     &phantomInterrupt,            /* Channel 93 */
     &phantomInterrupt,            /* Channel 94 */
+    &phantomInterrupt,            /* Channel 95 */
+    &phantomInterrupt,            /* Channel 96 */
+    &phantomInterrupt,            /* Channel 97 */
+    &phantomInterrupt,            /* Channel 98 */
+    &phantomInterrupt,            /* Channel 99 */
+    &phantomInterrupt,            /* Channel 100 */
+    &phantomInterrupt,            /* Channel 101 */
+    &phantomInterrupt,            /* Channel 102 */
+    &phantomInterrupt,            /* Channel 103 */
+    &phantomInterrupt,            /* Channel 104 */
+    &phantomInterrupt,            /* Channel 105 */
+    &phantomInterrupt,            /* Channel 106 */
+    &phantomInterrupt,            /* Channel 107 */
+    &phantomInterrupt,            /* Channel 108 */
+    &phantomInterrupt,            /* Channel 109 */
+    &phantomInterrupt,            /* Channel 110 */
+    &phantomInterrupt,            /* Channel 111 */
+    &phantomInterrupt,            /* Channel 112 */
+    &phantomInterrupt,            /* Channel 113 */
+    &phantomInterrupt,            /* Channel 114 */
+    &phantomInterrupt,            /* Channel 115 */
+    &phantomInterrupt,            /* Channel 116 */
+    &phantomInterrupt,            /* Channel 117 */
+    &phantomInterrupt,            /* Channel 118 */
+    &phantomInterrupt,            /* Channel 119 */
+    &phantomInterrupt,            /* Channel 120 */
+    &phantomInterrupt,            /* Channel 121 */
+    &phantomInterrupt,            /* Channel 122 */
+    &phantomInterrupt,            /* Channel 123 */
+    &phantomInterrupt,            /* Channel 124 */
+    &phantomInterrupt,            /* Channel 125 */
+    &phantomInterrupt,            /* Channel 126 */
 };
-
 void vimParityErrorHandler(void);
 
 /** @fn void vimInit(void)
@@ -147,7 +211,7 @@ void vimInit(void)
 {
 	/* VIM RAM Parity Enable */
 	VIM_PARCTL = 0xAU;
-
+	
 	/* Initialize VIM table */
     {
         uint32 i;
@@ -300,7 +364,7 @@ void vimInit(void)
     /* enable interrupts */
     vimREG->REQMASKSET0 = (uint32)((uint32)1U << 0U)
                         | (uint32)((uint32)1U << 1U)
-                        | (uint32)((uint32)1U << 2U)
+                        | (uint32)((uint32)0U << 2U)
                         | (uint32)((uint32)0U << 3U)
                         | (uint32)((uint32)0U << 4U)
                         | (uint32)((uint32)0U << 5U)
@@ -438,8 +502,8 @@ void vimInit(void)
 /** @fn void vimChannelMap(uint32 request, uint32 channel, t_isrFuncPTR handler)
 *   @brief Map selected interrupt request to the selected channel
 *
-*    @param[in] request: Interrupt request number 2..95
-*    @param[in] channel: VIM Channel number 2..95
+*    @param[in] request: Interrupt request number 2..127
+*    @param[in] channel: VIM Channel number 2..127
 *    @param[in] handler: Address of the interrupt handler
 *
 *   This function will map selected interrupt request to the selected channel.
@@ -467,7 +531,7 @@ void vimChannelMap(uint32 request, uint32 channel, t_isrFuncPTR handler)
 /** @fn void vimEnableInterrupt(uint32 channel, boolean inttype)
 *   @brief Enable interrupt for the the selected channel
 *
-*    @param[in] channel: VIM Channel number 2..95
+*    @param[in] channel: VIM Channel number 2..127
 *    @param[in] inttype: Interrupt type
 *                        - SYS_IRQ: Selected channel will be enabled as IRQ
 *                        - SYS_FIQ: Selected channel will be enabled as FIQ
@@ -480,7 +544,19 @@ void vimChannelMap(uint32 request, uint32 channel, t_isrFuncPTR handler)
 /* Requirements : HL_SR102 */
 void vimEnableInterrupt(uint32 channel, systemInterrupt_t inttype)
 {
-    if (channel >= 64U)
+	if (channel >= 96U)
+    {
+        if(inttype == SYS_IRQ)
+        {
+            vimREG->FIRQPR3 &= ~(uint32)((uint32)1U << (channel-96U));
+        }
+        else
+        {
+            vimREG->FIRQPR3 |= ((uint32)1U << (channel-96U));
+        }
+        vimREG->REQMASKSET3 = (uint32)1U << (channel-96U);
+    }
+    else if (channel >= 64U)
     {
         if(inttype == SYS_IRQ)
         {
@@ -525,7 +601,7 @@ void vimEnableInterrupt(uint32 channel, systemInterrupt_t inttype)
 /** @fn void vimDisableInterrupt(uint32 channel)
 *   @brief Disable interrupt for the the selected channel
 *
-*    @param[in] channel: VIM Channel number 2..95
+*    @param[in] channel: VIM Channel number 2..127
 *
 *   This function will disable interrupt for the selected channel.
 *
@@ -535,7 +611,11 @@ void vimEnableInterrupt(uint32 channel, systemInterrupt_t inttype)
 /* Requirements : HL_SR103 */
 void vimDisableInterrupt(uint32 channel)
 {
-    if (channel >= 64U)
+    if (channel >= 96U)
+    {
+        vimREG->REQMASKCLR3 = (uint32)1U << (channel-96U);
+    }
+    else if (channel >= 64U)
     {
         vimREG->REQMASKCLR2 = (uint32)1U << (channel-64U);
     }
@@ -612,6 +692,14 @@ void vimGetConfigValue(vim_config_reg_t *config_reg, config_value_type_t type)
 		config_reg->CONFIG_CHANCTRL[21U] = VIM_CHANCTRL21_CONFIGVALUE;
 		config_reg->CONFIG_CHANCTRL[22U] = VIM_CHANCTRL22_CONFIGVALUE;
 		config_reg->CONFIG_CHANCTRL[23U] = VIM_CHANCTRL23_CONFIGVALUE;
+		config_reg->CONFIG_CHANCTRL[24U] = VIM_CHANCTRL24_CONFIGVALUE;
+		config_reg->CONFIG_CHANCTRL[25U] = VIM_CHANCTRL25_CONFIGVALUE;
+		config_reg->CONFIG_CHANCTRL[26U] = VIM_CHANCTRL26_CONFIGVALUE;
+		config_reg->CONFIG_CHANCTRL[27U] = VIM_CHANCTRL27_CONFIGVALUE;
+		config_reg->CONFIG_CHANCTRL[28U] = VIM_CHANCTRL28_CONFIGVALUE;
+		config_reg->CONFIG_CHANCTRL[29U] = VIM_CHANCTRL29_CONFIGVALUE;
+		config_reg->CONFIG_CHANCTRL[30U] = VIM_CHANCTRL30_CONFIGVALUE;
+		config_reg->CONFIG_CHANCTRL[31U] = VIM_CHANCTRL31_CONFIGVALUE;
     }
     else
     {
@@ -653,9 +741,14 @@ void vimGetConfigValue(vim_config_reg_t *config_reg, config_value_type_t type)
 		config_reg->CONFIG_CHANCTRL[21U] = vimREG->CHANCTRL[21U];
 		config_reg->CONFIG_CHANCTRL[22U] = vimREG->CHANCTRL[22U];
 		config_reg->CONFIG_CHANCTRL[23U] = vimREG->CHANCTRL[23U];
-
-
-        
+		config_reg->CONFIG_CHANCTRL[24U] = vimREG->CHANCTRL[24U];
+		config_reg->CONFIG_CHANCTRL[25U] = vimREG->CHANCTRL[25U];
+		config_reg->CONFIG_CHANCTRL[26U] = vimREG->CHANCTRL[26U];
+		config_reg->CONFIG_CHANCTRL[27U] = vimREG->CHANCTRL[27U];
+		config_reg->CONFIG_CHANCTRL[28U] = vimREG->CHANCTRL[28U];
+		config_reg->CONFIG_CHANCTRL[29U] = vimREG->CHANCTRL[29U];
+		config_reg->CONFIG_CHANCTRL[30U] = vimREG->CHANCTRL[30U];
+		config_reg->CONFIG_CHANCTRL[31U] = vimREG->CHANCTRL[31U];
     }
 }
 
@@ -729,10 +822,14 @@ void vimParityErrorHandler(void)
         vimREG->REQMASKCLR1 = (uint32)1U << (vec-32U);
         vimREG->REQMASKSET1 = (uint32)1U << (vec-32U);
     }
-    else
+    else if(vec < 96U)
     {
         vimREG->REQMASKCLR2 = (uint32)1U << (vec-64U);
         vimREG->REQMASKSET2 = (uint32)1U << (vec-64U);
     }
-    
+	else
+	{
+	    vimREG->REQMASKCLR3 = (uint32)1U << (vec-96U);
+        vimREG->REQMASKSET3 = (uint32)1U << (vec-96U);
+	}
 }
