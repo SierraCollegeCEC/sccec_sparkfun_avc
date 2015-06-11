@@ -1,7 +1,7 @@
 /** @file system.c 
 *   @brief System Driver Source File
-*   @date 9.Sep.2014
-*   @version 04.01.00
+*   @date 17.Nov.2014
+*   @version 04.02.00
 *
 *   This file contains:
 *   - API Functions
@@ -9,7 +9,40 @@
 *   which are relevant for the System driver.
 */
 
-/* (c) Texas Instruments 2009-2014, All rights reserved. */
+/* 
+* Copyright (C) 2009-2014 Texas Instruments Incorporated - http://www.ti.com/ 
+* 
+* 
+*  Redistribution and use in source and binary forms, with or without 
+*  modification, are permitted provided that the following conditions 
+*  are met:
+*
+*    Redistributions of source code must retain the above copyright 
+*    notice, this list of conditions and the following disclaimer.
+*
+*    Redistributions in binary form must reproduce the above copyright
+*    notice, this list of conditions and the following disclaimer in the 
+*    documentation and/or other materials provided with the   
+*    distribution.
+*
+*    Neither the name of Texas Instruments Incorporated nor the names of
+*    its contributors may be used to endorse or promote products derived
+*    from this software without specific prior written permission.
+*
+*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+*  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+*  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+*  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
+*  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+*  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+*  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+*  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+*  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
+*  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+*  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*
+*/
+
 
 /* USER CODE BEGIN (0) */
 /* USER CODE END */
@@ -45,9 +78,9 @@ void setupPLL(void)
 /* USER CODE END */
 
 	/* Disable PLL1 and PLL2 */
-	systemREG1->CSDISSET = 0x00000002U;
+	systemREG1->CSDISSET = 0x00000002U | 0x00000040U; 
 	/*SAFETYMCUSW 28 D MR:NA <APPROVED> "Hardware status bit read check" */
-	while((systemREG1->CSDIS & 0x2U) != 0x2U)
+	while((systemREG1->CSDIS & 0x42U) != 0x42U)
 	{
 	/* Wait */
 	}
@@ -84,13 +117,26 @@ void setupPLL(void)
                         |  (uint32)((uint32)(2U - 1U) << 9U)
                         |  (uint32)61U;
 
+    /** @b Initialize @b Pll2: */
+
+    /**   - Setup pll2 control register :
+    *     - setup Pll output clock divider to max before Lock
+    *     - Setup reference clock divider 
+    *     - Setup internal Pll output divider
+    *     - Setup Pll multiplier          
+    */
+    systemREG2->PLLCTL3 = (uint32)((uint32)(2U - 1U) << 29U)
+                        | (uint32)((uint32)0x1FU << 24U) 
+                        | (uint32)((uint32)(6U - 1U)<< 16U) 
+                        | (uint32)((uint32)(120U - 1U) << 8U);
+
 	/** - Enable PLL(s) to start up or Lock */
     systemREG1->CSDIS = 0x00000000U	
                       | 0x00000000U 
                       | 0x00000008U 
                       | 0x00000080U 
                       | 0x00000000U 
-                      | 0x00000040U 
+                      | 0x00000000U 
                       | 0x00000000U;
 }
 
@@ -110,14 +156,14 @@ void trimLPO(void)
     {
     
         systemREG1->LPOMONCTL  = (uint32)((uint32)1U << 24U)
-                                | (uint32)LPO_TRIM_VALUE;
+                                | LPO_TRIM_VALUE;
     }
     else
     {
 
     	systemREG1->LPOMONCTL 	=  (uint32)((uint32)1U << 24U)
                                  | (uint32)((uint32)16U << 8U)
-                                 | (uint32)16U;
+                                 | 16U;
     }
 
 /* USER CODE BEGIN (5) */
@@ -136,9 +182,9 @@ void setupFlash(void)
 
     /** - Setup flash read mode, address wait states and data wait states */
     flashWREG->FRDCNTL =  0x00000000U 
-                       | (uint32)((uint32)1U << 8U) 
-                       | (uint32)((uint32)0U << 4U) 
-                       | (uint32)1U;
+                       | (uint32)((uint32)3U << 8U) 
+                       | (uint32)((uint32)1U << 4U) 
+                       |  1U;
 
     /** - Setup flash access wait states for bank 7 */
     FSM_WR_ENA_HL    = 0x5U;
@@ -149,11 +195,12 @@ void setupFlash(void)
 /* USER CODE END */
 
     /** - Disable write access to flash state machine registers */
-    FSM_WR_ENA_HL = 0xAU;
+    FSM_WR_ENA_HL    = 0xAU;
 
     /** - Setup flash bank power modes */
     flashWREG->FBFALLBACK = 0x00000000U
                           | (uint32)((uint32)SYS_ACTIVE << 14U) /* BANK 7 */
+                          | (uint32)((uint32)SYS_ACTIVE << 2U)  /* BANK 1 */
                           | (uint32)((uint32)SYS_ACTIVE << 0U); /* BANK 0 */
 
 /* USER CODE BEGIN (8) */
@@ -201,9 +248,10 @@ void mapClocks(void)
     /** @b Initialize @b Clock @b Tree: */
     /** - Disable / Enable clock domain */
     systemREG1->CDDIS = (uint32)((uint32)0U << 4U ) /* AVCLK 1 OFF */
-                      | (uint32)((uint32)1U << 5U ) /* AVCLK 2 OFF */
+                      | (uint32)((uint32)0U << 5U ) /* AVCLK 2 OFF */
 	                  | (uint32)((uint32)0U << 8U ) /* VCLK3 OFF */
-	                  | (uint32)((uint32)0U << 10U) /* AVCLK 3 OFF */
+					  | (uint32)((uint32)0U << 9U ) /* VCLK4 OFF */
+	                  | (uint32)((uint32)1U << 10U) /* AVCLK 3 OFF */
                       | (uint32)((uint32)0U << 11U); /* AVCLK 4 OFF */
 
 
@@ -229,9 +277,11 @@ void mapClocks(void)
 
 	/* Now the PLLs are locked and the PLL outputs can be sped up */
 	/* The R-divider was programmed to be 0xF. Now this divider is changed to programmed value */
-    systemREG1->PLLCTL1 = (systemREG1->PLLCTL1 & 0xE0FFFFFFU) | (uint32)((uint32)(2U - 1U) << 24U);
+    systemREG1->PLLCTL1 = (systemREG1->PLLCTL1 & 0xE0FFFFFFU) | (uint32)((uint32)(1U - 1U) << 24U);
+	/*SAFETYMCUSW 134 S MR:12.2 <APPROVED> "LDRA Tool issue" */
+    systemREG2->PLLCTL3 = (systemREG2->PLLCTL3 & 0xE0FFFFFFU) | (uint32)((uint32)(1U - 1U) << 24U);
 
-    /* Enable Frequency modulation */
+    /* Enable/Disable Frequency modulation */
 	systemREG1->PLLCTL2 |= 0x00000000U;
 
 	/** - Map device clock domains to desired sources and configure top-level dividers */
@@ -245,9 +295,13 @@ void mapClocks(void)
                        
     /** - Setup synchronous peripheral clock dividers for VCLK1, VCLK2, VCLK3 */
     systemREG1->CLKCNTL  = (systemREG1->CLKCNTL & 0xF0FFFFFFU) 
-						 | (uint32)((uint32)0U << 24U);
+						 | (uint32)((uint32)1U << 24U);
     systemREG1->CLKCNTL  = (systemREG1->CLKCNTL & 0xFFF0FFFFU) 
-						 | (uint32)((uint32)0U << 16U); 
+						 | (uint32)((uint32)1U << 16U); 
+
+	systemREG2->CLK2CNTL = (systemREG2->CLK2CNTL & 0xFFFFF0F0U)
+	                     | (uint32)((uint32)1U << 8U)
+						 | (uint32)((uint32)1U << 0U);
 
 /* USER CODE BEGIN (13) */
 /* USER CODE END */
@@ -262,11 +316,21 @@ void mapClocks(void)
     systemREG1->VCLKASRC = (uint32)((uint32)SYS_VCLK << 8U)
                          | (uint32)((uint32)SYS_VCLK << 0U);
 
+    systemREG2->VCLKACON1 =  (uint32)((uint32)(1U - 1U) << 24U) 
+                           | (uint32)((uint32)0U << 20U) 
+                           | (uint32)((uint32)SYS_VCLK << 16U)
+                           | (uint32)((uint32)(1U - 1U) << 8U)
+                           | (uint32)((uint32)0U << 4U) 
+                           | (uint32)((uint32)SYS_VCLK << 0U);
+
 /* USER CODE BEGIN (14) */
 /* USER CODE END */
 
 }
 
+/* SourceId : SYSTEM_SourceId_006 */
+/* DesignId : SYSTEM_DesignId_006 */
+/* Requirements : HL_SR471 */
 void systemInit(void)
 {
 	uint32 efcCheckStatus;
@@ -460,7 +524,10 @@ void systemGetConfigValue(system_config_reg_t *config_reg, config_value_type_t t
 		config_reg->CONFIG_DEVCR1 = SYS_DEVCR1_CONFIGVALUE;
 		config_reg->CONFIG_SYSECR = SYS_SYSECR_CONFIGVALUE;
 		
+		config_reg->CONFIG_PLLCTL3 = SYS2_PLLCTL3_CONFIGVALUE_2;
 		config_reg->CONFIG_STCCLKDIV = SYS2_STCCLKDIV_CONFIGVALUE;
+		config_reg->CONFIG_CLK2CNTL = SYS2_CLK2CNTL_CONFIGVALUE;
+		config_reg->CONFIG_VCLKACON1 = SYS2_VCLKACON1_CONFIGVALUE;
 		config_reg->CONFIG_CLKSLIP = SYS2_CLKSLIP_CONFIGVALUE;
 		config_reg->CONFIG_EFC_CTLEN = SYS2_EFC_CTLEN_CONFIGVALUE;
 	}
@@ -497,7 +564,10 @@ void systemGetConfigValue(system_config_reg_t *config_reg, config_value_type_t t
 		config_reg->CONFIG_SYSECR = systemREG1->SYSECR;
 		
 		/*SAFETYMCUSW 134 S MR:12.2 <APPROVED> "LDRA Tool issue" */
+		config_reg->CONFIG_PLLCTL3 = systemREG2->PLLCTL3;
 		config_reg->CONFIG_STCCLKDIV = systemREG2->STCCLKDIV;
+		config_reg->CONFIG_CLK2CNTL = systemREG2->CLK2CNTL;
+		config_reg->CONFIG_VCLKACON1 = systemREG2->VCLKACON1;
 		config_reg->CONFIG_CLKSLIP = systemREG2->CLKSLIP;
 		config_reg->CONFIG_EFC_CTLEN = systemREG2->EFC_CTLEN;
 	}

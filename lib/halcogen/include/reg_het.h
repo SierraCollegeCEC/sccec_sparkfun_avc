@@ -1,7 +1,7 @@
 /** @file reg_het.h
 *   @brief HET Register Layer Header File
-*   @date 9.Sep.2014
-*   @version 04.01.00
+*   @date 17.Nov.2014
+*   @version 04.02.00
 *   
 *   This file contains:
 *   - Definitions
@@ -11,7 +11,40 @@
 *   which are relevant for the HET driver.
 */
 
-/* (c) Texas Instruments 2009-2014, All rights reserved. */
+/* 
+* Copyright (C) 2009-2014 Texas Instruments Incorporated - http://www.ti.com/ 
+* 
+* 
+*  Redistribution and use in source and binary forms, with or without 
+*  modification, are permitted provided that the following conditions 
+*  are met:
+*
+*    Redistributions of source code must retain the above copyright 
+*    notice, this list of conditions and the following disclaimer.
+*
+*    Redistributions in binary form must reproduce the above copyright
+*    notice, this list of conditions and the following disclaimer in the 
+*    documentation and/or other materials provided with the   
+*    distribution.
+*
+*    Neither the name of Texas Instruments Incorporated nor the names of
+*    its contributors may be used to endorse or promote products derived
+*    from this software without specific prior written permission.
+*
+*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+*  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+*  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+*  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
+*  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+*  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+*  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+*  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+*  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
+*  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+*  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*
+*/
+
 
 #ifndef __REG_HET_H__
 #define __REG_HET_H__
@@ -137,6 +170,31 @@ typedef volatile struct het1RamBase
 
 #define NHET1RAMPARLOC	(*(volatile uint32 *)0xFF462000U)
 #define NHET1RAMLOC		(*(volatile uint32 *)0xFF460000U)
+
+/** @def hetREG2
+*   @brief HET2 Register Frame Pointer
+*
+*   This pointer is used by the HET driver to access the het module registers.
+*/
+#define hetREG2 ((hetBASE_t *)0xFFF7B900U)
+
+/** @def hetPORT2
+*   @brief HET2 GIO Port Register Pointer
+*
+*   Pointer used by the GIO driver to access I/O PORT of HET2
+*   (use the GIO drivers to access the port pins).
+*/
+#define hetPORT2 ((gioPORT_t *)0xFFF7B94CU)
+
+/** @def hetRAM2
+*   @brief NHET1 RAM Pointer
+*
+*   This pointer is used by the HET driver to access the NHET2 memory.
+*/
+#define hetRAM2 ((hetRAMBASE_t *)0xFF440000U)
+
+#define NHET2RAMPARLOC	(*(volatile uint32 *)0xFF442000U)
+#define NHET2RAMLOC		(*(volatile uint32 *)0xFF440000U)
 
 /* USER CODE BEGIN (1) */
 /* USER CODE END */

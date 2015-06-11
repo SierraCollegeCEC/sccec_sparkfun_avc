@@ -1,7 +1,7 @@
 /** @file adc.h
 *   @brief ADC Driver Header File
-*   @date 9.Sep.2014
-*   @version 04.01.00
+*   @date 17.Nov.2014
+*   @version 04.02.00
 *   
 *   This file contains:
 *   - Definitions
@@ -11,7 +11,40 @@
 *   which are relevant for the ADC driver.
 */
 
-/* (c) Texas Instruments 2009-2014, All rights reserved. */
+/* 
+* Copyright (C) 2009-2014 Texas Instruments Incorporated - http://www.ti.com/ 
+* 
+* 
+*  Redistribution and use in source and binary forms, with or without 
+*  modification, are permitted provided that the following conditions 
+*  are met:
+*
+*    Redistributions of source code must retain the above copyright 
+*    notice, this list of conditions and the following disclaimer.
+*
+*    Redistributions in binary form must reproduce the above copyright
+*    notice, this list of conditions and the following disclaimer in the 
+*    documentation and/or other materials provided with the   
+*    distribution.
+*
+*    Neither the name of Texas Instruments Incorporated nor the names of
+*    its contributors may be used to endorse or promote products derived
+*    from this software without specific prior written permission.
+*
+*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+*  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+*  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+*  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
+*  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+*  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+*  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+*  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+*  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
+*  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+*  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*
+*/
+
 
 #ifndef __ADC_H__
 #define __ADC_H__
@@ -24,7 +57,6 @@ extern "C" {
 
 /* USER CODE BEGIN (0) */
 /* USER CODE END */
-
 
 /* ADC General Definitions */
 
@@ -109,10 +141,53 @@ enum adc1HwTriggerSource
 	ADC1_RTI_COMP0 = 3U,   /**< Alias for RTI compare 0 match   */
 	ADC1_HET1_12 = 4U,     /**< Alias for HET1 pin 12           */
 	ADC1_HET1_14 = 5U,     /**< Alias for HET1 pin 14           */
-	ADC1_HET1_17 = 6U,     /**< Alias for HET1 pin 17           */
-	ADC1_HET1_19 = 7U      /**< Alias for HET1 pin 19           */
+	ADC1_GIOB0 = 6U,       /**< Alias for GIO port b pin 0      */
+	ADC1_GIOB1 = 7U,       /**< Alias for GIO port b pin 1      */
+
+	ADC1_HET2_5 = 1U,      /**< Alias for HET2 pin 5            */
+	ADC1_HET1_27 = 2U,     /**< Alias for HET1 pin 27           */
+	ADC1_HET1_17 = 4U,     /**< Alias for HET1 pin 17           */
+	ADC1_HET1_19 = 5U,     /**< Alias for HET1 pin 19           */
+	ADC1_HET1_11 = 6U,     /**< Alias for HET1 pin 11           */
+	ADC1_HET2_13 = 7U,     /**< Alias for HET2 pin 13           */
+
+	ADC1_EPWM_B = 1U,      /**< Alias for B Signal EPWM         */
+	ADC1_EPWM_A1 = 3U,     /**< Alias for A1 Signal EPWM        */	
+	ADC1_HET2_1 = 5U,      /**< Alias for HET2 pin 1            */
+	ADC1_EPWM_A2 = 6U,     /**< Alias for A2 Signal EPWM        */
+	ADC1_EPWM_AB = 7U      /**< Alias for AB Signal EPWM        */	
+
 };
 
+/** @enum adc2HwTriggerSource
+*   @brief Alias names for hardware trigger source
+*   This enumeration is used to provide alias names for the hardware trigger sources:
+*/
+
+enum adc2HwTriggerSource
+{
+	ADC2_EVENT = 0U,       /**< Alias for event pin             */
+	ADC2_HET1_8 = 1U,      /**< Alias for HET1 pin 8            */
+	ADC2_HET1_10 = 2U,     /**< Alias for HET1 pin 10           */
+	ADC2_RTI_COMP0 = 3U,   /**< Alias for RTI compare 0 match   */
+	ADC2_HET1_12 = 4U,     /**< Alias for HET1 pin 12           */
+	ADC2_HET1_14 = 5U,     /**< Alias for HET1 pin 14           */
+	ADC2_GIOB0 = 6U,       /**< Alias for GIO port b pin 0      */
+	ADC2_GIOB1 = 7U,       /**< Alias for GIO port b pin 1      */
+	ADC2_HET2_5 = 1U,      /**< Alias for HET2 pin 5            */
+	ADC2_HET1_27 = 2U,     /**< Alias for HET1 pin 27           */
+	ADC2_HET1_17 = 4U,     /**< Alias for HET1 pin 17           */
+	ADC2_HET1_19 = 5U,     /**< Alias for HET1 pin 19           */
+	ADC2_HET1_11 = 6U,     /**< Alias for HET1 pin 11           */
+	ADC2_HET2_13 = 7U,     /**< Alias for HET2 pin 13           */
+	
+	ADC2_EPWM_B = 1U,      /**< Alias for B Signal EPWM         */
+	ADC2_EPWM_A1 = 3U,     /**< Alias for A1 Signal EPWM        */	
+	ADC2_HET2_1 = 5U,      /**< Alias for HET2 pin 1            */
+	ADC2_EPWM_A2 = 6U,     /**< Alias for A2 Signal EPWM        */
+	ADC2_EPWM_AB = 7U      /**< Alias for AB Signal EPWM        */	
+
+};
 
 /* USER CODE BEGIN (1) */
 /* USER CODE END */
@@ -134,6 +209,7 @@ typedef struct adcData
 
 /* USER CODE BEGIN (2) */
 /* USER CODE END */
+
 typedef struct adc_config_reg
 {           
     uint32 CONFIG_OPMODECR;
@@ -152,6 +228,7 @@ typedef struct adc_config_reg
     uint32 CONFIG_G2SAMPDISEN;
     uint32 CONFIG_PARCR;
 }adc_config_reg_t;
+
 
 
 /** 
@@ -184,11 +261,12 @@ uint32 adcMidPointCalibration(adcBASE_t *adc);
 void adcSetEVTPin(adcBASE_t *adc, uint32 value);
 uint32 adcGetEVTPin(adcBASE_t *adc);
 
+
 /** @fn void adcNotification(adcBASE_t *adc, uint32 group)
 *   @brief Group notification
 *   @param[in] adc Pointer to ADC node:
 *              - adcREG1: ADC1 module pointer
-
+*              - adcREG2: ADC2 module pointer
 *   @param[in] group number of ADC node:
 *              - adcGROUP0: ADC event group
 *              - adcGROUP1: ADC group 1
@@ -198,9 +276,11 @@ uint32 adcGetEVTPin(adcBASE_t *adc);
 */
 void adcNotification(adcBASE_t *adc, uint32 group);
 
-/**@}*/
 /* USER CODE BEGIN (3) */
 /* USER CODE END */
 
-
+/**@}*/
+#ifdef __cplusplus
+}
+#endif
 #endif

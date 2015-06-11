@@ -1,7 +1,7 @@
 /** @file sys_mpu.h
 *   @brief System Mpu Header File
-*   @date 9.Sep.2014
-*   @version 04.01.00
+*   @date 17.Nov.2014
+*   @version 04.02.00
 *   
 *   This file contains:
 *   - Mpu Interface Functions
@@ -9,7 +9,40 @@
 *   which are relevant for the memory protection unit driver.
 */
 
-/* (c) Texas Instruments 2009-2014, All rights reserved. */
+/* 
+* Copyright (C) 2009-2014 Texas Instruments Incorporated - http://www.ti.com/ 
+* 
+* 
+*  Redistribution and use in source and binary forms, with or without 
+*  modification, are permitted provided that the following conditions 
+*  are met:
+*
+*    Redistributions of source code must retain the above copyright 
+*    notice, this list of conditions and the following disclaimer.
+*
+*    Redistributions in binary form must reproduce the above copyright
+*    notice, this list of conditions and the following disclaimer in the 
+*    documentation and/or other materials provided with the   
+*    distribution.
+*
+*    Neither the name of Texas Instruments Incorporated nor the names of
+*    its contributors may be used to endorse or promote products derived
+*    from this software without specific prior written permission.
+*
+*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+*  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+*  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+*  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
+*  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+*  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+*  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+*  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+*  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
+*  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+*  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*
+*/
+
 
 #ifndef __SYS_MPU_H__
 #define __SYS_MPU_H__
@@ -78,6 +111,34 @@ extern "C" {
 *   Alias for Mpu region 8
 */
 #define mpuREGION8 7U
+
+/** @def mpuREGION9
+*   @brief Mpu region 9
+*
+*   Alias for Mpu region 9
+*/
+#define mpuREGION9 8U
+
+/** @def mpuREGION10
+*   @brief Mpu region 10
+*
+*   Alias for Mpu region 10
+*/
+#define mpuREGION10 9U
+
+/** @def mpuREGION11
+*   @brief Mpu region 11
+*
+*   Alias for Mpu region 11
+*/
+#define mpuREGION11 10U
+
+/** @def mpuREGION12
+*   @brief Mpu region 12
+*
+*   Alias for Mpu region 12
+*/
+#define mpuREGION12 11U
 
 /** @def mpuREGION_ENABLE
 *   @brief Enable MPU Region

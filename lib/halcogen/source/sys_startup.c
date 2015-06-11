@@ -1,7 +1,7 @@
 /** @file sys_startup.c 
 *   @brief Startup Source File
-*   @date 9.Sep.2014
-*   @version 04.01.00
+*   @date 17.Nov.2014
+*   @version 04.02.00
 *
 *   This file contains:
 *   - Include Files
@@ -13,7 +13,40 @@
 *   which are relevant for the Startup.
 */
 
-/* (c) Texas Instruments 2009-2014, All rights reserved. */
+/* 
+* Copyright (C) 2009-2014 Texas Instruments Incorporated - http://www.ti.com/ 
+* 
+* 
+*  Redistribution and use in source and binary forms, with or without 
+*  modification, are permitted provided that the following conditions 
+*  are met:
+*
+*    Redistributions of source code must retain the above copyright 
+*    notice, this list of conditions and the following disclaimer.
+*
+*    Redistributions in binary form must reproduce the above copyright
+*    notice, this list of conditions and the following disclaimer in the 
+*    documentation and/or other materials provided with the   
+*    distribution.
+*
+*    Neither the name of Texas Instruments Incorporated nor the names of
+*    its contributors may be used to endorse or promote products derived
+*    from this software without specific prior written permission.
+*
+*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+*  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+*  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+*  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
+*  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+*  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+*  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+*  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+*  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
+*  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+*  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*
+*/
+
 
 /* USER CODE BEGIN (0) */
 /* USER CODE END */
@@ -44,7 +77,7 @@ extern void __TI_auto_init(void);
 extern void main(void);
 /*SAFETYMCUSW 122 S MR:20.11 <APPROVED> "Startup code(exit and abort need to be present)" */
 /*SAFETYMCUSW 354 S MR:NA <APPROVED> " Startup code(Extern declaration present in the library)" */
-extern void exit(void);
+extern void exit(int);
 
 
 /* USER CODE BEGIN (3) */
@@ -111,6 +144,12 @@ void _c_int00(void)
         _errata_CORTEXR4_66_();
     
 /* USER CODE BEGIN (14) */
+/* USER CODE END */
+
+        /* Workaround for Errata CORTEXR4 57 */ 
+        _errata_CORTEXR4_57_();
+    
+/* USER CODE BEGIN (15) */
 /* USER CODE END */
 
         /* continue with normal start-up sequence */
@@ -283,7 +322,7 @@ void _c_int00(void)
      * The CPU RAM is a single-port memory. The actual "RAM Group" for all on-chip SRAMs is defined in the
      * device datasheet.
      */
-    pbistRun(0x00000020U, /* ESRAM Single Port PBIST */
+    pbistRun(0x00300020U, /* ESRAM Single Port PBIST */
              (uint32)PBIST_March13N_SP);
 
 /* USER CODE BEGIN (32) */
@@ -352,20 +391,20 @@ void _c_int00(void)
     
     pbistRun(  (uint32)0x00000000U    /* EMAC RAM */
              | (uint32)0x00000000U    /* USB RAM */  
-             | (uint32)0x00000000U    /* DMA RAM */
+             | (uint32)0x00000800U    /* DMA RAM */
              | (uint32)0x00000200U    /* VIM RAM */
              | (uint32)0x00000040U    /* MIBSPI1 RAM */
-             | (uint32)0x00000000U    /* MIBSPI3 RAM */
-             | (uint32)0x00000000U    /* MIBSPI5 RAM */
+             | (uint32)0x00000080U    /* MIBSPI3 RAM */
+             | (uint32)0x00000100U    /* MIBSPI5 RAM */
              | (uint32)0x00000004U    /* CAN1 RAM */
              | (uint32)0x00000008U    /* CAN2 RAM */
-             | (uint32)0x00000000U    /* CAN3 RAM */
+             | (uint32)0x00000010U    /* CAN3 RAM */
              | (uint32)0x00000400U    /* ADC1 RAM */
-             | (uint32)0x00000000U    /* ADC2 RAM */
+             | (uint32)0x00020000U    /* ADC2 RAM */
              | (uint32)0x00001000U    /* HET1 RAM */
-             | (uint32)0x00000000U    /* HET2 RAM */
+             | (uint32)0x00040000U    /* HET2 RAM */
              | (uint32)0x00002000U    /* HTU1 RAM */
-             | (uint32)0x00000000U    /* HTU2 RAM */
+             | (uint32)0x00080000U    /* HTU2 RAM */
              | (uint32)0x00000000U    /* RTP RAM */
              | (uint32)0x00000000U    /* FRAY RAM */
              ,(uint32) PBIST_March13N_DP);
@@ -436,6 +475,16 @@ void _c_int00(void)
      */
      mibspiREG1->GCR0 = 0x1U;
      
+    /* Release the MibSPI3 modules from local reset.
+     * This will cause the MibSPI3 RAMs to get initialized along with the parity memory.
+     */
+    mibspiREG3->GCR0 = 0x1U;
+    
+    /* Release the MibSPI5 modules from local reset.
+     * This will cause the MibSPI5 RAMs to get initialized along with the parity memory.
+     */
+    mibspiREG5->GCR0 = 0x1U;
+    
 /* USER CODE BEGIN (56) */
 /* USER CODE END */
 
@@ -451,17 +500,17 @@ void _c_int00(void)
     /* NOTE : Please Refer DEVICE DATASHEET for the list of Supported Memories and their channel numbers.
               Memory Initialization is perfomed only on the user selected memories in HALCoGen's GUI SAFETY INIT tab.
      */
-    memoryInit( (uint32)((uint32)0U << 1U)    /* DMA RAM */
+    memoryInit( (uint32)((uint32)1U << 1U)    /* DMA RAM */
               | (uint32)((uint32)1U << 2U)    /* VIM RAM */
               | (uint32)((uint32)1U << 5U)    /* CAN1 RAM */
               | (uint32)((uint32)1U << 6U)    /* CAN2 RAM */
-              | (uint32)((uint32)0U << 10U)   /* CAN3 RAM */
+              | (uint32)((uint32)1U << 10U)   /* CAN3 RAM */
               | (uint32)((uint32)1U << 8U)    /* ADC1 RAM */
-              | (uint32)((uint32)0U << 14U)   /* ADC2 RAM */
+              | (uint32)((uint32)1U << 14U)   /* ADC2 RAM */
               | (uint32)((uint32)1U << 3U)    /* HET1 RAM */
               | (uint32)((uint32)1U << 4U)    /* HTU1 RAM */
-              | (uint32)((uint32)0U << 15U)   /* HET2 RAM */
-              | (uint32)((uint32)0U << 16U)   /* HTU2 RAM */
+              | (uint32)((uint32)1U << 15U)   /* HET2 RAM */
+              | (uint32)((uint32)1U << 16U)   /* HTU2 RAM */
               );
 
     /* Disable parity */
@@ -482,10 +531,25 @@ void _c_int00(void)
 
     htu1ParityCheck();
     
+/* USER CODE BEGIN (59) */
+/* USER CODE END */
+
+    het2ParityCheck();
+    
+/* USER CODE BEGIN (60) */
+/* USER CODE END */
+
+    htu2ParityCheck();
+    
 /* USER CODE BEGIN (61) */
 /* USER CODE END */
 
     adc1ParityCheck();
+    
+/* USER CODE BEGIN (62) */
+/* USER CODE END */
+
+    adc2ParityCheck();
     
 /* USER CODE BEGIN (63) */
 /* USER CODE END */
@@ -497,11 +561,21 @@ void _c_int00(void)
 
     can2ParityCheck();
     
+/* USER CODE BEGIN (65) */
+/* USER CODE END */
+
+    can3ParityCheck();
+    
 /* USER CODE BEGIN (66) */
 /* USER CODE END */
 
     vimParityCheck();
     
+/* USER CODE BEGIN (67) */
+/* USER CODE END */
+
+    dmaParityCheck();
+
 
 /* USER CODE BEGIN (68) */
 /* USER CODE END */
@@ -511,11 +585,31 @@ void _c_int00(void)
     { 
     }/* Wait */                 
     /* wait for MibSPI1 RAM to complete initialization */
+/*SAFETYMCUSW 28 D MR:NA <APPROVED> "Hardware status bit read check" */
+    while ((mibspiREG3->FLG & 0x01000000U) == 0x01000000U)
+    { 
+    }/* Wait */                 
+    /* wait for MibSPI3 RAM to complete initialization */ 
+/*SAFETYMCUSW 28 D MR:NA <APPROVED> "Hardware status bit read check" */
+    while ((mibspiREG5->FLG & 0x01000000U) == 0x01000000U)
+    { 
+    }/* Wait */                 
+    /* wait for MibSPI5 RAM to complete initialization */
 
 /* USER CODE BEGIN (69) */
 /* USER CODE END */
 
     mibspi1ParityCheck();
+    
+/* USER CODE BEGIN (70) */
+/* USER CODE END */
+
+    mibspi3ParityCheck();
+    
+/* USER CODE BEGIN (71) */
+/* USER CODE END */
+    
+    mibspi5ParityCheck();
     
 
 /* USER CODE BEGIN (72) */
@@ -551,9 +645,8 @@ void _c_int00(void)
 /* USER CODE BEGIN (76) */
 /* USER CODE END */
 /*SAFETYMCUSW 122 S MR:20.11 <APPROVED> "Startup code(exit and abort need to be present)" */
-    exit();
+    exit(0);
 
-    /* call the application */
 /* USER CODE BEGIN (77) */
 /* USER CODE END */
 }

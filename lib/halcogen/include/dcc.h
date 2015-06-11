@@ -1,11 +1,44 @@
 /** @file dcc.h
 *   @brief DCC Driver Definition File
-*   @date 9.Sep.2014
-*   @version 04.01.00
+*   @date 17.Nov.2014
+*   @version 04.02.00
 *   
 */
 
-/* (c) Texas Instruments 2009-2014, All rights reserved. */
+/* 
+* Copyright (C) 2009-2014 Texas Instruments Incorporated - http://www.ti.com/ 
+* 
+* 
+*  Redistribution and use in source and binary forms, with or without 
+*  modification, are permitted provided that the following conditions 
+*  are met:
+*
+*    Redistributions of source code must retain the above copyright 
+*    notice, this list of conditions and the following disclaimer.
+*
+*    Redistributions in binary form must reproduce the above copyright
+*    notice, this list of conditions and the following disclaimer in the 
+*    documentation and/or other materials provided with the   
+*    distribution.
+*
+*    Neither the name of Texas Instruments Incorporated nor the names of
+*    its contributors may be used to endorse or promote products derived
+*    from this software without specific prior written permission.
+*
+*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+*  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+*  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+*  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
+*  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+*  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+*  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+*  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+*  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
+*  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+*  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*
+*/
+
 
 #ifndef __DCC_H__
 #define __DCC_H__
@@ -152,7 +185,7 @@ extern "C" {
 *
 *   @note This value should be used for API argument @a cnt1_Clock_Source
 */
-#define dcc2CNT1_CLKSRC_N2HET1_0 0x00005000FU
+#define dcc2CNT1_CLKSRC_N2HET1_0 0x0000500FU
 
 /** @def dccNOTIFICATION_DONE
 *   @brief Alias name for DCC Done notification
@@ -252,6 +285,7 @@ uint32 dccGetErrStatus(dccBASE_t  *dcc);
 void dccEnableNotification(dccBASE_t  *dcc, uint32 notification);
 void dccDisableNotification(dccBASE_t  *dcc, uint32 notification);
 void dcc1GetConfigValue(dcc_config_reg_t *config_reg, config_value_type_t type);
+void dcc2GetConfigValue(dcc_config_reg_t *config_reg, config_value_type_t type);
 /** @fn void dccNotification(dccBASE_t  *dcc,uint32 flags)
 *   @brief Interrupt callback
 *   @param[in] dcc   - dcc module base address

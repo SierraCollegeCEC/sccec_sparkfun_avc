@@ -1,11 +1,44 @@
 /** @file eqep.h
 *   @brief EQEP Driver Header File
-*   @date 9.Sep.2014
-*   @version 04.01.00
+*   @date 17.Nov.2014
+*   @version 04.02.00
 *   
 */
 
-/* (c) Texas Instruments 2009-2014, All rights reserved. */
+/* 
+* Copyright (C) 2009-2014 Texas Instruments Incorporated - http://www.ti.com/ 
+* 
+* 
+*  Redistribution and use in source and binary forms, with or without 
+*  modification, are permitted provided that the following conditions 
+*  are met:
+*
+*    Redistributions of source code must retain the above copyright 
+*    notice, this list of conditions and the following disclaimer.
+*
+*    Redistributions in binary form must reproduce the above copyright
+*    notice, this list of conditions and the following disclaimer in the 
+*    documentation and/or other materials provided with the   
+*    distribution.
+*
+*    Neither the name of Texas Instruments Incorporated nor the names of
+*    its contributors may be used to endorse or promote products derived
+*    from this software without specific prior written permission.
+*
+*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+*  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+*  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+*  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
+*  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+*  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+*  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+*  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+*  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
+*  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+*  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*
+*/
+
 
 #ifndef __eQEP_H__
 #define __eQEP_H__
@@ -416,7 +449,6 @@ typedef struct eqep_config_reg
 	uint16 CONFIG_QEINT;
 } eqep_config_reg_t;		
 
-
 #define EQEP1_QPOSINIT_CONFIGVALUE ((uint32)0x00000000U)
 #define EQEP1_QPOSMAX_CONFIGVALUE ((uint32)0x00000000U)
 #define EQEP1_QPOSCMP_CONFIGVALUE ((uint32)0x00000000U)
@@ -466,6 +498,55 @@ typedef struct eqep_config_reg
 								   | (uint16)((uint16)0U << 3U)\
 								   | (uint16)((uint16)0U << 2U)\
 								   | (uint16)((uint16)0U << 1U)))   
+#define EQEP2_QPOSINIT_CONFIGVALUE ((uint32)0x00000000U)
+#define EQEP2_QPOSMAX_CONFIGVALUE ((uint32)0x00000000U)
+#define EQEP2_QPOSCMP_CONFIGVALUE ((uint32)0U)
+#define EQEP2_QUPRD_CONFIGVALUE ((uint32) 0U)
+#define EQEP2_QWDPRD_CONFIGVALUE ((uint16) 0U)
+#define EQEP2_QDECCTL_CONFIGVALUE ((uint16)((uint16)((uint16)eQEP_DIRECTION_COUNT << 14U)\
+								   | (uint16)((uint16)0U << 13U)\
+								   | (uint16)((uint16)eQEP_INDEX_PIN << 12U)\
+								   | (uint16)((uint16)eQEP_RESOLUTION_1x << 11U)\
+								   | (uint16)((uint16)0U << 10U)\
+								   | (uint16)((uint16)0U << 9U)\
+								   | (uint16)((uint16)0U << 8U)\
+								   | (uint16)((uint16)0U << 7U)\
+								   | (uint16)((uint16)0U << 6U)\
+								   | (uint16)((uint16)0U << 5U)\
+								   | (uint16)0x0000U))
+					 
+#define EQEP2_QEPCTL_CONFIGVALUE ((uint16)((uint16)((uint16)eQEP_MAX_POSITION << 12U)\
+								   | (uint16)((uint16)0U << 11U)\
+								   | (uint16)((uint16)eQEP_DIRECTON_DEPENDENT << 10U)\
+								   | (uint16)((uint16)0U << 9U)\
+								   | (uint16)((uint16)eQEP_RISING_EDGE << 8U)\
+								   | (uint16)((uint16)0U << 7U)\
+								   | (uint16)((uint16)eQEP_RISING_EDGE << 6U)\
+								   | (uint16)((uint16)eQEP_LATCH_RISING_EDGE << 4U)\
+								   | (uint16)((uint16)eQEP_ON_POSITION_COUNTER_READ << 2U)\
+								   | (uint16)0x0000U))
+					 
+#define EQEP2_QCAPCTL_CONFIGVALUE ((uint16)((uint16)((uint16)eQEP_PS_8 << 4U)\
+								   | ((uint16)eQEP_PS_512)\
+								   | (uint16)0x0000U))
+								   
+#define EQEP2_QPOSCTL_CONFIGVALUE ((uint16)((uint16)((uint16)0U << 15U)\
+								   | (uint16)((uint16)eQEP_QPOSCNT_EQ_QPSCMP << 14U)\
+								   | (uint16)((uint16)eQEP_ACTIVE_HIGH << 13U)\
+								   | (uint16)((uint16)0U)\
+								   | (uint16)0x0000U))
+					   
+#define EQEP2_QEINT_CONFIGVALUE ((uint16)((uint16)((uint16)0U << 11U)\
+								   | (uint16)((uint16)0U << 10U)\
+								   | (uint16)((uint16)0U << 9U)\
+								   | (uint16)((uint16)0U << 8U)\
+								   | (uint16)((uint16)0U << 7U)\
+								   | (uint16)((uint16)0U << 6U)\
+								   | (uint16)((uint16)0U << 5U)\
+								   | (uint16)((uint16)0U << 4U)\
+								   | (uint16)((uint16)0U << 3U)\
+								   | (uint16)((uint16)0U << 2U)\
+								   | (uint16)((uint16)0U << 1U)))	
 								   
 /**
  *  @defgroup eQEP eQEP
@@ -621,17 +702,16 @@ void eqepWritePosnCompare (eqepBASE_t *eqep, uint32 posn);
 *   @param[in] flags			Copy of  interrupt flags
 */
 void 	eqepNotification(eqepBASE_t *eqep,uint16 flags);
+void 	eqepNotification(eqepBASE_t *eqep,uint16 flags);
 
 void eqep1GetConfigValue(eqep_config_reg_t *config_reg, config_value_type_t type);
-
+void eqep2GetConfigValue(eqep_config_reg_t *config_reg, config_value_type_t type);
 /* USER CODE BEGIN (2) */
 /* USER CODE END */
 
 /**@}*/
-
 #ifdef __cplusplus
 }
 #endif /*extern "C" */
 
-
-#endif /*end of _QEP_H_ definition */
+#endif /*end of _eQEP_H_ definition */

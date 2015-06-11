@@ -1,7 +1,38 @@
 ;-------------------------------------------------------------------------------
 ; sys_mpu.asm
 ;
-; (c) Texas Instruments 2009-2013, All rights reserved.
+; Copyright (C) 2009-2014 Texas Instruments Incorporated - http://www.ti.com/ 
+; 
+; 
+;  Redistribution and use in source and binary forms, with or without 
+;  modification, are permitted provided that the following conditions 
+;  are met:
+;
+;    Redistributions of source code must retain the above copyright 
+;    notice, this list of conditions and the following disclaimer.
+;
+;    Redistributions in binary form must reproduce the above copyright
+;    notice, this list of conditions and the following disclaimer in the 
+;    documentation and/or other materials provided with the   
+;    distribution.
+;
+;    Neither the name of Texas Instruments Incorporated nor the names of
+;    its contributors may be used to endorse or promote products derived
+;    from this software without specific prior written permission.
+;
+;  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+;  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+;  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+;  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
+;  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+;  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+;  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+;  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+;  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
+;  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+;  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+;
+;
 ;
 
     .text
@@ -109,6 +140,47 @@ _mpuInit_
         mcr   p15, #0,    r0, c6, c1, #4
         movw  r0,  #((0 << 15) + (0 << 14) + (0 << 13) + (0 << 12) + (0 << 11) + (0 << 10) + (0 <<  9) + (0 <<  8) + (0x17 << 1) + (1))
         mcr   p15, #0,    r0, c6, c1, #2
+        ; Setup region 9
+        mov   r0,  #8
+        mcr   p15, #0,    r0, c6, c2, #0
+        ldr   r0,  r9Base
+        mcr   p15, #0,    r0, c6, c1, #0
+        mov   r0,  #0x0010
+        orr   r0,  r0,    #0x1300
+        mcr   p15, #0,    r0, c6, c1, #4
+        movw  r0,  #((0 << 15) + (0 << 14) + (0 << 13) + (0 << 12) + (0 << 11) + (0 << 10) + (0 <<  9) + (0 <<  8) + (0x08 << 1) + (1))
+        mcr   p15, #0,    r0, c6, c1, #2
+        ; Setup region 10
+        mov   r0,  #9
+        mcr   p15, #0,    r0, c6, c2, #0
+        ldr   r0,  r10Base
+        mcr   p15, #0,    r0, c6, c1, #0
+        mov   r0,  #0x0010
+        orr   r0,  r0,    #0x1300
+        mcr   p15, #0,    r0, c6, c1, #4
+        movw  r0,  #((0 << 15) + (0 << 14) + (0 << 13) + (0 << 12) + (0 << 11) + (0 << 10) + (0 <<  9) + (0 <<  8) + (0x17 << 1) + (1))
+        mcr   p15, #0,    r0, c6, c1, #2
+        ; Setup region 11
+        mov   r0,  #10
+        mcr   p15, #0,    r0, c6, c2, #0
+        ldr   r0,  r11Base
+        mcr   p15, #0,    r0, c6, c1, #0
+        mov   r0,  #0x0008
+        orr   r0,  r0,    #0x1100
+        mcr   p15, #0,    r0, c6, c1, #4
+        movw  r0,  #((1 << 15) + (1 << 14) + (1 << 13) + (0 << 12) + (0 << 11) + (0 << 10) + (0 <<  9) + (0 <<  8) + (0x0A << 1) + (0))
+        mcr   p15, #0,    r0, c6, c1, #2
+        ; Setup region 12
+        mov   r0,  #11
+        mcr   p15, #0,    r0, c6, c2, #0
+        ldr   r0,  r12Base
+        mcr   p15, #0,    r0, c6, c1, #0
+        mov   r0,  #0x0008
+        orr   r0,  r0,    #0x1300
+        mcr   p15, #0,    r0, c6, c1, #4
+        movw  r0,  #((1 << 15) + (1 << 14) + (0 << 13) + (0 << 12) + (0 << 11) + (0 << 10) + (0 <<  9) + (0 <<  8) + (0x15 << 1) + (0))
+        mcr   p15, #0,    r0, c6, c1, #2
+
 
         ; Enable mpu background region
         mrc   p15, #0, r0,      c1, c0, #0
@@ -131,7 +203,10 @@ r5Base  .word 0x60000000
 r6Base  .word 0x80000000  
 r7Base  .word 0xF0000000  
 r8Base  .word 0xFC000000  
-
+r9Base  .word 0xFE000000  
+r10Base  .word 0xFF000000  
+r11Base  .word 0x08001000  
+r12Base  .word 0x20000000  
 
     .endasmfunc
 
