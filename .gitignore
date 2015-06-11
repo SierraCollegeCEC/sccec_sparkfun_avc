@@ -34,3 +34,11 @@ Thumbs.db
 #################
 *.sublime-workspace
 *.sublime-project
+
+# Code Composer Studio #
+########################
+*.log
+workspace/RemoteSystemsTempFiles/
+workspace/sccec_sparkfun_avc/Debug/
+workspace/sccec_sparkfun_avc/Release/
+workspace/.metadata/
