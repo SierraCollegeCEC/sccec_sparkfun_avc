@@ -12,22 +12,27 @@
 #include "bezier.h"
 
 motionData MotionData;
+errParams headingParams, speedParams;
 
 void initNav()
 {
-  /*
-    Nothing goes here yet.
-    For future milestones, include Bezier curve data here.
-  */
+
+  /*initmap(); Hi! Implement me!*/
+
+  setErrParams(&headingParams, 3.f, 2.f, 0.1f, .1f); /* Heading PID values. */
+  
 }
 
 float findAngle(vector vec){
 
   float angle =  180 * ( atan2( ( -1 * vec.y ) , vec.x ) / M_PI );
+  /* Dear James: Copy and pasted from sensors.cpp. Why is there a -1 on the y component?
+     Was that causing our last direction mishap? I'm too lazy to ask Alex.
+     -- Kris
+  */
   return angle;
   
 }  
-  
 
 float findCorrection(vector current, vector desired)
 {
@@ -36,22 +41,21 @@ float findCorrection(vector current, vector desired)
     finds the (shortest, signed) difference between the two.
   */
 
-  float tempAngle, correction;
+  float correction;
   
-  tempAngle = findAngle(desired) - findAngle(current);
+  correction = findAngle(desired) - findAngle(current);
 
-  if ( abs(tempAngle) > 180)
-    { /* Use the other angle, in the other direction */
+  if ( fabs(correction) > 180)
+    { /* Angle too large? Use the other angle, in the other direction */
 
-      if ( tempAngle > 0) 
-        { correction = tempAngle - 360.f; }
+      if ( correction > 0)
+        /* Were we going left (positive theta)? Go right instead. */
+        { correction -= 360.f; }
       else
-        { correction = tempAngle + 360.f; }
+        /* Were we going right (negative theta)? Go left instead. */
+        { correction += 360.f; }
     }
 
-  else
-    { correction = tempAngle; }
-  
   return correction;
 }
 
@@ -59,15 +63,15 @@ void updateNav()
 {
   /*
     This function:
-     - gets the navigation data from sensors (heading, position);
-     - gets desired values from Bezier Curves (position);
-     - finds difference between desired position and real position
-       to obtain desired heading;
-     - find difference between desired heading and real heading
-     - applies PID to heading differences;
-     - creates instructions for motion module;
-     - and pushes instructions to MotionData
-       on every update.
+    - gets the navigation data from sensors (heading, position);
+    - gets desired values from Bezier Curves (position);
+    - finds difference between desired position and real position
+    to obtain desired heading;
+    - find difference between desired heading and real heading
+    - applies PID to heading differences;
+    - creates instructions for motion module;
+    - and pushes instructions to MotionData
+    on every update.
   */
   navData* NavData;
   float  headingDiff;
@@ -75,14 +79,9 @@ void updateNav()
 
   NavData = getNavData();
   
-  headingDiff = findCorrection(NavData->heading, getDesiredHeading());
+  headingDiff = findCorrection(NavData->heading, getDesiredHeading(NavData->position));
   
-  /* getDesiredHeading NEEDS to accept NavData->pos as an argument, but I can't till
-     it's defined in sensors.h. Returning stub value in the meantime for
-     purposes of this commit.
-  */
-  
-  adjustedHeading = pidAdjust(headingDiff);
+  adjustedHeading = pidAdjust(headingDiff, &headingParams);
   
   MotionData.heading = adjustedHeading;
   
@@ -92,3 +91,4 @@ motionData* getMotionData()
 {
   return &MotionData;
 }
+
