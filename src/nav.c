@@ -10,9 +10,12 @@
 #include <math.h>
 #include "pid.h"
 #include "bezier.h"
+#include "string.h"
+#include "telemetry.h"
 
 motionData MotionData;
 errParams headingParams, speedParams;
+float magneticDeclination;
 
 void initNav()
 {
@@ -20,6 +23,10 @@ void initNav()
 	/*initmap(); Hi! Implement me!*/
 
 	setErrParams(&headingParams, 3.f, 2.f, 0.1f, .1f); /* Heading PID values. */
+
+	/* Event Handlers */
+	addTelemetryEventHandler(setHeadingPID);
+	addTelemetryEventHandler(setMotionPID);
   
 }
 
@@ -92,3 +99,18 @@ motionData* getMotionData()
 	return &MotionData;
 }
 
+/* Event handlers */
+
+BEGIN_EVENT_HANDLER( setHeadingPID, "setHeadingPID", paramsString ){
+	const float * params = parseToArray(paramsString, 4);
+	setErrParams( &headingParams, params[0], params[1], params[2], params[3] );
+	// free(something);
+}
+END_EVENT_HANDLER
+
+BEGIN_EVENT_HANDLER( setMotionPID, "setMotionPID", paramsString ){
+	const float * params = parseToArray(paramsString, 4);
+	setErrParams( &motionParams, params[0], params[1], params[2], params[3] );
+	// free(something);
+}
+END_EVENT_HANDLER

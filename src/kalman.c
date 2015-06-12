@@ -4,7 +4,9 @@
  * Authors: Kristoffer Semelka, Austin
  */
 
+#include "common.h"
 #include "sensors.h"
+#include "telemetry.h"
 
 extern navData current;         /* The current state. */
 static navData prediction;      /* A prediction of the next state. */
@@ -26,6 +28,9 @@ void initFilter()
 	/* Initializes the Kalman filter.	*/
 	INS = getINSData();
 	measurement = getSensorData();
+
+	addTelemetryEventHandler(setKalman);
+	addTelemetryEventHandler(setKalmanRow);
 }
 
 void updateFilter()
@@ -56,14 +61,14 @@ void updateFilter()
 void predict()
 {
 	/* Apply a state transition model to current readings,
-	adds displacement measured from INS unit, and assigns to
-	prediction.
-	
-	While this could be a terser matrix multiplication, I've
-	chosen  to hand unroll the dot products because much of
-	the state transition matrix is 0. (Sacrifice in
-	readability is minimal.)
-	*/
+	 * adds displacement measured from INS unit, and assigns to
+	 * prediction.
+	 * 
+	 * While this could be a terser matrix multiplication, I've
+	 * chosen  to hand unroll the dot products because much of
+	 * the state transition matrix is 0. (Sacrifice in
+	 * readability is minimal.)
+ 	 */
 	prediction[pos_x] = step(current[pos_x], current[vel_x],
 													 INS[displ_x]);
 	
@@ -81,7 +86,7 @@ float step(float initial, float velocity, float displacement)
 	return initial + velocity * dt + displacement; 
 }
 
-#define navData_iterate(var) for(navData_field var = 0; var < NAV_DATA_FIELDS; var++)
+#define navData_iterate( var ) for( navData_field var = 0; var < NAV_DATA_FIELDS; var++ )
 /* Declares and initializes a variable for use within a
 	 loop over a navData array. You need to add braces!
 */
@@ -95,7 +100,7 @@ void compare()
 	}
 }
 
-float dot(float *matrixRow, float *vector, int length){
+float dot( float *matrixRow, float *vector, int length ){
 	/* Standard dot product */
 
 	float accum = 0;
@@ -118,11 +123,25 @@ void filter()
 	*/
 	
 	navData_iterate(i){
-		current[i] = dot(kalman[i], error, NAV_DATA_FIELDS);
+		current[i] = dot( kalman[i], error, NAV_DATA_FIELDS );
 	}
 }
 
 navData* getNavData()
 {
 	return &current;
+}
+
+/* Telemetry Event Handlers */
+BEGIN_EVENT_HANDLER(setKalman, "setKalman", valuesString)
+{
+	kalman = parseto2DArray(valuesString);
+}
+END_EVENT_HANDLER
+
+BEGIN_EVENT_HANDLER(setKalmanRow, "setKalmanRow", valuesString)
+{
+	uint8_t row = getNextInt(valuesString);
+	uint8_t comma = findComma(valuesString);
+	kalman[row] = parsetoArray(substring(valuesString, comma));
 }
