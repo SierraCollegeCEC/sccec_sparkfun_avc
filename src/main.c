@@ -27,12 +27,12 @@ int main( void )
 	rtiStartCounter(rtiCOUNTER_BLOCK0);
 
 	sensorsInit();
-	navigationInit();
+	navInit();
 	motionInit();
 
-	schAddTask( sensorsUpdate, 0, 10 );
-	schAddTask( navigationUpdate, 0, 30 );
-	schAddTask( motionUpdate, 0, 30 );
+	schAddTask( updateSensors, 0, 10 );
+	schAddTask( updateNav, 0, 30 );
+	schAddTask( updateMotion, 0, 30 );
 
 	schStart();
 	while( 1 )

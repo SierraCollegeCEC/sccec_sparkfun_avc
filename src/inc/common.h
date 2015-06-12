@@ -28,14 +28,16 @@ const int spiMOSI = 11;
 const int spiRF24 = 6; // SS
 const int spiRF24_mode = 7; // CE
 
-/*
- * Vector Datatype
- */
+/* Typedefs */
 
+/* Vector Datatype */
 typedef struct s_vector {
   float x;
   float y;
 } vector;
+
+/* Booleans */
+typedef uint8_t bool;
 
 #endif
 
