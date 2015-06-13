@@ -20,26 +20,15 @@ float magneticDeclination;
 void initNav()
 {
 
-	/*initmap(); Hi! Implement me!*/
+	initmap(map);
 
 	setErrParams(&headingParams, 3.f, 2.f, 0.1f, .1f); /* Heading PID values. */
 
 	/* Event Handlers */
 	addTelemetryEventHandler(setHeadingPID);
 	addTelemetryEventHandler(setMotionPID);
-  
+
 }
-
-float findAngle(vector vec){
-
-	float angle =  180 * ( atan2( ( -1 * vec.y ) , vec.x ) / M_PI );
-	/* Dear James: Copy and pasted from sensors.cpp. Why is there a -1 on the y component?
-	   Was that causing our last direction mishap? I'm too lazy to ask Alex.
-	   -- Kris
-	*/
-	return angle;
-  
-}  
 
 float findCorrection(vector current, vector desired)
 {
@@ -49,7 +38,7 @@ float findCorrection(vector current, vector desired)
 	*/
 
 	float correction;
-  
+
 	correction = findAngle(desired) - findAngle(current);
 
 	if ( fabs(correction) > 180)

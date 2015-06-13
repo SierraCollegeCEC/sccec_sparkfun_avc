@@ -8,7 +8,8 @@
 #define _BEZIER_H_
 #include "common.h"
 
-void initMap(void);
+extern curve map; /* A linked list of curves. Configurable. */
+void initMap(float* map);
 /* Initialize the control points defining the map. */
 
 vector getDesiredHeading(vector currentPos);

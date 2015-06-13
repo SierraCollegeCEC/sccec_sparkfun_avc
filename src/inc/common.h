@@ -8,6 +8,26 @@
 #define _COMMON_H_
 #include <stdint.h>
 
+/*** Configuration ***/
+/* These are the primary configurable values. */
+
+const float ** map = 
+{
+	/* Two coordinates make a point.
+	   Four points make a curve. */
+	
+	/* x     y */
+	0.1f, 0.1f,
+	0.2f, 0.2f,
+	0.3f, 0.3f,
+	0.4f, 0.4f,
+
+	0.5f, 0.5f,
+	0.6f, 0.6f,
+	1.2f, 1.2f,
+	2.0f, 2.0f
+}
+
 // Since this is const it doesnt need to be extern.
 // Run the code at 10Hz for now
 const float dt = 100.0f;
@@ -28,10 +48,7 @@ const int spiMOSI = 11;
 const int spiRF24 = 6; // SS
 const int spiRF24_mode = 7; // CE
 
-/* Prototypes */
-
-
-/* Typedefs */
+/*** Typedefs ***/
 
 /* Vector Datatype */
 typedef struct s_vector {
@@ -41,6 +58,12 @@ typedef struct s_vector {
 
 /* Booleans */
 typedef uint8_t bool;
+/* Prototypes */
+float **parseto2DArray(char *string);
+float *parsetoArray(char *string);
+float findAngle(vector vec);
+float norm (vector point);
+vector diff(vector P1, vector P0)
 
 #endif
 
