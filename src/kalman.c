@@ -23,6 +23,17 @@ extern KalmanGain kalman = {	/* Kalman gain, which is the linear correction
 	{.01, .01, .01, .01, .01}
 }        
 
+/* Forward Declarations */
+void predict();
+void compare();
+void correct();
+float step(float, float, float);
+float dot(float*, float*, int);
+telemetryEventHandler setKalman;
+telemetryEventHandler setKalmanRow;
+
+
+
 void initFilter()
 {
 	/* Initializes the Kalman filter.	*/
@@ -53,8 +64,10 @@ void updateFilter()
 	 */
 
 	predict(); /* Prediction */
+	INS = getINSData();
+	measurement = getSensorData();
 	compare(); /* Comparison */
-	filter(); /* Correction */
+	correct(); /* Correction */
 	
 }
 
@@ -112,7 +125,7 @@ float dot( float *matrixRow, float *vector, int length ){
 	return accum;
 }
 
-void filter()
+void correct()
 {
 	/* current = Kalman * error
 
@@ -133,15 +146,30 @@ navData* getNavData()
 }
 
 /* Telemetry Event Handlers */
-BEGIN_EVENT_HANDLER(setKalman, "setKalman", valuesString)
-{
-	kalman = parseto2DArray(valuesString);
-}
-END_EVENT_HANDLER
 
-BEGIN_EVENT_HANDLER(setKalmanRow, "setKalmanRow", valuesString)
+void setKalman(char *key, char *valuesString)
+{ 	/* Event handler for the "setKalman" key.
+	 * Parse valuesString into a NAV_DATA_FIELDS by SENSOR_DATA_FIELDS
+	 * sized array, where valuesString is comma-separated, with 20 values.
+	 */
+	
+	if( strmcmp(key, "setKalman") == 0 )
+	{
+		kalman = parseto2DArray(valuesString);
+	}
+}
+
+void setKalmanRow(char *key, char *valuesString)
 {
-	uint8_t row = getNextInt(valuesString);
-	uint8_t comma = findComma(valuesString);
-	kalman[row] = parsetoArray(substring(valuesString, comma));
+	/* Event handler for the "setKalmanRow" key.
+	 * Parse valuesString into a row number i, and 5 values.
+	 * Place the 5 values into the ith row of the kalman matrix.
+	 */
+
+	 if( strmcmp( key, "setKalmanRow") == 0 )
+	{
+		uint8_t row = getNextInt(valuesString);
+		uint8_t comma = findComma(valuesString);
+		kalman[row] = parsetoArray(substring(valuesString, comma));
+	}
 }
