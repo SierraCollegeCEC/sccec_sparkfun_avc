@@ -14,7 +14,7 @@
 /* AVC */
 #include "schedule.h"
 #include "sensors.h"
-#include "nav.h"
+#include "navigation.h"
 #include "motion.h"
 
 int counter = 0;
@@ -27,12 +27,12 @@ int main( void )
 	rtiStartCounter(rtiCOUNTER_BLOCK0);
 
 	sensorsInit();
-	navInit();
+	navigationInit();
 	motionInit();
 
-	schAddTask( updateSensors, 0, 10 );
-	schAddTask( updateNav, 0, 30 );
-	schAddTask( updateMotion, 0, 30 );
+	schAddTask( sensorsUpdate, 0, 10 );
+	schAddTask( navigationUpdate, 0, 30 );
+	schAddTask( motionUpdate, 0, 30 );
 
 	schStart();
 	while( 1 )
