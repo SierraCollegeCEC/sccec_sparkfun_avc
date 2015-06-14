@@ -8,12 +8,12 @@
 #define _PID_H_
 
 typedef struct s_errParams {
-  float kp;
-  float kd;
-  float ki;
-  float maxInt; /* Clamping integration error prevents saturation. */
-  float lastErr;
-  float totalErr;
+	float kp;
+	float kd;
+	float ki;
+	float maxInt; /* Clamping integration error prevents saturation. */
+	float lastErr;
+	float totalErr;
 
 } errParams;
 
