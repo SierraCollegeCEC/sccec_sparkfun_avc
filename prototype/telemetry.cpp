@@ -118,7 +118,7 @@ void updateTelemetry()
 		}
 
 		/* Write the key/message to the allocated space */
-		uint8_t keyLen = len;
+		int keyLen = len;
 		if( colon )
 		{
 			keyLen = (colon - start);
@@ -161,7 +161,8 @@ void updateTelemetry()
  */
 void addTelemetryEventHandler( telemetryEventHandler func )
 {
-	handlerNode* newNode = malloc( sizeof(handlerNode) );
+	/* C version: handlerNode* newNode = malloc( sizeof(handlerNode) ); */
+	handlerNode* newNode = new handlerNode;
 	if( newNode )
 	{
 		newNode->func = func;
