@@ -9,7 +9,7 @@
 #include <math.h>
 #include "bezier.h"
 
-#define POINTS_PER_CURVE 4
+#define POINTS_PER_CURVE 4 /* These are quadratic bezier curves. */
 
 typedef struct s_curve
 {
@@ -24,6 +24,16 @@ float lastT;
 /* For finding closest point on curve, keep track of last t we used and assume
 	 t is increasing and minimally changing. See findDesiredPos(currentPos).
 */
+
+/* Forward declarations */
+
+void setMap(float*);
+vector findDesiredPos(vector);
+float findClosestT(vector);
+float offset(float);
+vector bezier(float);
+float bezierHelper(float, float, float, float, float);
+void setMapHandler(char*, char*);
 
 void initMap(float *mapValues)
 {
@@ -49,54 +59,30 @@ void setMap(float *mapValues)
  	lastT = 0.f;
 }
 
-float bezierHelper(float t, float P0, float P1, float P2, float P3)
+float getDesiredHeading(vector currentPos)
 {
-	/* grunt work of function */
+	float desiredHeading;
+	vector desiredPos;
 
-	float val  = P0 * pow(1 - t, 3) + P1 * 3 * pow(1-t, 2) * t + P2
-		* 3 * (1-t) * pow(t, 2) + P3 * pow(t, 3);
+	desiredPos = findDesiredPos(currentPos);
+	desiredHeading = findAngle(diff(desiredPos, currentPos));
 	
-	return val;
+	return desiredHeading;
 }
 
-vector bezier(float t)
+vector findDesiredPos(vector currentPos)
 {
-	/* Takes some parameter t between 0 and 1 and a set of control points and
-	 * gives you the corresponding point on the curve defined by those points.
-	 * This is a *cubic* bezier curve. Extra complexity is no problem;
-	 * the math takes about 142 cycles to compute, excluding fetches.
-	 */
+	/* Given where we are, where do we want to eventually be? Rabbit-chase.*/
 
-	vector point;
-	vector cpoints = current.points;
+	float tOfClosest, tDesired;
+	vector desiredPos;
+	
+	tOfClosest = findClosestT(currentPos); /* Where are we close to? */
+	tDesired = tOfClosest + offset(tOfClosest); /* Offset by some ammount */
 
-	/* Crank out the x, then the y */
-	point.x = bezierHelper(t, cpoints[0].x, cpoints[1].x, cpoints[2].x, cpoints[3].x);
-	point.y = bezierHelper(t, cpoints[0].y, cpoints[1].y, cpoints[2].y, cpoints[3].y);
+	desiredPos = bezier(tDesired); /* Find out where we want to be with new t. */
 
-	return point;
-}
-
-float offset(float tOfClosest)
-{
-	/* INCOMPLETE. This function should dynamically determine what value of "t"
-	   we should be chasing. I did some thinking, and I think that this should
-	   be a function of the proportion of the curve we wish to cover in that cycle
-	   divided by the current desired velocity (distance / velocity = dt).
-
-	   The velocity we wish to go should also be inversely proportional to the
-	   average curvature over the upcoming distance, and proportional to the
-	   arclength that we wish to traverse over that same distance.
-	   (ds/dt = constant * distance /mean-kappa). As curvature approaches zero,
-	   speed becomes infinite (value clamped by controller).
-	   As curvature increases, speed decreases.
-	   As "desired covered distance" decreases, then so does speed.
-	   The constant would be tuned.
-
-	   Setting to dummy value for now. No idea how this will perform.
-	*/
-	/* Inch 1/100th of a t */
-	return 0.01f;
+	return desiredPos;
 }
 
 float findClosestT(vector currentPos)
@@ -162,30 +148,54 @@ float findClosestT(vector currentPos)
 	return t;
 }
 
-vector findDesiredPos(vector currentPos)
+float offset(float tOfClosest)
 {
-	/* Given where we are, where do we want to eventually be? Rabbit-chase.*/
+	/* INCOMPLETE. This function should dynamically determine what value of "t"
+	   we should be chasing. I did some thinking, and I think that this should
+	   be a function of the proportion of the curve we wish to cover in that cycle
+	   divided by the current desired velocity (distance / velocity = dt).
 
-	float tOfClosest, tDesired;
-	vector desiredPos;
-	
-	tOfClosest = findClosestT(currentPos); /* Where are we close to? */
-	tDesired = tOfClosest + offset(tOfClosest); /* Offset by some ammount */
+	   The velocity we wish to go should also be inversely proportional to the
+	   average curvature over the upcoming distance, and proportional to the
+	   arclength that we wish to traverse over that same distance.
+	   (ds/dt = constant * distance /mean-kappa). As curvature approaches zero,
+	   speed becomes infinite (value clamped by controller).
+	   As curvature increases, speed decreases.
+	   As "desired covered distance" decreases, then so does speed.
+	   The constant would be tuned.
 
-	desiredPos = bezier(tDesired); /* Find out where we want to be with new t. */
-
-	return desiredPos;
+	   Setting to dummy value for now. No idea how this will perform.
+	*/
+	/* Inch 1/100th of a t */
+	return 0.01f;
 }
-	
 
-vector getDesiredHeading(vector currentPos)
+vector bezier(float t)
 {
-	vector desiredHeading, desiredPos;
+	/* Takes some parameter t between 0 and 1 and a set of control points and
+	 * gives you the corresponding point on the curve defined by those points.
+	 * This is a *cubic* bezier curve. Extra complexity is no problem;
+	 * the math takes about 142 cycles to compute, excluding fetches.
+	 */
 
-	desiredPos = findDesiredPos(currentPos);
-	desiredHeading = diff(desiredPos, currentPos);
+	vector point;
+	vector cpoints = current.points;
+
+	/* Crank out the x, then the y */
+	point.x = bezierHelper(t, cpoints[0].x, cpoints[1].x, cpoints[2].x, cpoints[3].x);
+	point.y = bezierHelper(t, cpoints[0].y, cpoints[1].y, cpoints[2].y, cpoints[3].y);
+
+	return point;
+}
+
+float bezierHelper(float t, float P0, float P1, float P2, float P3)
+{
+	/* grunt work of function */
+
+	float val  = P0 * pow(1 - t, 3) + P1 * 3 * pow(1-t, 2) * t + P2
+		* 3 * (1-t) * pow(t, 2) + P3 * pow(t, 3);
 	
-	return desiredHeading;
+	return val;
 }
 
 /* Event Handlers */

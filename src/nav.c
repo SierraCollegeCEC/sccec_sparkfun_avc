@@ -3,18 +3,25 @@
  * Navigation Subsystem
  * Authors: Kristoffer Semelka
  */
+ 
+#include <stdlib.h>
+#include <math.h>
+
 #include "common.h"
 #include "nav.h"
 #include "sensors.h"
-#include <stdlib.h>
-#include <math.h>
 #include "pid.h"
 #include "bezier.h"
 #include "telemetry.h"
 
 motionData MotionData;
 errParams headingParams, speedParams;
-float magneticDeclination;
+const float magneticDeclination;
+
+/* Forward declarations */
+telemetryEventHandler setHeadingPID, setMotionPID;
+float findCorrection(float, vector)
+
 
 void initNav()
 {
@@ -26,32 +33,6 @@ void initNav()
 	/* Event Handlers */
 	addTelemetryEventHandler(setHeadingPID);
 	addTelemetryEventHandler(setMotionPID);
-
-}
-
-float findCorrection(vector current, vector desired)
-{
-	/*
-	  Takes the current heading and desired heading, and
-	  finds the (shortest, signed) difference between the two.
-	*/
-
-	float correction;
-
-	correction = findAngle(desired) - findAngle(current);
-
-	if ( fabs(correction) > 180)
-		{ /* Angle too large? Use the other angle, in the other direction */
-
-			if ( correction > 0)
-				/* Were we going left (positive theta)? Go right instead. */
-				{ correction -= 360.f; }
-			else
-				/* Were we going right (negative theta)? Go left instead. */
-				{ correction += 360.f; }
-		}
-
-	return correction;
 }
 
 void updateNav()
@@ -74,7 +55,7 @@ void updateNav()
 
 	NavData = getNavData();
   
-	headingDiff = findCorrection(NavData[heading], getDesiredHeading(NavData[position]);
+	headingDiff = findCorrection(NavData.heading, getDesiredHeading(NavData.position);
   
 	adjustedHeading = pidAdjust(headingDiff, &headingParams);
   
@@ -85,6 +66,31 @@ void updateNav()
 motionData* getMotionData()
 {
 	return &MotionData;
+}
+
+float findCorrection(float current, vector desired)
+{
+	/*
+	  Takes the current heading and desired heading, and
+	  finds the (shortest, signed) difference between the two.
+	*/
+
+	float correction;
+
+	correction = findAngle(desired) - findAngle(current);
+
+	if ( fabs(correction) > 180)
+		{ /* Angle too large? Use the other angle, in the other direction */
+
+			if ( correction > 0)
+				/* Were we going left (positive theta)? Go right instead. */
+				{ correction -= 360.f; }
+			else
+				/* Were we going right (negative theta)? Go left instead. */
+				{ correction += 360.f; }
+		}
+
+	return correction;
 }
 
 /* Event handlers */
