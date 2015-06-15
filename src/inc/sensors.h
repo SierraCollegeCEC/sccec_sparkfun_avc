@@ -10,17 +10,36 @@
 void initSensors();
 void updateSensors();
 
-#define INSDATA_FIELDS 5
-typedef enum INSData_fields {disp_x, disp_y, change_vel_x, change_vel_y,
-							 yaw} INSData_field;
-typedef float INSData[INSDATA_FIELDS];
+typedef struct s_INSData
+{	/* Data structure for Accelerometer and Gyroscope data */
+	float disp_x;       /* Displacement in x direction */
+	float disp_y;       /* Displacement in y direction */
+	float change_vel_x; /* Change of velocity in x */
+	float change_vel_y; /* Change of velocity in y */
+	float yaw;          /* Directional displacement in xy-plane (compass direction) */
+} INSData;
 
-#define SENSOR_DATA_FIELDS 5
-typedef enum sensorData_fields {pos_x, pos_y, vel_x, vel_y, yaw} sensorData_field;
-typedef float sensorData[SENSOR_DATA_FIELDS];
+typedef struct s_SensorData
+{	/* Data structure for GPS and Magnetometer Data */
+	float pos_x;   /* Global x coordinate (from GPS) */
+	float pos_y;   /* Global y coordinate (from GPS) */
+	float vel_x;   /* Velocity in x (from GPS) */
+	float vel_y;   /* Velocity in y (from GPS) */
+	float heading; /* Direction in xy-plane (from Mag) */
+} SensorData;
 
-INSData getINSData();
-sensorData getSensorData();
+typedef struct s_NavData
+{	/* Data structure for GPS and Magnetometer Data */
+	float pos_x;   /* Global x coordinate */
+	float pos_y;   /* Global y coordinate */
+	float vel_x;   /* Velocity in x */
+	float vel_y;   /* Velocity in y */
+	float heading; /* Direction in xy-plane (compass direction) */
+} NavData;
+
+INSData* getINSData();
+sensorData* getSensorData();
+NavData* getNavData();
 
 #endif
 

@@ -29,7 +29,7 @@
 #include "common.h"
 #include "sensors.h"
 #include <math.h>
-#include <Arduino.h>
+#include "kalman.h"
 
 /* Drivers */
 #include "drivers/hm55b.h" /* Magenetometer */
@@ -37,8 +37,8 @@
 /* Debugging Flag */
 const int DEBUGGING = 0;
 
-sensorData SensorData;
 INSData INS;
+sensorData SensorData;
 
 void initSensors()
 {
@@ -52,28 +52,30 @@ void initSensors()
 
 void integrateGyro(float reading)
 {
-	INS[yaw] += reading * dt;
+	INS.yaw += reading * dt;
 }
 
 void integrateAccel(vector readings)
 {
-	INS[change_vel_x] += readings.x * dt^2 / 2;
-	INS[change_vel_y] += readings.y * dt^2 / 2;
+	INS.change_vel_x += readings.x * dt^2 / 2;
+	INS.change_vel_y += readings.y * dt^2 / 2;
 
-	INS[displ_x] += change_vel_x * dt;
-	INS[displ_y] += change_vel_y * dt;
+	INS.displ_x += INS.change_vel_x * dt;
+	INS.displ_y += INS.change_vel_y * dt;
 }
 
-void resetIntegrators()
+void resetINS()
 {
-	for(int i = 0; i < INSDATA_FIELDS; i++){
-		INS[i] = 0.f;
-	}
+	INS.displ_x = 0.f;
+	INS.displ_y = 0.f;
+	INS.change_vel_x = 0.f;
+	INS.change_vel_y = 0.f;
+	INS.yaw = 0.f;
 }
 
 void updateSensors()
 {
-	SensorData[heading] = mag_read();
+	SensorData.heading = mag_read();
 }
 
 sensorData getSensorData()
@@ -84,4 +86,9 @@ sensorData getSensorData()
 INSData getINSData()
 {
 	return &INSData;
+}
+
+NavData* getNavData()
+{
+	return getCurrentEstimate();
 }

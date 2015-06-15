@@ -11,13 +11,11 @@
 void initFilter();
 void updateFilter();
 
+#define SENSOR_DATA_FIELDS 5
 #define NAV_DATA_FIELDS 5
-typedef enum navData_fields {pos_x, pos_y, vel_x, vel_y, heading} navData_field;
-
-typedef float navData[NAV_DATA_FIELDS];
 
 typedef KalmanGain float[SENSOR_DATA_FIELDS][NAV_DATA_FIELDS]; 
 
-navData getNavData();
+navData* getCurrentEstimate();
 
 #endif
