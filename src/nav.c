@@ -10,7 +10,6 @@
 #include <math.h>
 #include "pid.h"
 #include "bezier.h"
-#include "string.h"
 #include "telemetry.h"
 
 motionData MotionData;
