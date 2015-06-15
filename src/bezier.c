@@ -22,11 +22,10 @@ curve *current; /* Current curve. */
 curve *previous; /* In case we need to go back. */
 float lastT;
 /* For finding closest point on curve, keep track of last t we used and assume
-	 t is increasing and minimally changing. See findDesiredPos(currentPos).
+   t is increasing and minimally changing. See findDesiredPos(currentPos).
 */
 
 /* Forward declarations */
-
 void setMap(float*);
 vector findDesiredPos(vector);
 float findClosestT(vector);
@@ -179,7 +178,7 @@ vector bezier(float t)
 	 */
 
 	vector point;
-	vector cpoints = current.points;
+	vector cpoints[] = current->points;
 
 	/* Crank out the x, then the y */
 	point.x = bezierHelper(t, cpoints[0].x, cpoints[1].x, cpoints[2].x, cpoints[3].x);
@@ -193,7 +192,7 @@ float bezierHelper(float t, float P0, float P1, float P2, float P3)
 	/* grunt work of function */
 
 	float val  = P0 * pow(1 - t, 3) + P1 * 3 * pow(1-t, 2) * t + P2
-		* 3 * (1-t) * pow(t, 2) + P3 * pow(t, 3);
+	             * 3 * (1-t) * pow(t, 2) + P3 * pow(t, 3);
 	
 	return val;
 }

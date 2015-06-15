@@ -68,16 +68,14 @@ motionData* getMotionData()
 	return &MotionData;
 }
 
-float findCorrection(float current, vector desired)
+float findCorrection(float current, float desired)
 {
 	/*
 	  Takes the current heading and desired heading, and
 	  finds the (shortest, signed) difference between the two.
 	*/
 
-	float correction;
-
-	correction = findAngle(desired) - findAngle(current);
+	float correction = desired - current;
 
 	if ( fabs(correction) > 180)
 		{ /* Angle too large? Use the other angle, in the other direction */
