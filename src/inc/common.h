@@ -11,13 +11,16 @@
 #include <stdlib.h>
 
 /*** Configuration ***/
-/* These are the primary configurable values. */
-
-extern float map[] =
+/* These are the primary configurable values.
+ * C's linkage defaults are different than C++'s.
+ * Declare all global constants static to avoid
+ * redefinitions.
+ */
+static float map[] =
 {
 	/* Two coordinates make a point.
 	   Four points make a curve. */
-	
+
 	/* x     y */
 	0.1f, 0.1f,
 	0.2f, 0.2f,
@@ -30,26 +33,25 @@ extern float map[] =
 	2.0f, 2.0f
 };
 
-// Since this is const it doesnt need to be extern.
 // Run the code at 10Hz for now
-const float dt = 100.0f;
-#define M_PI 3.14159f;
+static const float dt = 100.0f;
+static const float M_PI = 3.14159f;
 
 /*
  * I/O Pin Definitions
  * These arent needed in all files but it's nice to have them in one place so we can avoid pin collisions
  */
-const uint8_t escPin = 10;
-const uint8_t strPin = 9;
-const uint8_t CLK = 7;
-const uint8_t EN = 11;
-const uint8_t DATA = 12;
+static const uint8_t escPin = 10;
+static const uint8_t strPin = 9;
+static const uint8_t CLK = 7;
+static const uint8_t EN = 11;
+static const uint8_t DATA = 12;
 
-const int spiSCK = 13;
-const int spiMISO = 12;
-const int spiMOSI = 11;
-const int spiRF24 = 6; // SS
-const int spiRF24_mode = 7; // CE
+static const int spiSCK = 13;
+static const int spiMISO = 12;
+static const int spiMOSI = 11;
+static const int spiRF24 = 6; // SS
+static const int spiRF24_mode = 7; // CE
 
 /*** Typedefs ***/
 /* Formatting */
