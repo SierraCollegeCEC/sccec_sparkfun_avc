@@ -25,7 +25,6 @@ static sensorDataArr prediction;   /* A prediction of the next state, in array f
 static sensorDataArr measurement;  /* The GPS and Magnetometer data, in array form. */
 static sensorDataArr error;        /* Difference between error and measurement. */
 
-float kalman[][SENSOR_DATA_FIELDS];
 /* Kalman gain, which is the linear correction
 * factor applied to the error term. */
 
@@ -36,7 +35,8 @@ float kalman[][SENSOR_DATA_FIELDS];
 	{.01, .01, .01, .01, .01}, \
 	{.01, .01, .01, .01, .01} \
 }
-
+KalmanGain kalmaninitial = KALMAN_GAIN;
+float * kalman;
 
 /* Forward Declarations */
 void predict();
@@ -51,10 +51,9 @@ void setKalman(char*, char*);
 
 void initFilter()
 {
-	int jerk[] = {2, 3, 4};
 	addTelemetryEventHandler(setKalman);
 	addTelemetryEventHandler(setKalmanRow);
-	kalman = KALMAN_GAIN;
+	kalman = kalmaninitial;
 }
 
 void updateFilter()
@@ -136,7 +135,7 @@ void correct()
 
 	for(uint8_t i = 0; i < NAV_DATA_FIELDS; i++)
 	{
-		currentArr[i] = prediction[i] + dot(kalman[i], error, SENSOR_DATA_FIELDS);
+		currentArr[i] = prediction[i] + dot(&kalman[i * NAV_DATA_FIELDS], error, SENSOR_DATA_FIELDS);
 	}
 
 	convertCurrentToStruct(currentArr);
@@ -195,7 +194,9 @@ void setKalman(char *key, char *valuesString)
 
 	if( strcmp(key, "setKalman") == 0 )
 	{
-		kalman = float(parseTo2DArray(valuesString))[][5];
+		float *old = kalman;
+		kalman = parseTo2DArray(valuesString);
+		free(old);
 	}
 }
 
