@@ -13,7 +13,7 @@
  * This is the typedef for function pointers that will respond to events from the telemetry
  * system. These events are fired when messages are recieved from the reciever
  */
-typedef void (*telemetryEventHandler)(char*,float);
+typedef void (*telemetryEventHandler)(char*,char*);
 
 void initTelemetry();
 void updateTelemetry();

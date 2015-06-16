@@ -3,7 +3,7 @@
  * Telemetry Subsystem
  * Authors: James Smith
  */
-#include <SPI.h>
+#include "spi.h"
 #include "common.h"
 #include "telemetry.h"
 #include "radio.h"
@@ -23,34 +23,35 @@ uint8_t strBuffer[MAX_PACKET_SIZE+2];
 typedef struct s_handlerNode
 {
 	telemetryEventHandler func;
-	s_handlerNode* next;
+	struct s_handlerNode* next;
 } handlerNode;
 
 handlerNode* handlerList;
 
 void printPacket( uint8_t* data, uint8_t length )
 {
-	Serial.print( "[" );
+	print( "[" );
 	for( int i = 0; i < length; ++i )
 	{
-		Serial.print( (char)data[i] );
+		printChar( (char)data[i] );
 	}
-	Serial.print( "]" );
+	print( "]" );
 }
 
 #ifdef TELEMETRY_DEBUG
-void evtHandler( char* key, float val )
+void evtHandler( char* key, char* val )
 {
-	Serial.print( "Recieved message, key: " );
-	Serial.print( key );
-	Serial.print( ", val: " );
-	Serial.println( val );
+	print( "Recieved message, key: " );
+	print( key );
+	print( ", val: " );
+	print( val );
+	print("\n");
 }
 #endif
 
 void initTelemetry()
 {
-	Serial.println( "Starting radio..." );
+	print( "Starting radio...\n" );
 	radioSetup( &radio, spiRF24_mode, spiRF24 );
 
 #ifdef TELEMETRY_DEBUG
@@ -62,7 +63,7 @@ void initTelemetry()
 void updateTelemetry()
 {
 	/* Listens on the serial port for a string command to send to the reciever */
-	if( Serial.available() > 0 )
+	if( available() > 0 )
 	{
 		/* This delay allows the serial buffer on the sending device to fill up. Pretty ugly hack
 		   Alternative option: Build the packet up over several frames, wait for \n, then procede  */
@@ -71,15 +72,15 @@ void updateTelemetry()
 		/* First, send the length of the message so we know how much to decode. We could alternatively 
 		   send this null-terminated, but its possible that null is a valid value for some telemetry 
 		   transmissions */
-		packet[0] = Serial.available() - 1;
+		packet[0] = available() - 1;
 
 		/* Read serial data into the memory address just after the packet length */
 		char* dest = (char*)(packet + 1);
-		Serial.readBytes( dest, packet[0] + 1 );
+		readBytes( dest, packet[0] + 1 );
 		
 #ifdef TELEMETRY_DEBUG
 		printPacket( packet, packet[0] + 1 );
-		Serial.println();
+		print("\n");
 #endif
 		
 		/* Should use the result to print a status to the debug channel */
@@ -98,9 +99,9 @@ void updateTelemetry()
 		radioRecieve( &radio, packet, 32 );
 
 #ifdef TELEMETRY_DEBUG
-		Serial.print( "Recieved: " );
+		print( "Recieved: " );
 		printPacket( packet, packet[0] + 1 );
-		Serial.println();
+		print("\n");
 #endif
 
 		/* Loop through the recieved packet looking for a colon character to determine if this is a key:value */
@@ -128,7 +129,7 @@ void updateTelemetry()
 		strBuffer[keyLen] = 0;
 
 		char* key = (char*)strBuffer;
-		float val = 0.0f;
+		char* val = "0.0";
 
 		/* If this is a key:value command, create a string for the value and convert it to a float */
 		if( colon )
@@ -136,14 +137,16 @@ void updateTelemetry()
 			int valLen = len - keyLen - 1;
 			memcpy( strBuffer + keyLen + 1, start + keyLen + 1, valLen );
 			strBuffer[keyLen + valLen + 1] = 0;
-			val = atof( (char*)(strBuffer + keyLen + 1) );
+			/*val = atof( (char*)(strBuffer + keyLen + 1) );*/
 		}
 
 #ifdef TELEMETRY_DEBUG
-		Serial.println( key );
-		Serial.println( val );
+		print( key );
+		print("\n");
+		print( val );
+		print("\n");
 		printPacket( strBuffer, 32 );
-		Serial.println();
+		print("\n");
 #endif
 
 		/* Run through the event handler list and call any events that have registered with us */

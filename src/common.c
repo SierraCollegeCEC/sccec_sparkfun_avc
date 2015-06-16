@@ -22,9 +22,10 @@ float *parsetoArray(char *string)
 }
 
 float findAngle(vector vec)
-{	/* Takes a vector, and finds its angle with respect to the positive x-axis. */
-	float angle =  180 * ( atan2( ( -1 * vec.y ) , vec.x ) / M_PI );
-	return angle;
+{
+	/* Takes a vector, and finds its angle with respect to the positive x-axis. */
+	float radians = atan2(-1 * vec.y, vec.x);
+	return 180.f * radians / M_PI;
 }
 
 float norm (vector point)
@@ -43,4 +44,28 @@ vector diff(vector P1, vector P0)
 	difference.y = P1.y - P0.y;
 
 	return difference;
+}
+
+uint8_t max(uint8_t a, uint8_t b)
+{
+	if( a < b )
+	{
+		return b;
+	}
+	else
+	{
+		return a;
+	}
+}
+
+uint8_t min(uint8_t a, uint8_t b)
+{
+	if( a < b )
+	{
+		return a;
+	}
+	else
+	{
+		return b;
+	}
 }
