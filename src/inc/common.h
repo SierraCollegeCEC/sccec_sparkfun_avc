@@ -11,7 +11,7 @@
 /*** Configuration ***/
 /* These are the primary configurable values. */
 
-const float ** map = 
+extern float map[] =
 {
 	/* Two coordinates make a point.
 	   Four points make a curve. */
@@ -26,11 +26,12 @@ const float ** map =
 	0.6f, 0.6f,
 	1.2f, 1.2f,
 	2.0f, 2.0f
-}
+};
 
 // Since this is const it doesnt need to be extern.
 // Run the code at 10Hz for now
 const float dt = 100.0f;
+#define M_PI = 3.14159f;
 
 /*
  * I/O Pin Definitions
@@ -56,14 +57,20 @@ typedef struct s_vector {
   float y;
 } vector;
 
-/* Booleans */
-typedef uint8_t bool;
+struct
+{
+	void(*print)(char*);
+	void(*println)(float);
+	uint8_t(*available)(void);
+	void*(*readBytes)(void*, uint8_t);
+} Serial;
+
 /* Prototypes */
-float **parseto2DArray(char *string);
-float *parsetoArray(char *string);
+float **parseTo2DArray(char *string);
+float *parseToArray(char *string);
 float findAngle(vector vec);
 float norm (vector point);
-vector diff(vector P1, vector P0)
+vector diff(vector, vector);
 
 #endif
 

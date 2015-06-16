@@ -26,9 +26,9 @@ int main( void )
 	_enable_IRQ();
 	rtiStartCounter(rtiCOUNTER_BLOCK0);
 
-	sensorsInit();
-	navInit();
-	motionInit();
+	initSensors();
+	initNav();
+	initMotion();
 
 	schAddTask( updateSensors, 0, 10 );
 	schAddTask( updateNav, 0, 30 );

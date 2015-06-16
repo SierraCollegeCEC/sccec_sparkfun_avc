@@ -11,12 +11,14 @@ float **parseto2DArray(char *string)
 {	/* To-do.
 	 * Parses a two-dimensional array out of a string of values. 
 	 */
+	return (float**) 0;
 }
 
-float *parsetoArray(char *string);
+float *parsetoArray(char *string)
 {	/* To-do
 	 * Parses an array out of a string of values.
 	 */
+	return (float*) 0;
 }
 
 float findAngle(vector vec)
@@ -41,4 +43,4 @@ vector diff(vector P1, vector P0)
 	difference.y = P1.y - P0.y;
 
 	return difference;
-}  
+}
