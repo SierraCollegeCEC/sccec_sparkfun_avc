@@ -3,6 +3,7 @@
  * Sensors Subsystem
  * Authors: 
  */
+#include "common.h"
 
 #ifndef _SENSORS_H_
 #define _SENSORS_H_
@@ -26,20 +27,19 @@ typedef struct s_SensorData
 	float vel_x;   /* Velocity in x (from GPS) */
 	float vel_y;   /* Velocity in y (from GPS) */
 	float heading; /* Direction in xy-plane (from Mag) */
-} SensorData;
+} sensorData;
 
 typedef struct s_NavData
 {	/* Data structure for GPS and Magnetometer Data */
-	float pos_x;   /* Global x coordinate */
-	float pos_y;   /* Global y coordinate */
+	vector position;
 	float vel_x;   /* Velocity in x */
 	float vel_y;   /* Velocity in y */
 	float heading; /* Direction in xy-plane (compass direction) */
-} NavData;
+} navData;
 
 INSData* getINSData();
 sensorData* getSensorData();
-NavData* getNavData();
+navData* getNavData();
 
 #endif
 
