@@ -11,7 +11,10 @@
 #include "kalman.h"
 
 #ifndef MAG
-void mag_reset();
+void mag_reset()
+{
+	;
+}
 float mag_read()
 {
 	return 0.f;

@@ -187,6 +187,13 @@ vector bezier(float t)
 	return point;
 }
 
+curve* makeMapFromArray(float* arr)
+{
+	/* Makes a linked list from an array of values. */
+	/* Todo: Implement. */
+	return (curve*) 0;
+}
+
 float bezierHelper(float t, float P0, float P1, float P2, float P3)
 {
 	/* grunt work of function */

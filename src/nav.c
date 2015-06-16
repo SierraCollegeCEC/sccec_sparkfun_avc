@@ -15,11 +15,11 @@
 #include "telemetry.h"
 
 motionData MotionData;
-errParams headingParams, speedParams;
+errParams headingParams, throttleParams;
 const float magneticDeclination;
 
 /* Forward declarations */
-void setSpeedPID(char*, char*);
+void setThrottlePID(char*, char*);
 void setHeadingPID(char*, char*);
 float findCorrection(float, float);
 
@@ -33,7 +33,7 @@ void initNav()
 
 	/* Event Handlers */
 	addTelemetryEventHandler(setHeadingPID);
-	addTelemetryEventHandler(setSpeedPID);
+	addTelemetryEventHandler(setThrottlePID);
 }
 
 void updateNav()
@@ -104,12 +104,12 @@ void setHeadingPID(char *key, char *paramsString)
 	}	
 }
 
-void setMotionPID(char *key, char *paramsString)
+void setThrottlePID(char *key, char *paramsString)
 {	/* Event handler for the "setMotionPID" key. */
 	
-	if ( strcmp(key, "setMotionPID") == 0 )
+	if ( strcmp(key, "setThrottlePID") == 0 )
 	{
 		float* params = parseToArray(paramsString);
-		setErrParams( &headingParams, params[0], params[1], params[2], params[3] );
+		setErrParams( &throttleParams, params[0], params[1], params[2], params[3] );
 	}	
 }
