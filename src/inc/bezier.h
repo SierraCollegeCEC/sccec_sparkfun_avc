@@ -11,7 +11,7 @@
 void initMap(float* map);
 /* Initialize the control points defining the map. */
 
-vector getDesiredHeading(vector currentPos);
+float getDesiredHeading(vector currentPos);
 /* Get a desired heading, given where you currently are. */
 
 #endif

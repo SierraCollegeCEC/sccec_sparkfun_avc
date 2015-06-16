@@ -4,10 +4,10 @@
  * authors: Brad Morton, Eric Maginnis
  */
 
-#ifndef _SPARKFUN_MOTION_H_
-#define _SPARKFUN_MOTION_H_
+#ifndef _MOTION_H_
+#define _MOTION_H_
 
-void motionInit();
-void motionUpdate();
+void initMotion();
+void updateMotion();
 
 #endif

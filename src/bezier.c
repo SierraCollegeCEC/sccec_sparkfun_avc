@@ -8,16 +8,16 @@
 #include <stdlib.h>
 #include <math.h>
 #include "bezier.h"
+#include "telemetry.h"
 
 #define POINTS_PER_CURVE 4 /* These are quadratic bezier curves. */
 
 typedef struct s_curve
 {
-	vector[POINTS_PER_CURVE] points; /* A curve is an array of control points. */
-	s_curve *next; /* A curve knows where the next segment is */
+	vector points[POINTS_PER_CURVE]; /* A curve is an array of control points. */
+	struct s_curve *next; /* A curve knows where the next segment is */
 } curve;
 
-curve *map;
 curve *current; /* Current curve. */
 curve *previous; /* In case we need to go back. */
 float lastT;
@@ -27,6 +27,7 @@ float lastT;
 
 /* Forward declarations */
 void setMap(float*);
+curve* makeMapFromArray(float*);
 vector findDesiredPos(vector);
 float findClosestT(vector);
 float offset(float);
@@ -52,8 +53,7 @@ void setMap(float *mapValues)
  	 * Thus, a map should have a total size of 2 * POINTS_PER_CURVE * SEGMENTS * sizeof(float).
  	 */
 
- 	map = makeMapFromArray(mapValues);
- 	current = map;
+ 	current = makeMapFromArray(mapValues);
  	previous = current;
  	lastT = 0.f;
 }
@@ -137,8 +137,8 @@ float findClosestT(vector currentPos)
 	/* If we're nearing the end of a curve, go on to the next one. */
 	if ( (1 - t) < .95 )
 	{
-		previous = curve;
-		curve = curve->next;
+		previous = current;
+		current = current->next;
 		t = 0;
 	}
 	
@@ -178,7 +178,7 @@ vector bezier(float t)
 	 */
 
 	vector point;
-	vector cpoints[] = current->points;
+	vector *cpoints = current->points;
 
 	/* Crank out the x, then the y */
 	point.x = bezierHelper(t, cpoints[0].x, cpoints[1].x, cpoints[2].x, cpoints[3].x);
@@ -203,7 +203,7 @@ void setMapHandler(char *key, char* mapValues)
 {
 	if( strcmp(key, "setMap") == 0 )
 	{
-		mapArray = parsetoArray(mapValues);
+		float* mapArray = parseToArray(mapValues);
 		setMap(mapArray);
 		free(mapArray);
 	}
