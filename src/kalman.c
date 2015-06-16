@@ -7,24 +7,7 @@
 #include "common.h"
 #include "sensors.h"
 #include "telemetry.h"
-
-extern navData current;         /* The current state. */
-
-static INSData INS;             /* Inertial Navigation System data, which
-                                 * consists of acceleromter and gyro data. */
-
-static sensorDataArr prediction;   /* A prediction of the next state, in array form. */
-static sensorDataArr measurement;  /* The GPS and Magnetometer data, in array form. */
-static sensorDataArr error;        /* Difference between error and measurement. */
-
-extern KalmanGain kalman = {	/* Kalman gain, which is the linear correction
-                                 * factor applied to the error term. */
-	{.01, .01, .01, .01, .01},
-	{.01, .01, .01, .01, .01},
-	{.01, .01, .01, .01, .01},
-	{.01, .01, .01, .01, .01},
-	{.01, .01, .01, .01, .01}
-}
+#include "kalman.h"
 
 /* Array representation of structs, for internal use. */
 enum sensorData_field {gps_pos_x, gps_pos_y, gps_vel_x, gps_vel_y, mag_heading};
@@ -33,19 +16,45 @@ typedef float sensorDataArr[SENSOR_DATA_FIELDS];
 enum navData_field {pos_x, pos_y, vel_x, vel_y, heading};
 typedef float navDataArr[NAV_DATA_FIELDS];
 
+extern navData current;         /* The current state. */
+
+static INSData* INS;             /* Inertial Navigation System data, which
+                                 * consists of acceleromter and gyro data. */
+
+static sensorDataArr prediction;   /* A prediction of the next state, in array form. */
+static sensorDataArr measurement;  /* The GPS and Magnetometer data, in array form. */
+static sensorDataArr error;        /* Difference between error and measurement. */
+
+float kalman[][SENSOR_DATA_FIELDS];
+/* Kalman gain, which is the linear correction
+* factor applied to the error term. */
+
+#define KALMAN_GAIN {\
+	{.01, .01, .01, .01, .01}, \
+	{.01, .01, .01, .01, .01}, \
+	{.01, .01, .01, .01, .01}, \
+	{.01, .01, .01, .01, .01}, \
+	{.01, .01, .01, .01, .01} \
+}
+
+
 /* Forward Declarations */
 void predict();
 void compare();
 void correct();
 float step(float, float, float);
-float dot(float i[], float j[], int);
-telemetryEventHandler setKalman;
-telemetryEventHandler setKalmanRow;
+float dot(float [], float [], uint8_t);
+void convertSensorToArray(sensorData *data);
+void convertCurrentToStruct(navDataArr data);
+void setKalmanRow(char*, char*);
+void setKalman(char*, char*);
 
 void initFilter()
 {
+	int jerk[] = {2, 3, 4};
 	addTelemetryEventHandler(setKalman);
 	addTelemetryEventHandler(setKalmanRow);
+	kalman = KALMAN_GAIN;
 }
 
 void updateFilter()
@@ -87,16 +96,16 @@ void predict()
 	 * the state transition matrix is 0. (Sacrifice in
 	 * readability is minimal.)
  	 */
-	prediction[pos_x] = step(current.pos_x, current.vel_x,
-	                        INS.displ_x);
+	prediction[pos_x] = step(current.position.x, current.vel_x,
+	                        INS->disp_x);
 	
-	prediction[pos_y] = step(current.pos_y, current.vel_y,
-	                        INS.displ_y);
+	prediction[pos_y] = step(current.position.y, current.vel_y,
+	                        INS->disp_y);
 
-	prediction[vel_x] = current.vel_x + INS.change_vel_x;
-	prediction[vel_y] = current.vel_y + INS.change_vel_y;
+	prediction[vel_x] = current.vel_x + INS->change_vel_x;
+	prediction[vel_y] = current.vel_y + INS->change_vel_y;
 
-	prediction[heading] = current.heading + INS.yaw;
+	prediction[heading] = current.heading + INS->yaw;
 }
 
 float step(float initial, float velocity, float displacement)
@@ -105,8 +114,7 @@ float step(float initial, float velocity, float displacement)
 }
 
 void compare()
-{
-	/* error = measured - predicted */
+{	/* error = measured - predicted */
 
 	for(uint8_t i = 0; i < SENSOR_DATA_FIELDS; i++)
 	{
@@ -126,9 +134,9 @@ void correct()
 
 	float currentArr[NAV_DATA_FIELDS];
 
-	for(uint8_t i = 0; uint8_t < NAV_DATA_FIELDS, i++)
+	for(uint8_t i = 0; i < NAV_DATA_FIELDS; i++)
 	{
-		currentArr[i] = prediction[i] + dot(kalman[i] * error);
+		currentArr[i] = prediction[i] + dot(kalman[i], error, SENSOR_DATA_FIELDS);
 	}
 
 	convertCurrentToStruct(currentArr);
@@ -148,15 +156,28 @@ float dot(float matrixRow[], float vector[], uint8_t length)
 	return accum;
 }
 
-void convertSensorToArray(SensorData *data)
+void convertSensorToArray(sensorData *data)
 {
 	/* Converts a SensorData struct to a SensorDataArr,
 	   and assigns to sensorDataArr */
-	sensorDataArr[gps_pos_x] = data->pos_x;
-	sensorDataArr[gps_pos_y] = data->pos_y;
-	sensorDataArr[gps_vel_x] = data->vel_x;
-	sensorDataArr[gps_vel_y] = data->vel_y;
-	sensorDataArr[mag_heading] = data->heading;
+	measurement[gps_pos_x] = data->pos_x;
+	measurement[gps_pos_y] = data->pos_y;
+	measurement[gps_vel_x] = data->vel_x;
+	measurement[gps_vel_y] = data->vel_y;
+	measurement[mag_heading] = data->heading;
+}
+
+void convertCurrentToStruct(navDataArr data)
+{
+	/* Converts a navDataArr array to a struct,
+	 * and assigns to current.
+	 */
+
+	current.position.x = data[pos_x];
+	current.position.y = data[pos_y];
+	current.vel_x = data[vel_x];
+	current.vel_y = data[vel_y];
+	current.heading = data[heading];
 }
 
 navData* getCurrentEstimate()
@@ -171,10 +192,10 @@ void setKalman(char *key, char *valuesString)
 	 * Parse valuesString into a NAV_DATA_FIELDS by SENSOR_DATA_FIELDS
 	 * sized array, where valuesString is comma-separated, with 20 values.
 	 */
-	
-	if( strmcmp(key, "setKalman") == 0 )
+
+	if( strcmp(key, "setKalman") == 0 )
 	{
-		kalman = parseto2DArray(valuesString);
+		kalman = float(parseTo2DArray(valuesString))[][5];
 	}
 }
 
@@ -185,7 +206,7 @@ void setKalmanRow(char *key, char *valuesString)
 	 * Place the 5 values into the ith row of the kalman matrix.
 	 */
 
-	if( strmcmp( key, "setKalmanRow") == 0 )
+	if( strcmp( key, "setKalmanRow") == 0 )
 	{
 		uint8_t row = getNextInt(valuesString);
 		uint8_t comma = findComma(valuesString);

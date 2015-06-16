@@ -14,7 +14,7 @@ void updateFilter();
 #define SENSOR_DATA_FIELDS 5
 #define NAV_DATA_FIELDS 5
 
-typedef KalmanGain float[SENSOR_DATA_FIELDS][NAV_DATA_FIELDS]; 
+typedef float KalmanGain[SENSOR_DATA_FIELDS][NAV_DATA_FIELDS];
 
 navData* getCurrentEstimate();
 
