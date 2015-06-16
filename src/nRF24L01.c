@@ -10,7 +10,7 @@
  * TODO: move SPI init to a common area
  * Authors: James Smith
  */
-#include <SPI.h>
+#include "spi.h"
 #include "common.h"
 #include "radio.h"
 
@@ -126,9 +126,9 @@ const uint8_t PAYLOAD_SIZE = MAX_PACKET_SIZE;
 
 /* Forward Declarations */
 void writeRegister( Radio* radio, uint8_t reg, uint8_t value );
-void writeRegister( Radio* radio, uint8_t reg, const uint8_t* value, uint8_t length );
+void writeRegisterBytes( Radio* radio, uint8_t reg, const uint8_t* value, uint8_t length );
 uint8_t readRegister( Radio* radio, uint8_t reg );
-void readRegister( Radio* radio, uint8_t reg, uint8_t* buffer, uint8_t length );
+void readRegisterBytes( Radio* radio, uint8_t reg, uint8_t* buffer, uint8_t length );
 void setFrequency( Radio* radio, uint16_t freq );
 void flushBuffers( Radio* radio );
 void printDebug( Radio* radio );
@@ -158,14 +158,14 @@ void radioSetup( Radio* radio, uint8_t pinCE, uint8_t pinSS )
 		pinMode( radio->pinCE, OUTPUT );
 		pinMode( radio->pinSS, OUTPUT );
 
-		SPI.setBitOrder( MSBFIRST );
-		SPI.setDataMode( SPI_MODE0 );
-		SPI.setClockDivider( SPI_CLOCK_DIV4 );
+		spiSetBitOrder( MSBFIRST );
+		spiSetDataMode( SPI_MODE0 );
+		spiSetClockDivider( SPI_CLOCK_DIV4 );
 
 		digitalWrite( radio->pinCE, LOW );
 		digitalWrite( radio->pinSS, HIGH );
 
-		SPI.begin();
+		spiInit();
 
 		/*
 		 * Automatically re-transmit packets
@@ -173,7 +173,7 @@ void radioSetup( Radio* radio, uint8_t pinCE, uint8_t pinSS )
 		 * ARC: Auto-Retransmit Count: How many times to retransmit. 0-15
 		 * TODO: Clean up these magic numbers
 		 */
-		writeRegister( radio, SETUP_RETR, (B0100 << ARD) | (15 << ARC) );
+		writeRegister( radio, SETUP_RETR, (0b0100 << ARD) | (15 << ARC) );
 
 		/* RF SETUP */
 		writeRegister( radio, RF_SETUP, readRegister( radio, RF_SETUP ) & ~(BIT(RF_PWR_LOW) | BIT(RF_PWR_HIGH)) | BIT(RF_PWR_HIGH) );
@@ -188,10 +188,10 @@ void radioSetup( Radio* radio, uint8_t pinCE, uint8_t pinSS )
 		flushBuffers( radio );
 
 		//writeRegister( radio, SETUP_AW, (ADDR_WIDTH << AW) );
-		writeRegister( radio, TX_ADDR, ADDR, 5 );
+		writeRegisterBytes( radio, TX_ADDR, ADDR, 5 );
 
 		/* Listening address */
-		writeRegister( radio, RX_ADDR_P1, ADDR, 5);
+		writeRegisterBytes( radio, RX_ADDR_P1, ADDR, 5);
 		writeRegister( radio, EN_RXADDR, readRegister(radio,EN_RXADDR) | BIT(ERX_P1) );
 		writeRegister( radio, RX_PW_P1, PAYLOAD_SIZE );
 
@@ -229,16 +229,16 @@ bool radioSend( Radio* radio, uint8_t* buffer, uint8_t length )
 		 */
 		uint8_t padding = PAYLOAD_SIZE - length;
 		digitalWrite( radio->pinSS, LOW );
-		SPI.transfer( W_TX_PAYLOAD );
+		transmitByte( W_TX_PAYLOAD );
 		while( length > 0 )
 		{
-			SPI.transfer( *buffer );
+			transmitByte( *buffer );
 			buffer++;
 			length--;
 		}
 		while( padding > 0 )
 		{
-			SPI.transfer( 0x00 );
+			transmitByte( 0x00 );
 			padding--;
 		}
 		digitalWrite( radio->pinSS, HIGH );
@@ -253,13 +253,13 @@ bool radioSend( Radio* radio, uint8_t* buffer, uint8_t length )
 		uint32_t timeout = 500;
 		while( waitingForAck && (timeout > (millis() - sent_at)) )
 		{
-			//Serial.print( "Sending " );
-			//Serial.println( readRegister( radio, STATUS ), BIN );
+			//print( "Sending " );
+			//println( readRegister( radio, STATUS ), BIN );
 			waitingForAck = !(readRegister( radio, STATUS ) & (BIT(TX_DS) | BIT(MAX_RT)));
 		}
 
-		//Serial.print( "status: " );
-		//Serial.println( readRegister( radio, STATUS ), BIN );
+		//print( "status: " );
+		//println( readRegister( radio, STATUS ), BIN );
 
 		/* Send is finished, go back to listening mode */
 		bool result = (readRegister( radio, STATUS ) & BIT(TX_DS));
@@ -288,7 +288,7 @@ bool radioHasData( Radio* radio )
 	{
 		uint8_t status;
 		digitalWrite( radio->pinSS, LOW );
-		status = SPI.transfer( NOP );
+		status = transmitByte( NOP );
 		digitalWrite( radio->pinSS, HIGH );
 
 		bool result = (status & BIT(RX_DR));
@@ -314,16 +314,16 @@ void radioRecieve( Radio* radio, uint8_t* buffer, uint8_t length )
 	{
 		uint8_t padding = PAYLOAD_SIZE - length;
 		digitalWrite( radio->pinSS, LOW );
-		SPI.transfer( R_RX_PAYLOAD );
+		transmitByte( R_RX_PAYLOAD );
 		while( length > 0 )
 		{
-			*buffer = SPI.transfer( 0xFF );
+			*buffer = transmitByte( 0xFF );
 			buffer++;
 			length--;
 		}
 		while( padding > 0 )
 		{
-			SPI.transfer( 0x00 );
+			transmitByte( 0x00 );
 			padding--;
 		}
 		digitalWrite( radio->pinSS, HIGH );
@@ -342,13 +342,13 @@ void radioRecieve( Radio* radio, uint8_t* buffer, uint8_t length )
  * This can write to multi byte registers, just pass in the address to the bytes you want
  * to write and how many of them there are
  */
-void writeRegister( Radio* radio, uint8_t reg, const uint8_t* value, uint8_t length )
+void writeRegisterBytes( Radio* radio, uint8_t reg, const uint8_t* value, uint8_t length )
 {
 	digitalWrite( radio->pinSS, LOW );
-	SPI.transfer( W_REGISTER | (REGISTER_MASK & reg) );
+	transmitByte( W_REGISTER | (REGISTER_MASK & reg) );
 	while( length > 0 )
 	{
-		SPI.transfer( *value );
+		transmitByte( *value );
 		value++;
 		length--;
 	}
@@ -356,13 +356,13 @@ void writeRegister( Radio* radio, uint8_t reg, const uint8_t* value, uint8_t len
 }
 
 /* 
- * Specialized version of writeRegister that writes to 1 byte registers
+ * Specialized version of writeRegisterBytes that writes to 1 byte registers
  * Since most registers on the nRF24L01+ are 1 byte registers, this is more convenient
  * because we can just pass new register values by value
  */
 void writeRegister( Radio* radio, uint8_t reg, uint8_t value )
 {
-	writeRegister( radio, reg, &value, 1 );
+	writeRegisterBytes( radio, reg, &value, 1 );
 }
 
 /*
@@ -370,13 +370,13 @@ void writeRegister( Radio* radio, uint8_t reg, uint8_t value )
  * Returns the value as a byte
  * TODO: Support for reading from registers that are longer than 1 byte!
  */
-void readRegister( Radio* radio, uint8_t reg, uint8_t* buffer, uint8_t length )
+void readRegisterBytes( Radio* radio, uint8_t reg, uint8_t* buffer, uint8_t length )
 {
 	digitalWrite( radio->pinSS, LOW );
-	SPI.transfer( R_REGISTER | (REGISTER_MASK & reg) );
+	transmitByte( R_REGISTER | (REGISTER_MASK & reg) );
 	while( length > 0 )
 	{
-		*buffer = SPI.transfer( 0xFF );
+		*buffer = transmitByte( 0xFF );
 		buffer++;
 		length--;
 	}
@@ -391,7 +391,7 @@ void readRegister( Radio* radio, uint8_t reg, uint8_t* buffer, uint8_t length )
 uint8_t readRegister( Radio* radio, uint8_t reg )
 {
 	uint8_t value = 0;
-	readRegister( radio, reg, &value, 1 );
+	readRegisterBytes( radio, reg, &value, 1 );
 	return value;
 }
 
@@ -418,11 +418,11 @@ void setFrequency( Radio* radio, uint16_t freq )
 void flushBuffers( Radio* radio )
 {
 	digitalWrite( radio->pinSS, LOW );
-	SPI.transfer( FLUSH_RX );
+	transmitByte( FLUSH_RX );
 	digitalWrite( radio->pinSS, HIGH );
 
 	digitalWrite( radio->pinSS, LOW );
-	SPI.transfer( FLUSH_TX );
+	transmitByte( FLUSH_TX );
 	digitalWrite( radio->pinSS, HIGH );
 }
 
@@ -431,52 +431,52 @@ void printDebug( Radio* radio )
 	// Print status register
 	uint8_t status;
 	digitalWrite( radio->pinSS, LOW );
-	status = SPI.transfer( NOP );
+	status = transmitByte( NOP );
 	digitalWrite( radio->pinSS, HIGH );
-	Serial.print( "STATUS:     " );
-	Serial.println( status, BIN );
+	print( "STATUS:     " );
+	printFormat( status, BIN );
 
 	uint8_t addr[5] = {0,0,0,0,0};
 	
-	Serial.print( "RX_ADDR_P0: " );
-	readRegister( radio, RX_ADDR_P0, addr, 5 );
-	Serial.print( addr[0], HEX );
-	Serial.print( addr[1], HEX );
-	Serial.print( addr[2], HEX );
-	Serial.print( addr[3], HEX );
-	Serial.println( addr[4], HEX );
+	print( "RX_ADDR_P0: " );
+	readRegisterBytes( radio, RX_ADDR_P0, addr, 5 );
+	printFormat( addr[0], HEX );
+	printFormat( addr[1], HEX );
+	printFormat( addr[2], HEX );
+	printFormat( addr[3], HEX );
+	printFormat( addr[4], HEX );
 	
-	Serial.print( "RX_ADDR_P1: " );
-	readRegister( radio, RX_ADDR_P1, addr, 5 );
-	Serial.print( addr[0], HEX );
-	Serial.print( addr[1], HEX );
-	Serial.print( addr[2], HEX );
-	Serial.print( addr[3], HEX );
-	Serial.println( addr[4], HEX );
+	print( "RX_ADDR_P1: " );
+	readRegisterBytes( radio, RX_ADDR_P1, addr, 5 );
+	printFormat( addr[0], HEX );
+	printFormat( addr[1], HEX );
+	printFormat( addr[2], HEX );
+	printFormat( addr[3], HEX );
+	printFormat( addr[4], HEX );
 
-	Serial.print( "TX_ADDR:    " );
-	readRegister( radio, TX_ADDR, addr, 5 );
-	Serial.print( addr[0], HEX );
-	Serial.print( addr[1], HEX );
-	Serial.print( addr[2], HEX );
-	Serial.print( addr[3], HEX );
-	Serial.println( addr[4], HEX );
+	print( "TX_ADDR:    " );
+	readRegisterBytes( radio, TX_ADDR, addr, 5 );
+	printFormat( addr[0], HEX );
+	printFormat( addr[1], HEX );
+	printFormat( addr[2], HEX );
+	printFormat( addr[3], HEX );
+	printFormat( addr[4], HEX );
 
-	Serial.print( "RX_PW_P0:   " );
-	Serial.println( readRegister( radio, RX_PW_P0 ), DEC );
-	Serial.print( "RX_PW_P1:   " );
-	Serial.println( readRegister( radio, RX_PW_P1 ), DEC );
+	print( "RX_PW_P0:   " );
+	printFormat( readRegister( radio, RX_PW_P0 ), DEC );
+	print( "RX_PW_P1:   " );
+	printFormat( readRegister( radio, RX_PW_P1 ), DEC );
 
-	Serial.print( "EN_AA:      " );
-	Serial.println( readRegister( radio, EN_AA ), BIN );
-	Serial.print( "EN_RXADDR:  " );
-	Serial.println( readRegister( radio, EN_RXADDR ), BIN );
-	Serial.print( "RF_CH:      " );
-	Serial.println( readRegister( radio, RF_CH ), BIN );
-	Serial.print( "RF_SETUP:   " );
-	Serial.println( readRegister( radio, RF_SETUP ), BIN );
-	Serial.print( "CONFIG:     " );
-	Serial.println( readRegister( radio, CONFIG ), BIN );
-	Serial.print( "DYNPD:      " );
-	Serial.println( readRegister( radio, DYNPD ), BIN );
+	print( "EN_AA:      " );
+	printFormat( readRegister( radio, EN_AA ), BIN );
+	print( "EN_RXADDR:  " );
+	printFormat( readRegister( radio, EN_RXADDR ), BIN );
+	print( "RF_CH:      " );
+	printFormat( readRegister( radio, RF_CH ), BIN );
+	print( "RF_SETUP:   " );
+	printFormat( readRegister( radio, RF_SETUP ), BIN );
+	print( "CONFIG:     " );
+	printFormat( readRegister( radio, CONFIG ), BIN );
+	print( "DYNPD:      " );
+	printFormat( readRegister( radio, DYNPD ), BIN );
 }
