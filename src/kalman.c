@@ -52,8 +52,8 @@ void setKalman(char*, char*);
 void initFilter()
 {
 	addTelemetryEventHandler(setKalman);
-	addTelemetryEventHandler(setKalmanRow);
-	kalman = kalmaninitial;
+	//addTelemetryEventHandler(setKalmanRow);
+	kalman = (float*)kalmaninitial;
 }
 
 void updateFilter()
@@ -200,17 +200,15 @@ void setKalman(char *key, char *valuesString)
 	}
 }
 
-void setKalmanRow(char *key, char *valuesString)
+/*void setKalmanRow(char *key, char *valuesString)
 {
 	/* Event handler for the "setKalmanRow" key.
 	 * Parse valuesString into a row number i, and 5 values.
 	 * Place the 5 values into the ith row of the kalman matrix.
 	 */
-
+/*
 	if( strcmp( key, "setKalmanRow") == 0 )
 	{
-		uint8_t row = getNextInt(valuesString);
-		uint8_t comma = findComma(valuesString);
-		kalman[row] = parsetoArray(substring(valuesString, comma));
+		kalman[row] = parseToArray(valuesString);
 	}
-}
+}*/

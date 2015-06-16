@@ -7,11 +7,11 @@
 #include "common.h"
 #include <math.h>
 
-float **parseto2DArray(char *string)
+float *parseto2DArray(char *string)
 {	/* To-do.
 	 * Parses a two-dimensional array out of a string of values. 
 	 */
-	return (float**) 0;
+	return (float*) 0;
 }
 
 float *parsetoArray(char *string)
