@@ -19,20 +19,21 @@ errParams headingParams, speedParams;
 const float magneticDeclination;
 
 /* Forward declarations */
-telemetryEventHandler setHeadingPID, setMotionPID;
-float findCorrection(float, vector)
+void setSpeedPID(char*, char*);
+void setHeadingPID(char*, char*);
+float findCorrection(float, float);
 
 
 void initNav()
 {
 
-	initmap(map);
+	initMap(map); /* Map is defined in common.h */
 
 	setErrParams(&headingParams, 3.f, 2.f, 0.1f, .1f); /* Heading PID values. */
 
 	/* Event Handlers */
 	addTelemetryEventHandler(setHeadingPID);
-	addTelemetryEventHandler(setMotionPID);
+	addTelemetryEventHandler(setSpeedPID);
 }
 
 void updateNav()
@@ -55,7 +56,7 @@ void updateNav()
 
 	NavData = getNavData();
   
-	headingDiff = findCorrection(NavData.heading, getDesiredHeading(NavData.position);
+	headingDiff = findCorrection(NavData->heading, getDesiredHeading(NavData->position));
   
 	adjustedHeading = pidAdjust(headingDiff, &headingParams);
   
@@ -98,7 +99,7 @@ void setHeadingPID(char *key, char *paramsString)
   
  	if ( strcmp(key, "setHeadingPID") == 0 )
 	{
-		float *params = parseToArray(paramsString, 4);
+		float* params = parseToArray(paramsString);
 		setErrParams( &headingParams, params[0], params[1], params[2], params[3] );
 	}	
 }
@@ -108,7 +109,7 @@ void setMotionPID(char *key, char *paramsString)
 	
 	if ( strcmp(key, "setMotionPID") == 0 )
 	{
-		float *params = parseToArray(paramsString, 4);
+		float* params = parseToArray(paramsString);
 		setErrParams( &headingParams, params[0], params[1], params[2], params[3] );
 	}	
 }
