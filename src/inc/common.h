@@ -70,6 +70,17 @@ vector diff(vector, vector);
 uint8_t max(uint8_t, uint8_t);
 uint8_t min(uint8_t, uint8_t);
 
+/* Parsing */
+float *parseToArray(char *string, uint8_t length);
+float *parseToArrayOfUnknownSize(char *string);
+
+/* These two functions will ONLY accept the commas being
+ * right after the numbers, i.e.
+ * "10.0f, 10E2, .0002, 20" is a valid string, but
+ * "10.0f , 20E20 , 2" is not. The last element
+ * should not have a comma, either.
+ */
+
 /* UNIMPLEMENTED PROTOTYPES */
 void delay(uint8_t);
 void delayMicroseconds(uint8_t);
@@ -94,9 +105,6 @@ void spiSetClockDivider( uint8_t );
 #define OUTPUT 0x00
 void pinMode(uint8_t, uint8_t);
 #define _BV(val) ( 1<<(val) )
-
-float *parseTo2DArray(char *string);
-float *parseToArray(char *string);
 
 #endif
 

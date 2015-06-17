@@ -99,8 +99,9 @@ void setHeadingPID(char *key, char *paramsString)
   
  	if ( strcmp(key, "setHeadingPID") == 0 )
 	{
-		float* params = parseToArray(paramsString);
+		float* params = parseToArray(paramsString, 4);
 		setErrParams( &headingParams, params[0], params[1], params[2], params[3] );
+		free(params);
 	}	
 }
 
@@ -109,7 +110,8 @@ void setThrottlePID(char *key, char *paramsString)
 	
 	if ( strcmp(key, "setThrottlePID") == 0 )
 	{
-		float* params = parseToArray(paramsString);
+		float* params = parseToArray(paramsString, 4);
 		setErrParams( &throttleParams, params[0], params[1], params[2], params[3] );
+		free(params);
 	}	
 }

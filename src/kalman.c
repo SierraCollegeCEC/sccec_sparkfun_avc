@@ -195,20 +195,34 @@ void setKalman(char *key, char *valuesString)
 	if( strcmp(key, "setKalman") == 0 )
 	{
 		float *old = kalman;
-		kalman = parseTo2DArray(valuesString);
-		free(old);
+		kalman = parseToArray(valuesString, NAV_DATA_FIELDS * SENSOR_DATA_FIELDS);
+
+		if(old != (float*)kalmaninitial){
+			/* Do NOT try to free static memory. */
+			free(old);
+		}
 	}
 }
 
-/*void setKalmanRow(char *key, char *valuesString)
+void setKalmanRow(char *key, char *valuesString)
 {
 	/* Event handler for the "setKalmanRow" key.
 	 * Parse valuesString into a row number i, and 5 values.
 	 * Place the 5 values into the ith row of the kalman matrix.
 	 */
-/*
+
 	if( strcmp( key, "setKalmanRow") == 0 )
 	{
-		kalman[row] = parseToArray(valuesString);
+		/* A replacement row has a row index, and SENSOR_DATA_FIELDS elements. */
+		float* newRow = parseToArray(valuesString, SENSOR_DATA_FIELDS + 1);
+		uint8_t rowIndex = (int)newRow[0];
+		float* oldRow = &kalman[rowIndex];
+
+		for( uint8_t i = 0; i < SENSOR_DATA_FIELDS; i++ )
+		{
+			oldRow[i] = newRow[i+1];
+		}
+
+		free(newRow);
 	}
-}*/
+}

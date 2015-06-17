@@ -116,18 +116,52 @@ void pinMode(uint8_t pin, uint8_t mode)
 }
 #define _BV(val) ( 1<<(val) )
 
-float *parseTo2DArray(char *string)
-{	/* To-do.
-	 * Parses a two-dimensional array out of a string of values. 
-	 */
-	return (float*) 0;
+float *parseToArrayOfUnknownSize(char *string)
+{
+	/* Todo: Implement more robust solution than "10 curves sounds good enough */
+	float *arr = calloc(sizeof(float), 80);
+	char *comma = string;
+	char *focus = string;
+	uint8_t i = 0;
+
+	do{
+		arr[i++] = (float)strtod(focus, &comma);
+		focus = comma + 1;
+	} while(comma != '\0' || *comma != ' ');
+
+	return arr;
 }
 
-float *parseToArray(char *string)
-{	/* To-do
-	 * Parses an array out of a string of values.
+float *parseToArray(char *string, uint8_t length)
+{	/* Parses an array out of a string of values, and
+	 * returns a pointer to the malloc'd array.
 	 */
-	return (float*) 0;
+	float *arr = calloc(sizeof(float), length);
+	char *comma = string;
+	char *focus = string;
+
+	for(uint8_t i = 0; i < length; i++)
+	{
+		arr[i] = (float)strtod(focus, &comma);
+		if( comma != 0 )
+		{
+			focus = comma + 1;
+		}
+		else
+		{
+			for( uint8_t rest = i; rest < length; rest++)
+			{ /* Fill the rest of the array with 0s. */
+				arr[i] = 0.f;
+				/* What I'd really like to do is call an error
+				 * function and log this happening, along with
+				 * the name of the telemetry handler.
+				 */
+			}
+			break;
+		}
+	}
+
+	return arr;
 }
 
 float findAngle(vector vec)

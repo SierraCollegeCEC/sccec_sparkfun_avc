@@ -129,15 +129,15 @@ void updateTelemetry()
 		strBuffer[keyLen] = 0;
 
 		char* key = (char*)strBuffer;
-		char* val = "0.0";
+		char* val;
 
-		/* If this is a key:value command, create a string for the value and convert it to a float */
+		/* If this is a key:value command, create a string for the value(s) and pass it along */
 		if( colon )
 		{
 			int valLen = len - keyLen - 1;
 			memcpy( strBuffer + keyLen + 1, start + keyLen + 1, valLen );
 			strBuffer[keyLen + valLen + 1] = 0;
-			/*val = atof( (char*)(strBuffer + keyLen + 1) );*/
+			val = (char*)(strBuffer + keyLen + 1);
 		}
 
 #ifdef TELEMETRY_DEBUG

@@ -210,7 +210,7 @@ void setMapHandler(char *key, char* mapValues)
 {
 	if( strcmp(key, "setMap") == 0 )
 	{
-		float* mapArray = parseToArray(mapValues);
+		float* mapArray = parseToArrayOfUnknownSize(mapValues);
 		setMap(mapArray);
 		free(mapArray);
 	}
