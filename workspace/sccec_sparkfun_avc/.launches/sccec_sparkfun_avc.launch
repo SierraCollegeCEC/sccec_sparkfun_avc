@@ -5,7 +5,7 @@
 <stringAttribute key="com.ti.ccstudio.debug.debugModel.ATTR_PROGRAM.Texas Instruments XDS110 USB Debug Probe/CortexR4" value="${build_artifact:sccec_sparkfun_avc}"/>
 <stringAttribute key="com.ti.ccstudio.debug.debugModel.ATTR_PROJECT.Texas Instruments XDS110 USB Debug Probe/CortexR4" value="sccec_sparkfun_avc"/>
 <stringAttribute key="com.ti.ccstudio.debug.debugModel.ATTR_TARGET_CONFIG" value="${target_config_active_default:sccec_sparkfun_avc}"/>
-<stringAttribute key="com.ti.ccstudio.debug.debugModel.MRU_PROGRAM.Texas Instruments XDS110 USB Debug Probe/CortexR4" value="C:/Users\james\Projects\sccec_sparkfun_avc\workspace\sccec_sparkfun_avc\Debug\sccec_sparkfun_avc.out"/>
+<stringAttribute key="com.ti.ccstudio.debug.debugModel.MRU_PROGRAM.Texas Instruments XDS110 USB Debug Probe/CortexR4" value="C:/Users\Kristoffer\Documents\src\sccec_sparkfun_avc\workspace\sccec_sparkfun_avc\Debug\sccec_sparkfun_avc.out"/>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
 <listEntry value="/sccec_sparkfun_avc"/>
 </listAttribute>

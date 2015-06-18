@@ -1,7 +1,7 @@
 /** @file reg_gio.h
 *   @brief GIO Register Layer Header File
-*   @date 17.Nov.2014
-*   @version 04.02.00
+*   @date 03.Apr.2015
+*   @version 04.04.00
 *   
 *   This file contains:
 *   - Definitions
@@ -12,7 +12,7 @@
 */
 
 /* 
-* Copyright (C) 2009-2014 Texas Instruments Incorporated - http://www.ti.com/ 
+* Copyright (C) 2009-2015 Texas Instruments Incorporated - www.ti.com  
 * 
 * 
 *  Redistribution and use in source and binary forms, with or without 
@@ -80,6 +80,8 @@ typedef volatile struct gioBase
     uint32 FLG;       /**< 0x0020: Interrupt Flag Register */
     uint32 OFF1;      /**< 0x0024: Interrupt Offset A Register */
     uint32 OFF2;      /**< 0x0028: Interrupt Offset B Register */
+    uint32 EMU1;      /**< 0x002C: Emulation 1 Register */
+	uint32 EMU2;      /**< 0x0030: Emulation 2 Register */
 } gioBASE_t;
 
 

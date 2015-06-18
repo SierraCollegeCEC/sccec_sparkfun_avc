@@ -28,10 +28,14 @@
  *                                                                    MISRA C fixes.
  * 01.21.00		  15Oct2014     Vishwanath Reddy     SDOCM00113379    RAM Optimization changes. Added mew ,acro 
  *                                                                    TI_FEE_TOTAL_BLOCKS_DATASETS 
+ * 01.22.00		  26Dec2014     Vishwanath Reddy     SDOCM00114423    Following new macros added.
+ *                                                                    TI_FEE_VIRTUALSECTOR_SIZE, 
+ *                                                                    TI_FEE_PHYSICALSECTOR_SIZE, 
+ *                                                                    TI_FEE_GENERATE_DEVICEANDVIRTUALSECTORSTRUC. 
  *********************************************************************************************************************/
    
 /*
-* Copyright (C) 2009-2014 Texas Instruments Incorporated - http://www.ti.com/ 
+* Copyright (C) 2009-2015 Texas Instruments Incorporated - www.ti.com  
 * 
 * 
 *  Redistribution and use in source and binary forms, with or without 
@@ -142,6 +146,12 @@
 #endif
 /*SAFETYMCUSW 79 S MR:19.4 <APPROVED> "Reason - FEE_TOTAL_BLOCKS_DATASETS is a symbolic constant."*/
 #define TI_FEE_TOTAL_BLOCKS_DATASETS			FEE_TOTAL_BLOCKS_DATASETS
+/*SAFETYMCUSW 79 S MR:19.4 <APPROVED> "Reason - FEE_VIRTUALSECTOR_SIZE is a symbolic constant."*/
+#define TI_FEE_VIRTUALSECTOR_SIZE				FEE_VIRTUALSECTOR_SIZE
+/*SAFETYMCUSW 79 S MR:19.4 <APPROVED> "Reason - FEE_PHYSICALSECTOR_SIZE is a symbolic constant."*/
+#define TI_FEE_PHYSICALSECTOR_SIZE				FEE_PHYSICALSECTOR_SIZE
+/*SAFETYMCUSW 79 S MR:19.4 <APPROVED> "Reason - FEE_GENERATE_DEVICEANDVIRTUALSECTORSTRUC is a symbolic constant."*/
+#define TI_FEE_GENERATE_DEVICEANDVIRTUALSECTORSTRUC	FEE_GENERATE_DEVICEANDVIRTUALSECTORSTRUC
 
 /*----------------------------------------------------------------------------*/
 /* Virtual Sector Configuration                                               */
@@ -159,8 +169,6 @@
 /* Block Configuration                                                        */
 /*SAFETYMCUSW 79 S MR:19.4 <APPROVED> "Reason - FEE_NUMBER_OF_BLOCKS is a symbolic constant."*/
 #define TI_FEE_NUMBER_OF_BLOCKS  				FEE_NUMBER_OF_BLOCKS
-
-
 #endif	/* TI_FEE_DRIVER */
 
 #endif /* FEE_INTERFACE_H */

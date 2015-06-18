@@ -1,40 +1,40 @@
-/** @file i2c.c 
+/** @file i2c.c
 *   @brief I2C Driver Implementation File
-*   @date 17.Nov.2014
-*   @version 04.02.00
+*   @date 03.Apr.2015
+*   @version 04.04.00
 *
 */
 
-/* 
-* Copyright (C) 2009-2014 Texas Instruments Incorporated - http://www.ti.com/ 
-* 
-* 
-*  Redistribution and use in source and binary forms, with or without 
-*  modification, are permitted provided that the following conditions 
+/*
+* Copyright (C) 2009-2015 Texas Instruments Incorporated - www.ti.com
+*
+*
+*  Redistribution and use in source and binary forms, with or without
+*  modification, are permitted provided that the following conditions
 *  are met:
 *
-*    Redistributions of source code must retain the above copyright 
+*    Redistributions of source code must retain the above copyright
 *    notice, this list of conditions and the following disclaimer.
 *
 *    Redistributions in binary form must reproduce the above copyright
-*    notice, this list of conditions and the following disclaimer in the 
-*    documentation and/or other materials provided with the   
+*    notice, this list of conditions and the following disclaimer in the
+*    documentation and/or other materials provided with the
 *    distribution.
 *
 *    Neither the name of Texas Instruments Incorporated nor the names of
 *    its contributors may be used to endorse or promote products derived
 *    from this software without specific prior written permission.
 *
-*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-*  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+*  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-*  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
-*  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
-*  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+*  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+*  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+*  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
 *  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
 *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-*  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
-*  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+*  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+*  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 */
@@ -82,32 +82,32 @@ void i2cInit(void)
     i2cREG1->MDR = (uint32)((uint32)0U << 5U);
 
     /** - set i2c mode */
-    i2cREG1->MDR =   (uint32)((uint32)0U << 15U)     /* nack mode                         */           
-                   | (uint32)((uint32)0U << 14U)     /* free running                      */           
-                   | (uint32)(0U)              /* start condition - master only     */    
-                   | (uint32)((uint32)1U <<11U)      /* stop condition                    */ 
-                   | (uint32)((uint32)1U <<10U)      /* Master/Slave mode                 */ 
-                   | (uint32)((uint32)I2C_TRANSMITTER)     /* Transmitter/receiver              */ 
-                   | (uint32)((uint32)I2C_7BIT_AMODE)      /* xpanded address                   */ 
-                   | (uint32)((uint32)0U << 7U)      /* repeat mode                       */ 
+    i2cREG1->MDR =   (uint32)((uint32)0U << 15U)     /* nack mode                         */
+                   | (uint32)((uint32)0U << 14U)     /* free running                      */
+                   | (uint32)(0U)              /* start condition - master only     */
+                   | (uint32)((uint32)1U <<11U)      /* stop condition                    */
+                   | (uint32)((uint32)1U <<10U)      /* Master/Slave mode                 */
+                   | (uint32)((uint32)I2C_TRANSMITTER)     /* Transmitter/receiver              */
+                   | (uint32)((uint32)I2C_7BIT_AMODE)      /* xpanded address                   */
+                   | (uint32)((uint32)0U << 7U)      /* repeat mode                       */
                    | (uint32)((uint32)0U << 6U)     /* digital loop back                  */
-                   | (uint32)((uint32)0U << 4U)     /* start byte - master only          */ 
-                   | (uint32)((uint32)0U << 3U)           /* free data format                  */ 
-                   | (uint32)(I2C_8_BIT);   /* bit count                         */ 
+                   | (uint32)((uint32)0U << 4U)     /* start byte - master only          */
+                   | (uint32)((uint32)0U << 3U)           /* free data format                  */
+                   | (uint32)(I2C_8_BIT);   /* bit count                         */
 
 
     /** - set i2c Backward Compatibility mode */
     i2cREG1->EMDR = 0U;
 
-	/** - Disable DMA */
+    /** - Disable DMA */
     i2cREG1->DMACR = 0x00U;
-	
+
     /** - set i2c data count */
-    i2cREG1->CNT = 8U;
+    i2cREG1->CNT = 10U;
 
     /** - disable all interrupts */
-    i2cREG1->IMR = 0x00U;    
-	
+    i2cREG1->IMR = 0x00U;
+
     /** - set prescale */
     i2cREG1->PSC = 9U;
 
@@ -146,11 +146,11 @@ void i2cInit(void)
                   | (uint32)((uint32)0U << 2U)     /* Register Access ready interrupt */
                   | (uint32)((uint32)0U << 1U)     /* No Acknowledgement interrupt    */
                   | (uint32)((uint32)0U);     /* Arbitration Lost interrupt      */
-        
-	/** - i2c Out of reset */
+
+    /** - i2c Out of reset */
     i2cREG1->MDR |= (uint32)I2C_RESET_OUT;
-    
-	/** - initialize global transfer variables */
+
+    /** - initialize global transfer variables */
     g_i2cTransfer_t.mode   = (uint32)0U << 4U;
     g_i2cTransfer_t.length = 0U;
 
@@ -200,8 +200,8 @@ void i2cSetSlaveAdd(i2cBASE_t *i2c, uint32 sadd)
 void i2cSetBaudrate(i2cBASE_t *i2c, uint32 baud)
 {
     uint32 prescale;
-    uint32 d;    
-    uint32 ck;    
+    uint32 d;
+    uint32 ck;
     float64 vclk = 80.000F * 1000000.0F;
     float64 divider= 0.0F;
     uint32 temp = 0U;
@@ -227,8 +227,8 @@ void i2cSetBaudrate(i2cBASE_t *i2c, uint32 baud)
 
     i2c->PSC = prescale;
     i2c->CKH = ck;
-    i2c->CKL = ck;    
-	
+    i2c->CKL = ck;
+
 /* USER CODE BEGIN (6) */
 /* USER CODE END */
 
@@ -335,8 +335,8 @@ void i2cSendByte(i2cBASE_t *i2c, uint8 byte)
 /* USER CODE END */
 
     /*SAFETYMCUSW 28 D MR:NA <APPROVED> "Potentially infinite loop found - Hardware Status check for execution sequence" */
-    while ((i2c->STR & (uint32)I2C_TX_INT) == 0U) 
-    { 
+    while ((i2c->STR & (uint32)I2C_TX_INT) == 0U)
+    {
     } /* Wait */
     i2c->DXR = (uint32)byte;
 
@@ -356,7 +356,7 @@ void i2cSendByte(i2cBASE_t *i2c, uint8 byte)
 *   mode transmission of the first byte is started and the routine
 *   returns immediately, i2cSend must not be called again until the
 *   transfer is complete, when the i2cNotification callback will
-*   be called.  In polling mode, i2cSend will not return  until 
+*   be called.  In polling mode, i2cSend will not return  until
 *   the transfer is complete.
 *
 *   @note if data word is less than 8 bits, then the data must be left
@@ -373,20 +373,20 @@ void i2cSend(i2cBASE_t *i2c, uint32 length, uint8 * data)
 
     if ((g_i2cTransfer_t.mode & (uint32)I2C_TX_INT) != 0U)
     {
-        /* Interrupt mode */   
+        /* Interrupt mode */
         /*SAFETYMCUSW 45 D MR:21.1 <APPROVED> "Valid non NULL input parameters are only allowed in this driver" */
         g_i2cTransfer_t.data   = data;
-        /* start transmit by sending first byte */  
-        /*SAFETYMCUSW 45 D MR:21.1 <APPROVED> "Valid non NULL input parameters are only allowed in this driver" */        
+        /* start transmit by sending first byte */
+        /*SAFETYMCUSW 45 D MR:21.1 <APPROVED> "Valid non NULL input parameters are only allowed in this driver" */
         i2c->DXR = (uint32)(*g_i2cTransfer_t.data);
-        /*SAFETYMCUSW 45 D MR:21.1 <APPROVED> "Valid non NULL input parameters are only allowed in this driver" */                
+        /*SAFETYMCUSW 45 D MR:21.1 <APPROVED> "Valid non NULL input parameters are only allowed in this driver" */
         /*SAFETYMCUSW 567 S MR:17.1,17.4 <APPROVED> "Pointer increment needed" */
-		g_i2cTransfer_t.data++;
-		
-		/* Length -1 since one data is written already */
-		g_i2cTransfer_t.length = (length - 1U);
-		
-		/* Enable Transmit Interrupt */
+        g_i2cTransfer_t.data++;
+
+        /* Length -1 since one data is written already */
+        g_i2cTransfer_t.length = (length - 1U);
+
+        /* Enable Transmit Interrupt */
         i2c->IMR |= (uint32)I2C_TX_INT;
     }
     else
@@ -395,14 +395,14 @@ void i2cSend(i2cBASE_t *i2c, uint32 length, uint8 * data)
         while (length > 0U)
         {
             /*SAFETYMCUSW 28 D MR:NA <APPROVED> "Potentially infinite loop found - Hardware Status check for execution sequence" */
-            while ((i2c->STR & (uint32)I2C_TX_INT) == 0U) 
-            { 
+            while ((i2c->STR & (uint32)I2C_TX_INT) == 0U)
+            {
             } /* Wait */
             /*SAFETYMCUSW 45 D MR:21.1 <APPROVED> "Valid non NULL input parameters are only allowed in this driver" */
             i2c->DXR = (uint32)(*data);
             /*SAFETYMCUSW 45 D MR:21.1 <APPROVED> "Valid non NULL input parameters are only allowed in this driver" */
             /*SAFETYMCUSW 567 S MR:17.1,17.4 <APPROVED> "Pointer increment needed" */
-			data++;
+            data++;
             length--;
         }
     }
@@ -439,8 +439,8 @@ uint32 i2cIsRxReady(i2cBASE_t *i2c)
 *
 *   @return The Stop Condition Detected flag
 *
-*   Checks to see if the Stop Condition Detected flag is set, 
-*   returns 0 if flags not set otherwise will return the Stop 
+*   Checks to see if the Stop Condition Detected flag is set,
+*   returns 0 if flags not set otherwise will return the Stop
 *   Condition Detected flag itself.
 */
 /* SourceId : I2C_SourceId_023 */
@@ -471,10 +471,10 @@ uint32 i2cRxError(i2cBASE_t *i2c)
 /* USER CODE END */
 
     i2c->STR = (uint32)((uint32)I2C_AL_INT | (uint32)I2C_NACK_INT);
-    
+
 /* USER CODE BEGIN (22) */
 /* USER CODE END */
-    
+
     return status;
 
 }
@@ -494,7 +494,7 @@ void i2cClearSCD(i2cBASE_t *i2c)
 /* USER CODE END */
 
     i2c->STR = (uint32)I2C_SCD_INT;
-    
+
 /* USER CODE BEGIN (24) */
 /* USER CODE END */
 }
@@ -516,8 +516,8 @@ void i2cClearSCD(i2cBASE_t *i2c)
 uint8 i2cReceiveByte(i2cBASE_t *i2c)
 {
     /*SAFETYMCUSW 28 D MR:NA <APPROVED> "Potentially infinite loop found - Hardware Status check for execution sequence" */
-    while ((i2c->STR & (uint32)I2C_RX_INT) == 0U) 
-    { 
+    while ((i2c->STR & (uint32)I2C_RX_INT) == 0U)
+    {
     } /* Wait */
 /* USER CODE BEGIN (25) */
 /* USER CODE END */
@@ -531,12 +531,12 @@ uint8 i2cReceiveByte(i2cBASE_t *i2c)
 *   @param[in] length - number of data words to transfer
 *   @param[in] data   - pointer to data buffer
 *
-*   Receive a block of 'length' bytes long and place it into the 
-*   data buffer pointed to by 'data'.  If interrupts have been 
+*   Receive a block of 'length' bytes long and place it into the
+*   data buffer pointed to by 'data'.  If interrupts have been
 *   enabled the data is received using interrupt mode, otherwise
 *   polling mode is used.  In interrupt mode receive is setup and
-*   the routine returns immediately, i2cReceive must not be called 
-*   again until the transfer is complete, when the i2cNotification 
+*   the routine returns immediately, i2cReceive must not be called
+*   again until the transfer is complete, when the i2cNotification
 *   callback will be called.  In polling mode, i2cReceive will not
 *   return  until the transfer is complete.
 */
@@ -555,7 +555,7 @@ void i2cReceive(i2cBASE_t *i2c, uint32 length, uint8 * data)
         i2c->STR = (uint32)I2C_AL_INT | (uint32)I2C_NACK_INT;
 
         g_i2cTransfer_t.length = length;
-        /*SAFETYMCUSW 45 D MR:21.1 <APPROVED> "Valid non NULL input parameters are only allowed in this driver" */      
+        /*SAFETYMCUSW 45 D MR:21.1 <APPROVED> "Valid non NULL input parameters are only allowed in this driver" */
         g_i2cTransfer_t.data   = data;
     }
     else
@@ -563,14 +563,14 @@ void i2cReceive(i2cBASE_t *i2c, uint32 length, uint8 * data)
         while (length > 0U)
         {
             /*SAFETYMCUSW 28 D MR:NA <APPROVED> "Potentially infinite loop found - Hardware Status check for execution sequence" */
-            while ((i2c->STR & (uint32)I2C_RX_INT) == 0U) 
-            { 
+            while ((i2c->STR & (uint32)I2C_RX_INT) == 0U)
+            {
             } /* Wait */
             /*SAFETYMCUSW 45 D MR:21.1 <APPROVED> "Valid non NULL input parameters are only allowed in this driver" */
             *data = ((uint8)i2c->DRR);
             /*SAFETYMCUSW 45 D MR:21.1 <APPROVED> "Valid non NULL input parameters are only allowed in this driver" */
             /*SAFETYMCUSW 567 S MR:17.1,17.4 <APPROVED> "Pointer increment needed" */
-			data++;
+            data++;
             length--;
         }
     }
@@ -594,7 +594,7 @@ void i2cEnableLoopback(i2cBASE_t *i2c)
 /* USER CODE END */
 
     /* enable digital loopback    */
-    i2c->MDR |= ((uint32)1U << 6U); 
+    i2c->MDR |= ((uint32)1U << 6U);
 
 /* USER CODE BEGIN (29) */
 /* USER CODE END */
@@ -613,9 +613,9 @@ void i2cDisableLoopback(i2cBASE_t *i2c)
 {
 /* USER CODE BEGIN (30) */
 /* USER CODE END */
-    
+
     /* Disable Loopback Mode */
-    i2c->MDR &= 0xFFFFFFBFU; 
+    i2c->MDR &= 0xFFFFFFBFU;
 
 /* USER CODE BEGIN (31) */
 /* USER CODE END */
@@ -664,7 +664,7 @@ void i2cEnableNotification(i2cBASE_t *i2c, uint32 flags)
 void i2cDisableNotification(i2cBASE_t *i2c, uint32 flags)
 {
     uint32 int_mask;
-    
+
 /* USER CODE BEGIN (33) */
 /* USER CODE END */
 
@@ -682,15 +682,17 @@ void i2cDisableNotification(i2cBASE_t *i2c, uint32 flags)
 *                      I2C_SLAVE     - Slave Mode
 */
 /* SourceId : I2C_SourceId_020 */
-/* DesignId : I2C_DesignId_020 */
+/* DesignId : I2C_DesignId_024 */
 /* Requirements : HL_SR526 */
 void i2cSetMode(i2cBASE_t *i2c, uint32 mode)
 {
+	uint32  temp_mdr;
 /* USER CODE BEGIN (34) */
 /* USER CODE END */
-
-    /* set Master / Slave Mode */
-    i2c->MDR |= mode;
+	
+    /* set Master or Slave Mode */
+	temp_mdr  = (i2c->MDR & (~I2C_MASTER));
+    i2c->MDR  = (temp_mdr | mode);
 
 /* USER CODE BEGIN (35) */
 /* USER CODE END */
@@ -700,15 +702,15 @@ void i2cSetMode(i2cBASE_t *i2c, uint32 mode)
 /** @fn void i2cGetConfigValue(i2c_config_reg_t *config_reg, config_value_type_t type)
 *   @brief Get the initial or current values of the I2C configuration registers
 *
-*   @param[in] *config_reg: pointer to the struct to which the initial or current 
+*   @param[in] *config_reg: pointer to the struct to which the initial or current
 *                           value of the configuration registers need to be stored
 *   @param[in] type:    whether initial or current value of the configuration registers need to be stored
-*                       - InitialValue: initial value of the configuration registers will be stored 
+*                       - InitialValue: initial value of the configuration registers will be stored
 *                                       in the struct pointed by config_reg
-*                       - CurrentValue: initial value of the configuration registers will be stored 
+*                       - CurrentValue: initial value of the configuration registers will be stored
 *                                       in the struct pointed by config_reg
 *
-*   This function will copy the initial or current value (depending on the parameter 'type') 
+*   This function will copy the initial or current value (depending on the parameter 'type')
 *   of the configuration registers to the struct pointed by config_reg
 *
 */
@@ -730,29 +732,29 @@ void i2cGetConfigValue(i2c_config_reg_t *config_reg, config_value_type_t type)
         config_reg->CONFIG_PSC  = I2C_PSC_CONFIGVALUE;
         config_reg->CONFIG_DMAC = I2C_DMAC_CONFIGVALUE;
         config_reg->CONFIG_FUN  = I2C_FUN_CONFIGVALUE;
-        config_reg->CONFIG_DIR  = I2C_DIR_CONFIGVALUE;  
-        config_reg->CONFIG_ODR  = I2C_ODR_CONFIGVALUE;      
-        config_reg->CONFIG_PD   = I2C_PD_CONFIGVALUE;   
-        config_reg->CONFIG_PSL  = I2C_PSL_CONFIGVALUE;  
+        config_reg->CONFIG_DIR  = I2C_DIR_CONFIGVALUE;
+        config_reg->CONFIG_ODR  = I2C_ODR_CONFIGVALUE;
+        config_reg->CONFIG_PD   = I2C_PD_CONFIGVALUE;
+        config_reg->CONFIG_PSL  = I2C_PSL_CONFIGVALUE;
     }
     else
     {
     /*SAFETYMCUSW 134 S MR:12.2 <APPROVED> "LDRA Tool issue" */
-        config_reg->CONFIG_OAR  = i2cREG1->OAR; 
-        config_reg->CONFIG_IMR  = i2cREG1->IMR;  
-        config_reg->CONFIG_CLKL = i2cREG1->CKL; 
-        config_reg->CONFIG_CLKH = i2cREG1->CKH; 
-        config_reg->CONFIG_CNT  = i2cREG1->CNT;  
-        config_reg->CONFIG_SAR  = i2cREG1->SAR;  
-        config_reg->CONFIG_MDR  = i2cREG1->MDR;  
-        config_reg->CONFIG_EMDR = i2cREG1->EMDR; 
-        config_reg->CONFIG_PSC  = i2cREG1->PSC;  
-        config_reg->CONFIG_DMAC = i2cREG1->DMACR; 
-        config_reg->CONFIG_FUN  = i2cREG1->PFNC;  
-        config_reg->CONFIG_DIR  = i2cREG1->DIR;  
-        config_reg->CONFIG_ODR  = i2cREG1->PDR;  
-        config_reg->CONFIG_PD   = i2cREG1->PDIS;    
-        config_reg->CONFIG_PSL  = i2cREG1->PSEL;    
+        config_reg->CONFIG_OAR  = i2cREG1->OAR;
+        config_reg->CONFIG_IMR  = i2cREG1->IMR;
+        config_reg->CONFIG_CLKL = i2cREG1->CKL;
+        config_reg->CONFIG_CLKH = i2cREG1->CKH;
+        config_reg->CONFIG_CNT  = i2cREG1->CNT;
+        config_reg->CONFIG_SAR  = i2cREG1->SAR;
+        config_reg->CONFIG_MDR  = i2cREG1->MDR;
+        config_reg->CONFIG_EMDR = i2cREG1->EMDR;
+        config_reg->CONFIG_PSC  = i2cREG1->PSC;
+        config_reg->CONFIG_DMAC = i2cREG1->DMACR;
+        config_reg->CONFIG_FUN  = i2cREG1->PFNC;
+        config_reg->CONFIG_DIR  = i2cREG1->DIR;
+        config_reg->CONFIG_ODR  = i2cREG1->PDR;
+        config_reg->CONFIG_PD   = i2cREG1->PDIS;
+        config_reg->CONFIG_PSL  = i2cREG1->PSEL;
     }
 }
 
@@ -783,30 +785,33 @@ void i2cSetDirection(i2cBASE_t *i2c, uint32 dir)
 
 /** @fn i2cIsMasterReady(i2cBASE_t *i2c)
 *   @brief Indicates whether MST bit is set or cleared to indicate that stop
-* 	condition was generated. This API should be called after Master Tx or Rx
-*	to check if the transaction is complete.
+*   condition was generated. This API should be called after Master Tx or Rx
+*   to check if the transaction is complete.
 *   @param[in] i2c   - i2c module base address
 *   @return boolean value to indicate whether MST bit is cleared after STOP bit is generated.
-*			- TRUE, if MST bit is cleared.
-*			- FALSE, if MST bit is set.
+*           - TRUE, if MST bit is cleared.
+*           - FALSE, if MST bit is set.
 */
-/* SourceId : I2C_SourceId_020 */
-/* DesignId : I2C_DesignId_020 */
+/* SourceId : I2C_SourceId_025 */
+/* DesignId : I2C_DesignId_025 */
 /* Requirements : HL_SR541 */
 bool i2cIsMasterReady(i2cBASE_t *i2c)
 {
-	bool retVal = 0U;
+    bool retVal = 0U;
 /* USER CODE BEGIN (49) */
 /* USER CODE END */
 
     /* check if MST bit is cleared. */
     if((i2c->MDR & I2C_MASTER) == 0)
-		retVal = true;
-	else
-		retVal = false;
-		
-	return retVal;
-		
+    {
+        retVal = true;
+    }
+    else
+    {
+        retVal = false;
+    }
+    return retVal;
+
 /* USER CODE BEGIN (50) */
 /* USER CODE END */
 }
@@ -815,26 +820,29 @@ bool i2cIsMasterReady(i2cBASE_t *i2c)
 *   @brief Returns the state of the bus busy flag. True if it is set and false otherwise.
 *   @param[in] i2c   - i2c module base address
 *   @return boolean value to indicate whether BB bit is set in the status register.
-*			- TRUE, if BB bit is set.
-*			- FALSE, if BB bit is cleared.
+*           - TRUE, if BB bit is set.
+*           - FALSE, if BB bit is cleared.
 */
-/* SourceId : I2C_SourceId_020 */
-/* DesignId : I2C_DesignId_020 */
+/* SourceId : I2C_SourceId_026 */
+/* DesignId : I2C_DesignId_026 */
 /* Requirements : HL_SR542 */
 bool i2cIsBusBusy(i2cBASE_t *i2c)
 {
-	bool retVal = 0U;
+    bool retVal = 0U;
 /* USER CODE BEGIN (51) */
 /* USER CODE END */
 
     /* check if BB bit is set. */
     if((i2c->STR & I2C_BUSBUSY) == I2C_BUSBUSY)
-		retVal = true;
-	else
-		retVal = false;
-		
-	return retVal;
-		
+    {
+        retVal = true;
+    }
+    else
+    {
+        retVal = false;
+    }
+    return retVal;
+
 /* USER CODE BEGIN (52) */
 /* USER CODE END */
 }

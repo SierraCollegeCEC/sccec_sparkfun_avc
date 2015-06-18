@@ -23,7 +23,7 @@
  *********************************************************************************************************************/
 
 /*
-* Copyright (C) 2009-2014 Texas Instruments Incorporated - http://www.ti.com/ 
+* Copyright (C) 2009-2015 Texas Instruments Incorporated - www.ti.com  
 * 
 * 
 *  Redistribution and use in source and binary forms, with or without 
@@ -62,7 +62,7 @@
 /**********************************************************************************************************************
  * INCLUDES
  *********************************************************************************************************************/
-#include "Device_header.h" 
+#include "Device_header.h"
 
 #ifndef TI_Fee_None
 #define TI_Fee_None 0x00U	/*Take no action on single bit errors, (respond with corrected data), */

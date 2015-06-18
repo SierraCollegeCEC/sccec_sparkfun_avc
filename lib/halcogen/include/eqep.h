@@ -1,12 +1,12 @@
 /** @file eqep.h
 *   @brief EQEP Driver Header File
-*   @date 17.Nov.2014
-*   @version 04.02.00
+*   @date 03.Apr.2015
+*   @version 04.04.00
 *   
 */
 
 /* 
-* Copyright (C) 2009-2014 Texas Instruments Incorporated - http://www.ti.com/ 
+* Copyright (C) 2009-2015 Texas Instruments Incorporated - www.ti.com  
 * 
 * 
 *  Redistribution and use in source and binary forms, with or without 
@@ -701,7 +701,6 @@ void eqepWritePosnCompare (eqepBASE_t *eqep, uint32 posn);
 *   @param[in] eqep		Handle to QEP object
 *   @param[in] flags			Copy of  interrupt flags
 */
-void 	eqepNotification(eqepBASE_t *eqep,uint16 flags);
 void 	eqepNotification(eqepBASE_t *eqep,uint16 flags);
 
 void eqep1GetConfigValue(eqep_config_reg_t *config_reg, config_value_type_t type);

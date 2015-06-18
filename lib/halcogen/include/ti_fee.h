@@ -46,10 +46,16 @@
  * 01.17.00		  15Oct2014    Vishwanath Reddy     SDOCM00113379    RAM Optimization changes.
  * 01.17.01		  30Oct2014    Vishwanath Reddy     SDOCM00113536    Support for TMS570LS07xx,TMS570LS09xx,
  *                                                                   TMS570LS05xx, RM44Lx. 
+ * 01.17.02		  26Dec2014    Vishwanath Reddy     SDOCM00114102    FLEE Errata Fix.
+ *                                                  SDOCM00114104    Change ALL 1's OK check condition.
+ *                                                                   Updated version info. Added new macros.
+ *                                                  SDOCM00114423	 Add new enum TI_Fee_DeviceType.
+ *                                                                   Add new variable TI_Fee_MaxSectors and 
+ *                                                                   prototype TI_FeeInternal_PopulateStructures. 
  *********************************************************************************************************************/
 
 /*
-* Copyright (C) 2009-2014 Texas Instruments Incorporated - http://www.ti.com/ 
+* Copyright (C) 2009-2015 Texas Instruments Incorporated - www.ti.com  
 * 
 * 
 *  Redistribution and use in source and binary forms, with or without 
@@ -101,7 +107,7 @@
 #define TI_FEE_PATCH_VERSION    2U
 #define TI_FEE_SW_MAJOR_VERSION 1U
 #define TI_FEE_SW_MINOR_VERSION 17U
-#define TI_FEE_SW_PATCH_VERSION 1U
+#define TI_FEE_SW_PATCH_VERSION 2U
 
 #define TI_FEE_VIRTUAL_SECTOR_VERSION 1U
 
@@ -130,6 +136,12 @@
 #define CorruptBlockLo		 0x00000000U
 
 #define FEE_BANK 0U
+
+/* Enable/Disable FEE sectors */
+#define FEE_DISABLE_SECTORS_31_00 0x00000000U
+#define FEE_DISABLE_SECTORS_63_32 0x00000000U
+#define FEE_ENABLE_SECTORS_31_00  0xFFFFFFFFU 
+#define FEE_ENABLE_SECTORS_63_32  0xFFFFFFFFU 
 
 /**********************************************************************************************************************
  *  GLOBAL DATA TYPES AND STRUCTURES
@@ -190,6 +202,13 @@ typedef enum
 	Suspend_Erase=0U,
 	Resume_Erase
 }TI_Fee_EraseCommandType;
+
+/* Enum to describe the Device types */
+typedef enum
+{
+   CHAMPION = 0U,               /* Function returned no error */
+   ARCHER = 1U             /* Function returned an error */
+} TI_Fee_DeviceType;
 
 typedef uint32 TI_Fee_AddressType;                     /* Used for defining variables to indicate number of 
                                                           bytes for address offset */
@@ -336,8 +355,15 @@ typedef struct
  *********************************************************************************************************************/
 /*  Fee Global Variables */
 extern const Fee_BlockConfigType Fee_BlockConfiguration[TI_FEE_NUMBER_OF_BLOCKS];
+#if (TI_FEE_GENERATE_DEVICEANDVIRTUALSECTORSTRUC == STD_OFF)
 extern const Fee_VirtualSectorConfigType Fee_VirtualSectorConfiguration[TI_FEE_NUMBER_OF_VIRTUAL_SECTORS];
 extern const Device_FlashType Device_FlashDevice;
+#endif
+#if (TI_FEE_GENERATE_DEVICEANDVIRTUALSECTORSTRUC == STD_ON)
+extern Fee_VirtualSectorConfigType Fee_VirtualSectorConfiguration[TI_FEE_NUMBER_OF_VIRTUAL_SECTORS];
+extern Device_FlashType Device_FlashDevice;
+extern uint8 TI_Fee_MaxSectors;
+#endif
 extern TI_Fee_GlobalVarsType TI_Fee_GlobalVariables[TI_FEE_NUMBER_OF_EEPS];
 extern TI_Fee_StatusWordType_UN TI_Fee_oStatusWord[TI_FEE_NUMBER_OF_EEPS];
 #if(TI_FEE_FLASH_CRC_ENABLE == STD_ON)
@@ -428,9 +454,13 @@ void TI_FeeInternal_StartProgramBlock(uint8 u8EEPIndex);
 void TI_FeeInternal_UpdateBlockOffsetArray(uint8 u8EEPIndex, boolean bActCpyVS,uint8 u8VirtualSector);
 void TI_FeeInternal_WriteInitialize(TI_Fee_AddressType oFlashNextAddress, uint8* DataBufferPtr, uint8 u8EEPIndex);
 void TI_FeeInternal_CheckForError(uint8 u8EEPIndex);
+void TI_FeeInternal_EnableRequiredFlashSector(uint32 u32VirtualSectorStartAddress);
 uint16 TI_FeeInternal_GetArrayIndex(uint16 BlockNumber, uint16 DataSetNumber, uint8 u8EEPIndex, boolean bCallContext);
 #if(TI_FEE_FLASH_CRC_ENABLE == STD_ON)
 uint32 TI_FeeInternal_Fletcher16( uint8 const *pu8data, uint16 u16Length);
+#endif
+#if (TI_FEE_GENERATE_DEVICEANDVIRTUALSECTORSTRUC == STD_ON)
+void TI_FeeInternal_PopulateStructures(TI_Fee_DeviceType DeviceType);
 #endif
 #endif /* TI_FEE_H */
 /**********************************************************************************************************************

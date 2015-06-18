@@ -1,7 +1,7 @@
 /** @file sys_startup.c 
 *   @brief Startup Source File
-*   @date 17.Nov.2014
-*   @version 04.02.00
+*   @date 03.Apr.2015
+*   @version 04.04.00
 *
 *   This file contains:
 *   - Include Files
@@ -14,7 +14,7 @@
 */
 
 /* 
-* Copyright (C) 2009-2014 Texas Instruments Incorporated - http://www.ti.com/ 
+* Copyright (C) 2009-2015 Texas Instruments Incorporated - www.ti.com 
 * 
 * 
 *  Redistribution and use in source and binary forms, with or without 
@@ -77,7 +77,7 @@ extern void __TI_auto_init(void);
 extern void main(void);
 /*SAFETYMCUSW 122 S MR:20.11 <APPROVED> "Startup code(exit and abort need to be present)" */
 /*SAFETYMCUSW 354 S MR:NA <APPROVED> " Startup code(Extern declaration present in the library)" */
-extern void exit(int);
+extern void exit(int _status);
 
 
 /* USER CODE BEGIN (3) */
@@ -113,13 +113,11 @@ void _c_int00(void)
 /* USER CODE BEGIN (7) */
 /* USER CODE END */
 
-
     /* Enable CPU Event Export */
     /* This allows the CPU to signal any single-bit or double-bit errors detected
      * by its ECC logic for accesses to program flash or data RAM.
      */
     _coreEnableEventBusExport_();
-
 /* USER CODE BEGIN (11) */
 /* USER CODE END */
 
@@ -250,12 +248,13 @@ void _c_int00(void)
 
 /* USER CODE BEGIN (26) */
 /* USER CODE END */
+
     /* Initialize System - Clock, Flash settings with Efuse self check */
     systemInit();
     
     /* Workaround for Errata PBIST#4 */
     errata_PBIST_4();
-
+	
     /* Run a diagnostic check on the memory self-test controller.
      * This function chooses a RAM test algorithm and runs it on an on-chip ROM.
      * The memory self-test is expected to fail. The function ensures that the PBIST controller
@@ -285,6 +284,9 @@ void _c_int00(void)
 
     }   
 	
+    /* Disable PBIST clocks and disable memory self-test mode */
+    pbistStop();
+
 	/* Run PBIST on PBIST ROM */
     pbistRun((uint32)PBIST_ROM_PBIST_RAM_GROUP,
              ((uint32)PBIST_TripleReadSlow | (uint32)PBIST_TripleReadFast));
@@ -305,9 +307,10 @@ void _c_int00(void)
          
         pbistFail();
 
-    }   
-
-
+    } 
+	
+    /* Disable PBIST clocks and disable memory self-test mode */
+    pbistStop();	
 /* USER CODE BEGIN (29) */
 /* USER CODE END */
 
@@ -359,6 +362,7 @@ void _c_int00(void)
 
     /* Disable PBIST clocks and disable memory self-test mode */
     pbistStop();
+
     
 /* USER CODE BEGIN (37) */
 /* USER CODE END */
@@ -383,12 +387,10 @@ void _c_int00(void)
 /* USER CODE BEGIN (39) */
 /* USER CODE END */
 
-
     /* Start PBIST on all dual-port memories */
     /* NOTE : Please Refer DEVICE DATASHEET for the list of Supported Dual port Memories.
        PBIST test performed only on the user selected memories in HALCoGen's GUI SAFETY INIT tab.
      */
-    
     pbistRun(  (uint32)0x00000000U    /* EMAC RAM */
              | (uint32)0x00000000U    /* USB RAM */  
              | (uint32)0x00000800U    /* DMA RAM */
@@ -412,7 +414,6 @@ void _c_int00(void)
 /* USER CODE BEGIN (40) */
 /* USER CODE END */
 
-
     /* Test the CPU ECC mechanism for RAM accesses.
      * The checkBxRAMECC functions cause deliberate single-bit and double-bit errors in TCRAM accesses
      * by corrupting 1 or 2 bits in the ECC. Reading from the TCRAM location with a 2-bit error
@@ -424,8 +425,6 @@ void _c_int00(void)
 
 /* USER CODE BEGIN (41) */
 /* USER CODE END */
-
-
 /* USER CODE BEGIN (43) */
 /* USER CODE END */
 
@@ -465,8 +464,6 @@ void _c_int00(void)
     /* Disable PBIST clocks and disable memory self-test mode */
     pbistStop();
     
-
-
 /* USER CODE BEGIN (55) */
 /* USER CODE END */
 

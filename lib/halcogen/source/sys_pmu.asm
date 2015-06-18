@@ -1,7 +1,7 @@
 ;-------------------------------------------------------------------------------
 ; sys_pmu.asm
 ;
-; Copyright (C) 2009-2014 Texas Instruments Incorporated - http://www.ti.com/ 
+; Copyright (C) 2009-2015 Texas Instruments Incorporated - www.ti.com 
 ; 
 ; 
 ;  Redistribution and use in source and binary forms, with or without 
@@ -61,6 +61,7 @@ _pmuInit_
         sub   r0,  r0,  #1
         mcr   p15, #0, r0, c9, c12, #3
         ; select counter 0 event
+		mov   r0,  #0
         mcr   p15, #0, r0, c9, c12, #5 ; select counter
         mov   r0,  #0x11
         mcr   p15, #0, r0, c9, c13, #1 ; select event
@@ -224,7 +225,6 @@ _pmuStopCounters_
 
 _pmuSetCountEvent_
 
-        lsr   r0,  r0, #1
         mcr   p15, #0, r0, c9, c12, #5 ; select counter
         mcr   p15, #0, r1, c9, c13, #1 ; select event
         bx    lr

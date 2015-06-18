@@ -1,7 +1,7 @@
 ;-------------------------------------------------------------------------------
 ; sys_core.asm
 ;
-; Copyright (C) 2009-2014 Texas Instruments Incorporated - http://www.ti.com/ 
+; Copyright (C) 2009-2015 Texas Instruments Incorporated - www.ti.com 
 ; 
 ; 
 ;  Redistribution and use in source and binary forms, with or without 
@@ -613,6 +613,9 @@ _disable_interrupt_
 
 ;-------------------------------------------------------------------------------
 ; Disable FIQ interrupt
+; SourceId : CORE_SourceId_026
+; DesignId : CORE_DesignId_026
+; Requirements: HL_SR494
 
         .def _disable_FIQ_interrupt_
         .asmfunc
