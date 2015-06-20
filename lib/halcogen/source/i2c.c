@@ -140,7 +140,7 @@ void i2cInit(void)
 
     /** - set interrupt enable */
     i2cREG1->IMR  = (uint32)((uint32)0U << 6U)     /* Address as slave interrupt      */
-                  | (uint32)((uint32)1U << 5U)     /* Stop Condition detect interrupt */
+                  | (uint32)((uint32)0U << 5U)     /* Stop Condition detect interrupt */
                   | (uint32)((uint32)0U << 4U)     /* Transmit data ready interrupt   */
                   | (uint32)((uint32)0U << 3U)     /* Receive data ready interrupt    */
                   | (uint32)((uint32)0U << 2U)     /* Register Access ready interrupt */
