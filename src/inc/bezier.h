@@ -8,7 +8,7 @@
 #define _BEZIER_H_
 #include "common.h"
 
-void initMap(void);
+void initMap(float* map);
 /* Initialize the control points defining the map. */
 
 float getDesiredHeading(vector currentPos);
