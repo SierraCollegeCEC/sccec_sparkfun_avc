@@ -7,6 +7,12 @@
 #ifndef _NAV_H_
 #define _NAV_H_
 
+#define M1HEADING 280
+
+/*
+  I'm assuming true north for this milestone.
+*/
+
 typedef struct s_motionData
 {
 	float heading;
@@ -16,7 +22,6 @@ typedef struct s_motionData
 motionData* getMotionData();
 void initNav();
 void updateNav();
-
 
 #endif
 
